@@ -162,7 +162,7 @@ export default function DashboardPage() {
         <h1 className="title">Analisis Detail Capaian</h1>
       </div>
 
-      <div className="grid grid-cols-2" style={{ gridTemplateColumns: '1fr 2fr' }}>
+      <div className="grid grid-cols-2" style={{ gridTemplateColumns: '300px 1fr', alignItems: 'start' }}>
         {/* Panel Kiri: Pemilihan Indikator */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           <div className="card">
@@ -319,64 +319,65 @@ export default function DashboardPage() {
             </div>
           )}
         </div>
-      </div>
-
-      {/* Rincian Per Tahun dipindah ke bawah agar melebar secara horizontal */}
-      <div style={{ marginTop: '2rem' }}>
-        <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0, marginBottom: '1.5rem', color: 'var(--text-main)' }}>
-          <TrendingUp size={20} color="var(--primary-color)" />
-          Rincian Per Tahun
-        </h3>
-        
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
-          {selectedData.length > 0 ? selectedData.map((row) => (
-            <div key={row.tahun} className="card" style={{ padding: '1.25rem' }}>
-              <h4 style={{ margin: '0 0 1rem 0', color: 'var(--primary-color)', borderBottom: '2px solid #f1f5f9', paddingBottom: '0.5rem' }}>
-                Tahun {row.tahun}
-              </h4>
-              <div style={{ overflowX: 'auto' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
-                  <thead>
-                    <tr style={{ borderBottom: '1px solid var(--border-color)', textAlign: 'left', color: 'var(--text-muted)' }}>
-                      <th style={{ padding: '0.5rem' }}>Status</th>
-                      <th style={{ padding: '0.5rem' }}>Nilai</th>
-                      <th style={{ padding: '0.5rem' }}>Label</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {['Semua', 'Negeri', 'Swasta'].map(status => {
-                      if (row[status] === undefined) return null;
-                      const label = row.labels[status];
-                      return (
-                        <tr key={status} style={{ borderBottom: '1px solid #f8fafc' }}>
-                          <td style={{ padding: '0.75rem 0.5rem', fontWeight: '500' }}>{status}</td>
-                          <td style={{ padding: '0.75rem 0.5rem' }}>{row.nilai_teks[status]}</td>
-                          <td style={{ padding: '0.75rem 0.5rem' }}>
-                            <span style={{ 
-                              padding: '0.2rem 0.5rem', 
-                              borderRadius: '4px', 
-                              backgroundColor: label?.toLowerCase().includes('baik') || label?.toLowerCase().includes('atas') ? '#dcfce7' : 
-                                               label?.toLowerCase().includes('kurang') || label?.toLowerCase().includes('bawah') ? '#fee2e2' : '#f1f5f9',
-                              color: label?.toLowerCase().includes('baik') || label?.toLowerCase().includes('atas') ? '#166534' : 
-                                     label?.toLowerCase().includes('kurang') || label?.toLowerCase().includes('bawah') ? '#991b1b' : '#334155',
-                              fontSize: '0.8rem',
-                              fontWeight: '500'
-                            }}>
-                              {label || '-'}
-                            </span>
-                          </td>
+          {/* Rincian Per Tahun di dalam Panel Kanan */}
+          <div style={{ marginTop: '1rem' }}>
+            <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0, marginBottom: '1.5rem', color: 'var(--text-main)' }}>
+              <TrendingUp size={20} color="var(--primary-color)" />
+              Rincian Per Tahun
+            </h3>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
+              {selectedData.length > 0 ? selectedData.map((row) => (
+                <div key={row.tahun} className="card" style={{ padding: '1.25rem' }}>
+                  <h4 style={{ margin: '0 0 1rem 0', color: 'var(--primary-color)', borderBottom: '2px solid #f1f5f9', paddingBottom: '0.5rem' }}>
+                    Tahun {row.tahun}
+                  </h4>
+                  <div style={{ overflowX: 'auto' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
+                      <thead>
+                        <tr style={{ borderBottom: '1px solid var(--border-color)', textAlign: 'left', color: 'var(--text-muted)' }}>
+                          <th style={{ padding: '0.5rem' }}>Status</th>
+                          <th style={{ padding: '0.5rem' }}>Nilai</th>
+                          <th style={{ padding: '0.5rem' }}>Label</th>
                         </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
+                      </thead>
+                      <tbody>
+                        {['Semua', 'Negeri', 'Swasta'].map(status => {
+                          if (row[status] === undefined) return null;
+                          const label = row.labels[status];
+                          return (
+                            <tr key={status} style={{ borderBottom: '1px solid #f8fafc' }}>
+                              <td style={{ padding: '0.75rem 0.5rem', fontWeight: '500' }}>{status}</td>
+                              <td style={{ padding: '0.75rem 0.5rem' }}>{row.nilai_teks[status]}</td>
+                              <td style={{ padding: '0.75rem 0.5rem' }}>
+                                <span style={{ 
+                                  padding: '0.2rem 0.5rem', 
+                                  borderRadius: '4px', 
+                                  backgroundColor: label?.toLowerCase().includes('baik') || label?.toLowerCase().includes('atas') ? '#dcfce7' : 
+                                                   label?.toLowerCase().includes('kurang') || label?.toLowerCase().includes('bawah') ? '#fee2e2' : '#f1f5f9',
+                                  color: label?.toLowerCase().includes('baik') || label?.toLowerCase().includes('atas') ? '#166534' : 
+                                         label?.toLowerCase().includes('kurang') || label?.toLowerCase().includes('bawah') ? '#991b1b' : '#334155',
+                                  fontSize: '0.8rem',
+                                  fontWeight: '500'
+                                }}>
+                                  {label || '-'}
+                                </span>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )) : (
+                <div className="card" style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)', gridColumn: '1 / -1' }}>
+                  Belum ada data untuk indikator ini
+                </div>
+              )}
             </div>
-          )) : (
-            <div className="card" style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)', gridColumn: '1 / -1' }}>
-              Belum ada data untuk indikator ini
-            </div>
-          )}
+          </div>
+
         </div>
       </div>
     </main>
