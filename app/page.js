@@ -225,58 +225,60 @@ export default function DashboardPage() {
             )}
           </div>
 
-          <div className="card">
-            <h3 style={{ marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0, padding: '0.5rem 0' }}>
               <TrendingUp size={20} color="var(--primary-color)" />
               Rincian Per Tahun
             </h3>
-            <div style={{ overflowX: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
-                <thead>
-                  <tr style={{ borderBottom: '2px solid var(--border-color)', textAlign: 'left' }}>
-                    <th style={{ padding: '0.5rem' }}>Tahun</th>
-                    <th style={{ padding: '0.5rem' }}>Status</th>
-                    <th style={{ padding: '0.5rem' }}>Nilai</th>
-                    <th style={{ padding: '0.5rem' }}>Label</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {selectedData.length > 0 ? selectedData.flatMap((row) => 
-                    ['Semua', 'Negeri', 'Swasta'].map(status => {
-                      if (row[status] === undefined) return null;
-                      const label = row.labels[status];
-                      return (
-                        <tr key={`${row.tahun}-${status}`} style={{ borderBottom: '1px solid var(--border-color)' }}>
-                          <td style={{ padding: '0.75rem 0.5rem', fontWeight: '600' }}>{row.tahun}</td>
-                          <td style={{ padding: '0.75rem 0.5rem' }}>{status}</td>
-                          <td style={{ padding: '0.75rem 0.5rem' }}>{row.nilai_teks[status]}</td>
-                          <td style={{ padding: '0.75rem 0.5rem' }}>
-                            <span style={{ 
-                              padding: '0.2rem 0.5rem', 
-                              borderRadius: '4px', 
-                              backgroundColor: label?.toLowerCase().includes('baik') || label?.toLowerCase().includes('atas') ? '#dcfce7' : 
-                                               label?.toLowerCase().includes('kurang') || label?.toLowerCase().includes('bawah') ? '#fee2e2' : '#f1f5f9',
-                              color: label?.toLowerCase().includes('baik') || label?.toLowerCase().includes('atas') ? '#166534' : 
-                                     label?.toLowerCase().includes('kurang') || label?.toLowerCase().includes('bawah') ? '#991b1b' : '#334155',
-                              fontSize: '0.8rem',
-                              fontWeight: '500'
-                            }}>
-                              {label || '-'}
-                            </span>
-                          </td>
-                        </tr>
-                      );
-                    })
-                  ) : (
-                    <tr>
-                      <td colSpan="3" style={{ textAlign: 'center', padding: '1rem', color: 'var(--text-muted)' }}>
-                        Belum ada data untuk indikator ini
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
+            
+            {selectedData.length > 0 ? selectedData.map((row) => (
+              <div key={row.tahun} className="card" style={{ padding: '1.25rem' }}>
+                <h4 style={{ margin: '0 0 1rem 0', color: 'var(--primary-color)', borderBottom: '2px solid #f1f5f9', paddingBottom: '0.5rem' }}>
+                  Tahun {row.tahun}
+                </h4>
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
+                    <thead>
+                      <tr style={{ borderBottom: '1px solid var(--border-color)', textAlign: 'left', color: 'var(--text-muted)' }}>
+                        <th style={{ padding: '0.5rem' }}>Status</th>
+                        <th style={{ padding: '0.5rem' }}>Nilai</th>
+                        <th style={{ padding: '0.5rem' }}>Label</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {['Semua', 'Negeri', 'Swasta'].map(status => {
+                        if (row[status] === undefined) return null;
+                        const label = row.labels[status];
+                        return (
+                          <tr key={status} style={{ borderBottom: '1px solid #f8fafc' }}>
+                            <td style={{ padding: '0.75rem 0.5rem', fontWeight: '500' }}>{status}</td>
+                            <td style={{ padding: '0.75rem 0.5rem' }}>{row.nilai_teks[status]}</td>
+                            <td style={{ padding: '0.75rem 0.5rem' }}>
+                              <span style={{ 
+                                padding: '0.2rem 0.5rem', 
+                                borderRadius: '4px', 
+                                backgroundColor: label?.toLowerCase().includes('baik') || label?.toLowerCase().includes('atas') ? '#dcfce7' : 
+                                                 label?.toLowerCase().includes('kurang') || label?.toLowerCase().includes('bawah') ? '#fee2e2' : '#f1f5f9',
+                                color: label?.toLowerCase().includes('baik') || label?.toLowerCase().includes('atas') ? '#166534' : 
+                                       label?.toLowerCase().includes('kurang') || label?.toLowerCase().includes('bawah') ? '#991b1b' : '#334155',
+                                fontSize: '0.8rem',
+                                fontWeight: '500'
+                              }}>
+                                {label || '-'}
+                              </span>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )) : (
+              <div className="card" style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>
+                Belum ada data untuk indikator ini
+              </div>
+            )}
           </div>
         </div>
 
