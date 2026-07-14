@@ -11,7 +11,7 @@ import {
   ResponsiveContainer,
   LabelList
 } from 'recharts';
-import { BarChart3, Users, X } from 'lucide-react';
+import { BarChart3, Users, X, List } from 'lucide-react';
 
 const TARGET_INDICATORS = [
   'Angka Partisipasi Sekolah (5-6)',
@@ -22,11 +22,20 @@ const TARGET_INDICATORS = [
   'Angka Partisipasi Sekolah (APS) 7 - 18 Kesetaraan'
 ];
 
+const APK_APM_INDICATORS = [
+  'Angka Partisipasi Kasar (APK) SMP/MTS/Paket B/SMPLB',
+  'Angka Partisipasi Kasar (APK) SD/MI/Paket A/SDLB',
+  'Angka Partisipasi Murni (APM) SMP/MTS/Paket B/SMPLB',
+  'Angka Partisipasi Murni (APM) SD/MI/Paket A/SDLB',
+  'Angka Partisipasi Murni (5-6)'
+];
+
 export default function PartisipasiPage() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedChart, setSelectedChart] = useState(null);
+  const [activeMenu, setActiveMenu] = useState('APS');
 
   useEffect(() => {
     fetch('/api/data')
@@ -44,22 +53,23 @@ export default function PartisipasiPage() {
       });
   }, []);
 
-  // Filter dan kelompokkan data berdasarkan indikator APS yang ditargetkan
-  // Karena kita menghilangkan filter Jenis/Status, kita perlu menduplikasi perlindungan
-  // atau mengambil nilai rata-rata/maksimum jika ada double (meski di parser sudah dideduplikasi per jenis).
-  // Namun untuk amannya, kita kelompokkan per nama_indikator, dan ambil nilai pertama untuk tiap tahun.
   const chartData = useMemo(() => {
     const grouped = {};
+    const currentIndicators = activeMenu === 'APS' ? TARGET_INDICATORS : APK_APM_INDICATORS;
     
     // Inisialisasi grup
-    TARGET_INDICATORS.forEach(name => {
+    currentIndicators.forEach(name => {
       grouped[name] = [];
     });
 
     for (const item of data) {
-      if (TARGET_INDICATORS.includes(item.nama_indikator)) {
+      if (currentIndicators.includes(item.nama_indikator)) {
+        // Untuk APK/APM, batasi hanya data 'Semua'.
+        if (activeMenu === 'APK/APM' && item.status_satuan_pendidikan !== 'Semua') {
+          continue;
+        }
+
         const name = item.nama_indikator;
-        // Cek apakah tahun ini sudah ada di array untuk indikator ini
         const existingYear = grouped[name].find(d => d.tahun === item.tahun);
         if (!existingYear) {
           grouped[name].push({
@@ -69,7 +79,6 @@ export default function PartisipasiPage() {
             label_capaian: item.label_capaian
           });
         } else if (existingYear.nilai_angka === null && item.nilai_angka !== null) {
-          // Ganti data null dengan data yang aktual
           existingYear.nilai_angka = item.nilai_angka;
           existingYear.nilai_teks = item.nilai_teks;
           existingYear.label_capaian = item.label_capaian;
@@ -77,13 +86,12 @@ export default function PartisipasiPage() {
       }
     }
 
-    // Urutkan tiap grup berdasarkan tahun
     Object.keys(grouped).forEach(key => {
       grouped[key].sort((a, b) => a.tahun - b.tahun);
     });
 
     return grouped;
-  }, [data]);
+  }, [data, activeMenu]);
 
   if (loading) {
     return (
@@ -103,97 +111,150 @@ export default function PartisipasiPage() {
     );
   }
 
+  const currentIndicators = activeMenu === 'APS' ? TARGET_INDICATORS : APK_APM_INDICATORS;
+
   return (
     <main className="container">
       <div className="header" style={{ marginBottom: '1rem' }}>
         <h1 className="title" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           <Users size={32} color="var(--primary-color)" />
-          Angka Partisipasi Sekolah (APS)
+          Angka Partisipasi Sekolah
         </h1>
       </div>
       <p style={{ color: 'var(--text-muted)', marginBottom: '2.5rem', fontSize: '1.05rem' }}>
         Pantau tingkat partisipasi siswa secara global untuk berbagai rentang usia dan jenjang pendidikan.
       </p>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '1.5rem' }}>
-        {TARGET_INDICATORS.map((indikatorName) => {
-          const itemData = chartData[indikatorName] || [];
-          const hasData = itemData.some(d => d.nilai_angka !== null);
-
-          return (
-            <div 
-              key={indikatorName} 
-              className="card" 
-              style={{ 
-                display: 'flex', flexDirection: 'column', height: '400px', 
-                cursor: hasData ? 'pointer' : 'default', 
-                transition: 'transform 0.2s, box-shadow 0.2s'
-              }}
-              onClick={() => {
-                if (hasData) {
-                  setSelectedChart({ name: indikatorName, data: itemData });
-                }
-              }}
-              title={hasData ? "Klik untuk melihat detail capaian" : ""}
-            >
-              <h3 style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', marginBottom: '1rem', fontSize: '1.1rem', color: 'var(--primary-color)', lineHeight: '1.4' }}>
-                <BarChart3 size={20} style={{ minWidth: '20px', marginTop: '3px' }} />
-                {indikatorName}
-              </h3>
-              
-              <div style={{ flex: 1, position: 'relative' }}>
-                {!hasData ? (
-                  <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', backgroundColor: '#f8fafc', borderRadius: '8px' }}>
-                    Data belum tersedia
-                  </div>
-                ) : (
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={itemData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                      <XAxis dataKey="tahun" tick={{ fill: '#64748b', fontSize: 12 }} tickLine={false} axisLine={{ stroke: '#cbd5e1' }} />
-                      <YAxis tick={{ fill: '#64748b', fontSize: 12 }} tickLine={false} axisLine={{ stroke: '#cbd5e1' }} />
-                      <RechartsTooltip 
-                        cursor={{ fill: '#f8fafc' }}
-                        content={({ active, payload, label }) => {
-                          if (active && payload && payload.length) {
-                            const data = payload[0].payload;
-                            return (
-                              <div style={{ backgroundColor: 'white', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '0.75rem 1rem', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)', fontSize: '0.85rem' }}>
-                                <h4 style={{ margin: '0 0 0.5rem 0', color: 'var(--primary-color)' }}>Tahun {label}</h4>
-                                <div style={{ marginBottom: '0.25rem', color: 'var(--text-main)' }}><strong>Nilai:</strong> {data.nilai_teks}</div>
-                                {data.label_capaian && data.label_capaian !== '-' && data.label_capaian.trim() !== '' && (
-                                  <div>
-                                    <strong>Status:</strong> <span style={{
-                                      padding: '0.15rem 0.4rem', 
-                                      borderRadius: '4px', 
-                                      backgroundColor: data.label_capaian.toLowerCase().includes('baik') || data.label_capaian.toLowerCase().includes('atas') ? '#dcfce7' : 
-                                                       data.label_capaian.toLowerCase().includes('kurang') || data.label_capaian.toLowerCase().includes('bawah') ? '#fee2e2' : '#f1f5f9',
-                                      color: data.label_capaian.toLowerCase().includes('baik') || data.label_capaian.toLowerCase().includes('atas') ? '#166534' : 
-                                             data.label_capaian.toLowerCase().includes('kurang') || data.label_capaian.toLowerCase().includes('bawah') ? '#991b1b' : '#334155',
-                                    }}>{data.label_capaian}</span>
-                                  </div>
-                                )}
-                              </div>
-                            );
-                          }
-                          return null;
-                        }}
-                      />
-                      <Bar 
-                        dataKey="nilai_angka" 
-                        fill="var(--primary-color)" 
-                        radius={[4, 4, 0, 0]} 
-                        barSize={40}
-                      >
-                        <LabelList dataKey="nilai_teks" position="top" style={{ fill: '#64748b', fontSize: '0.85rem', fontWeight: 600 }} />
-                      </Bar>
-                    </BarChart>
-                  </ResponsiveContainer>
-                )}
-              </div>
+      <div className="grid grid-cols-2" style={{ gridTemplateColumns: '300px 1fr', alignItems: 'start', gap: '1.5rem' }}>
+        {/* Panel Kiri: Side Menu */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          <div className="card">
+            <h3 style={{ marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <List size={20} color="var(--primary-color)" />
+              Menu Partisipasi
+            </h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <button 
+                onClick={() => setActiveMenu('APS')}
+                style={{
+                  textAlign: 'left',
+                  padding: '0.75rem 1rem',
+                  border: 'none',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  backgroundColor: activeMenu === 'APS' ? 'var(--primary-color)' : '#f8fafc',
+                  color: activeMenu === 'APS' ? 'white' : 'var(--text-main)',
+                  fontWeight: activeMenu === 'APS' ? '600' : '500',
+                  transition: 'all 0.2s',
+                  boxShadow: activeMenu === 'APS' ? '0 4px 6px -1px rgba(37, 99, 235, 0.2)' : 'none',
+                  border: activeMenu !== 'APS' ? '1px solid var(--border-color)' : '1px solid transparent'
+                }}
+              >
+                APS (Angka Partisipasi Sekolah)
+              </button>
+              <button 
+                onClick={() => setActiveMenu('APK/APM')}
+                style={{
+                  textAlign: 'left',
+                  padding: '0.75rem 1rem',
+                  border: 'none',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  backgroundColor: activeMenu === 'APK/APM' ? 'var(--primary-color)' : '#f8fafc',
+                  color: activeMenu === 'APK/APM' ? 'white' : 'var(--text-main)',
+                  fontWeight: activeMenu === 'APK/APM' ? '600' : '500',
+                  transition: 'all 0.2s',
+                  boxShadow: activeMenu === 'APK/APM' ? '0 4px 6px -1px rgba(37, 99, 235, 0.2)' : 'none',
+                  border: activeMenu !== 'APK/APM' ? '1px solid var(--border-color)' : '1px solid transparent'
+                }}
+              >
+                APK / APM
+              </button>
             </div>
-          );
-        })}
+          </div>
+        </div>
+
+        {/* Panel Kanan: Charts */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '1.5rem' }}>
+          {currentIndicators.map((indikatorName) => {
+            const itemData = chartData[indikatorName] || [];
+            const hasData = itemData.some(d => d.nilai_angka !== null);
+
+            return (
+              <div 
+                key={indikatorName} 
+                className="card" 
+                style={{ 
+                  display: 'flex', flexDirection: 'column', height: '400px', 
+                  cursor: hasData ? 'pointer' : 'default', 
+                  transition: 'transform 0.2s, box-shadow 0.2s'
+                }}
+                onClick={() => {
+                  if (hasData) {
+                    setSelectedChart({ name: indikatorName, data: itemData });
+                  }
+                }}
+                title={hasData ? "Klik untuk melihat detail capaian" : ""}
+              >
+                <h3 style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', marginBottom: '1rem', fontSize: '1.1rem', color: 'var(--primary-color)', lineHeight: '1.4' }}>
+                  <BarChart3 size={20} style={{ minWidth: '20px', marginTop: '3px' }} />
+                  {indikatorName}
+                </h3>
+                
+                <div style={{ flex: 1, position: 'relative' }}>
+                  {!hasData ? (
+                    <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', backgroundColor: '#f8fafc', borderRadius: '8px' }}>
+                      Data belum tersedia
+                    </div>
+                  ) : (
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={itemData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                        <XAxis dataKey="tahun" tick={{ fill: '#64748b', fontSize: 12 }} tickLine={false} axisLine={{ stroke: '#cbd5e1' }} />
+                        <YAxis tick={{ fill: '#64748b', fontSize: 12 }} tickLine={false} axisLine={{ stroke: '#cbd5e1' }} />
+                        <RechartsTooltip 
+                          cursor={{ fill: '#f8fafc' }}
+                          content={({ active, payload, label }) => {
+                            if (active && payload && payload.length) {
+                              const data = payload[0].payload;
+                              return (
+                                <div style={{ backgroundColor: 'white', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '0.75rem 1rem', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)', fontSize: '0.85rem' }}>
+                                  <h4 style={{ margin: '0 0 0.5rem 0', color: 'var(--primary-color)' }}>Tahun {label}</h4>
+                                  <div style={{ marginBottom: '0.25rem', color: 'var(--text-main)' }}><strong>Nilai:</strong> {data.nilai_teks}</div>
+                                  {data.label_capaian && data.label_capaian !== '-' && data.label_capaian.trim() !== '' && (
+                                    <div>
+                                      <strong>Status:</strong> <span style={{
+                                        padding: '0.15rem 0.4rem', 
+                                        borderRadius: '4px', 
+                                        backgroundColor: data.label_capaian.toLowerCase().includes('baik') || data.label_capaian.toLowerCase().includes('atas') ? '#dcfce7' : 
+                                                         data.label_capaian.toLowerCase().includes('kurang') || data.label_capaian.toLowerCase().includes('bawah') ? '#fee2e2' : '#f1f5f9',
+                                        color: data.label_capaian.toLowerCase().includes('baik') || data.label_capaian.toLowerCase().includes('atas') ? '#166534' : 
+                                               data.label_capaian.toLowerCase().includes('kurang') || data.label_capaian.toLowerCase().includes('bawah') ? '#991b1b' : '#334155',
+                                      }}>{data.label_capaian}</span>
+                                    </div>
+                                  )}
+                                </div>
+                              );
+                            }
+                            return null;
+                          }}
+                        />
+                        <Bar 
+                          dataKey="nilai_angka" 
+                          fill="var(--primary-color)" 
+                          radius={[4, 4, 0, 0]} 
+                          barSize={40}
+                        >
+                          <LabelList dataKey="nilai_teks" position="top" style={{ fill: '#64748b', fontSize: '0.85rem', fontWeight: 600 }} />
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       {/* Modal / Popup Detail */}
