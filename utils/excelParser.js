@@ -6,11 +6,13 @@ export function parseExcelData(buffer, defaultTahun) {
   const seenKey = new Set();
   
   for (const sheetName of workbook.SheetNames) {
-    // Tentukan tahun: Jika nama sheet adalah 4 digit angka, gunakan itu. Jika tidak, gunakan defaultTahun.
+    // Tentukan tahun: Ekstrak 4 digit tahun (20xx) dari nama sheet
     let tahun = defaultTahun;
-    if (/^\d{4}$/.test(sheetName.trim())) {
-      tahun = sheetName.trim();
+    const match = sheetName.match(/\b(20\d{2})\b/);
+    if (match) {
+      tahun = match[1];
     }
+    console.log(`Membaca sheet: "${sheetName}" -> Tahun Terdeteksi: ${tahun}`);
     
     const worksheet = workbook.Sheets[sheetName];
     const rows = xlsx.utils.sheet_to_json(worksheet, { header: 1 });
