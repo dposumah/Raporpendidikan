@@ -114,7 +114,7 @@ export default function PartisipasiPage() {
         Pantau tingkat partisipasi siswa secara global untuk berbagai rentang usia dan jenjang pendidikan.
       </p>
 
-      <div className="grid grid-cols-2">
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem' }}>
         {TARGET_INDICATORS.map((indikatorName) => {
           const itemData = chartData[indikatorName] || [];
           const hasData = itemData.some(d => d.nilai_angka !== null);
