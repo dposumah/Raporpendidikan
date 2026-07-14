@@ -34,7 +34,7 @@ export default function DashboardPage() {
         // Set default berjenjang jika ada data
         if (jsonData.length > 0) {
           const uniqueJenis = [...new Set(jsonData.map(item => item.jenis_satuan_pendidikan))];
-          const allowedJenis = ['SD Umum', 'SMP Umum', 'SD Kesetaraan', 'SMP Kesetaraan', 'PAUD'];
+          const allowedJenis = ['SD Umum', 'SMP Umum', 'PAUD'];
           const filteredJenis = allowedJenis.filter(j => uniqueJenis.includes(j));
           
           if (filteredJenis.length > 0) {
@@ -50,7 +50,7 @@ export default function DashboardPage() {
   }, []);
 
   const jenisList = useMemo(() => {
-    const allowedJenis = ['SD Umum', 'SMP Umum', 'SD Kesetaraan', 'SMP Kesetaraan', 'PAUD'];
+    const allowedJenis = ['SD Umum', 'SMP Umum', 'PAUD'];
     const uniqueJenis = [...new Set(data.map(item => item.jenis_satuan_pendidikan))];
     return allowedJenis.filter(jenis => uniqueJenis.includes(jenis));
   }, [data]);
