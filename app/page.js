@@ -83,8 +83,8 @@ export default function DashboardPage() {
       if (item.jenis_satuan_pendidikan === selectedJenis) {
         
         const nameLower = item.nama_indikator.toLowerCase();
-        // Cek apakah indikator ini ada di daftar (menggunakan includes untuk fleksibilitas)
-        const isAllowed = allowedIndicators.some(allowed => nameLower.includes(allowed));
+        // Cek apakah indikator ini ada di daftar (exact match)
+        const isAllowed = allowedIndicators.some(allowed => nameLower === allowed);
         
         if (isAllowed && !map.has(item.kode_indikator)) {
           map.set(item.kode_indikator, true);
@@ -278,9 +278,9 @@ export default function DashboardPage() {
         </div>
 
         {/* Panel Kanan: Grafik */}
-        <div className="card" style={{ display: 'flex', flexDirection: 'column' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-            <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          <div className="card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0 }}>
               <BarChart3 size={20} color="var(--primary-color)" />
               Grafik Progress Capaian
             </h3>
@@ -308,42 +308,55 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          <div style={{ flex: 1, minHeight: '400px', position: 'relative' }}>
-            {selectedData.length === 0 ? (
-              <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' }}>
-                Data tidak tersedia atau tidak memiliki nilai numerik untuk dibuatkan grafik.
+          {['Semua', 'Negeri', 'Swasta'].map((status) => {
+            // Cek apakah ada data untuk status ini di selectedData
+            const hasData = selectedData.some(row => row[status] !== undefined);
+            if (!hasData) return null;
+
+            const statusColors = {
+              'Semua': 'var(--primary-color)',
+              'Negeri': '#10b981',
+              'Swasta': '#f59e0b'
+            };
+
+            return (
+              <div key={status} className="card" style={{ display: 'flex', flexDirection: 'column' }}>
+                <h4 style={{ marginBottom: '1rem', color: statusColors[status], fontSize: '1.1rem' }}>Status: {status}</h4>
+                <div style={{ flex: 1, minHeight: '300px', position: 'relative' }}>
+                  <ResponsiveContainer width="100%" height="100%">
+                    {chartType === 'bar' ? (
+                      <BarChart data={selectedData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                        <XAxis dataKey="tahun" tick={{ fill: '#64748b' }} tickLine={false} axisLine={{ stroke: '#cbd5e1' }} />
+                        <YAxis tick={{ fill: '#64748b' }} tickLine={false} axisLine={{ stroke: '#cbd5e1' }} />
+                        <RechartsTooltip 
+                          cursor={{ fill: '#f8fafc' }}
+                          contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}
+                        />
+                        <Bar dataKey={status} fill={statusColors[status]} radius={[4, 4, 0, 0]} name={status} barSize={40} />
+                      </BarChart>
+                    ) : (
+                      <LineChart data={selectedData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                        <XAxis dataKey="tahun" tick={{ fill: '#64748b' }} tickLine={false} axisLine={{ stroke: '#cbd5e1' }} />
+                        <YAxis tick={{ fill: '#64748b' }} tickLine={false} axisLine={{ stroke: '#cbd5e1' }} />
+                        <RechartsTooltip 
+                          contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}
+                        />
+                        <Line type="monotone" dataKey={status} stroke={statusColors[status]} strokeWidth={3} activeDot={{ r: 8 }} name={status} />
+                      </LineChart>
+                    )}
+                  </ResponsiveContainer>
+                </div>
               </div>
-            ) : (
-              <ResponsiveContainer width="100%" height="100%">
-                {chartType === 'bar' ? (
-                  <BarChart data={selectedData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                    <XAxis dataKey="tahun" tick={{ fill: '#64748b' }} tickLine={false} axisLine={{ stroke: '#cbd5e1' }} />
-                    <YAxis tick={{ fill: '#64748b' }} tickLine={false} axisLine={{ stroke: '#cbd5e1' }} />
-                    <RechartsTooltip 
-                      cursor={{ fill: '#f8fafc' }}
-                      contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}
-                    />
-                    <Bar dataKey="Semua" fill="var(--primary-color)" radius={[4, 4, 0, 0]} name="Semua" />
-                    <Bar dataKey="Negeri" fill="#10b981" radius={[4, 4, 0, 0]} name="Negeri" />
-                    <Bar dataKey="Swasta" fill="#f59e0b" radius={[4, 4, 0, 0]} name="Swasta" />
-                  </BarChart>
-                ) : (
-                  <LineChart data={selectedData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                    <XAxis dataKey="tahun" tick={{ fill: '#64748b' }} tickLine={false} axisLine={{ stroke: '#cbd5e1' }} />
-                    <YAxis tick={{ fill: '#64748b' }} tickLine={false} axisLine={{ stroke: '#cbd5e1' }} />
-                    <RechartsTooltip 
-                      contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}
-                    />
-                    <Line type="monotone" dataKey="Semua" stroke="var(--primary-color)" strokeWidth={3} activeDot={{ r: 8 }} name="Semua" />
-                    <Line type="monotone" dataKey="Negeri" stroke="#10b981" strokeWidth={3} activeDot={{ r: 8 }} name="Negeri" />
-                    <Line type="monotone" dataKey="Swasta" stroke="#f59e0b" strokeWidth={3} activeDot={{ r: 8 }} name="Swasta" />
-                  </LineChart>
-                )}
-              </ResponsiveContainer>
-            )}
-          </div>
+            );
+          })}
+          
+          {selectedData.length === 0 && (
+            <div className="card" style={{ minHeight: '400px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' }}>
+              Data tidak tersedia atau tidak memiliki nilai numerik untuk dibuatkan grafik.
+            </div>
+          )}
         </div>
       </div>
     </main>
