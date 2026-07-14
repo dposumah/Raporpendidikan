@@ -28,6 +28,7 @@ export async function GET() {
           .select('*')
           .range(i, i + pageSize - 1)
           .order('tahun', { ascending: true })
+          .order('id', { ascending: true })
       );
     }
 
