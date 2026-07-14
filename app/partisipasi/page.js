@@ -11,7 +11,7 @@ import {
   ResponsiveContainer,
   LabelList
 } from 'recharts';
-import { BarChart3, Users } from 'lucide-react';
+import { BarChart3, Users, X } from 'lucide-react';
 
 const TARGET_INDICATORS = [
   'Angka Partisipasi Sekolah (5-6)',
@@ -26,6 +26,7 @@ export default function PartisipasiPage() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedChart, setSelectedChart] = useState(null);
 
   useEffect(() => {
     fetch('/api/data')
@@ -114,13 +115,27 @@ export default function PartisipasiPage() {
         Pantau tingkat partisipasi siswa secara global untuk berbagai rentang usia dan jenjang pendidikan.
       </p>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '1.5rem' }}>
         {TARGET_INDICATORS.map((indikatorName) => {
           const itemData = chartData[indikatorName] || [];
           const hasData = itemData.some(d => d.nilai_angka !== null);
 
           return (
-            <div key={indikatorName} className="card" style={{ display: 'flex', flexDirection: 'column', height: '400px' }}>
+            <div 
+              key={indikatorName} 
+              className="card" 
+              style={{ 
+                display: 'flex', flexDirection: 'column', height: '400px', 
+                cursor: hasData ? 'pointer' : 'default', 
+                transition: 'transform 0.2s, box-shadow 0.2s'
+              }}
+              onClick={() => {
+                if (hasData) {
+                  setSelectedChart({ name: indikatorName, data: itemData });
+                }
+              }}
+              title={hasData ? "Klik untuk melihat detail capaian" : ""}
+            >
               <h3 style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', marginBottom: '1rem', fontSize: '1.1rem', color: 'var(--primary-color)', lineHeight: '1.4' }}>
                 <BarChart3 size={20} style={{ minWidth: '20px', marginTop: '3px' }} />
                 {indikatorName}
@@ -180,6 +195,76 @@ export default function PartisipasiPage() {
           );
         })}
       </div>
+
+      {/* Modal / Popup Detail */}
+      {selectedChart && (
+        <div style={{
+          position: 'fixed',
+          top: 0, left: 0, right: 0, bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.6)',
+          backdropFilter: 'blur(4px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 100,
+          padding: '1rem'
+        }} onClick={() => setSelectedChart(null)}>
+          <div className="card" style={{
+            width: '100%',
+            maxWidth: '650px',
+            maxHeight: '90vh',
+            overflowY: 'auto',
+            padding: '2.5rem',
+            position: 'relative',
+            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
+          }} onClick={(e) => e.stopPropagation()}>
+            <button 
+              onClick={() => setSelectedChart(null)}
+              style={{ position: 'absolute', top: '1.25rem', right: '1.25rem', background: '#f1f5f9', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', borderRadius: '50%', width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background-color 0.2s' }}
+              onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#e2e8f0'}
+              onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#f1f5f9'}
+            >
+              <X size={20} />
+            </button>
+            <h2 style={{ marginBottom: '1.5rem', color: 'var(--primary-color)', paddingRight: '2.5rem', lineHeight: '1.4', fontSize: '1.5rem' }}>
+              Detail: {selectedChart.name}
+            </h2>
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.95rem' }}>
+                <thead>
+                  <tr style={{ borderBottom: '2px solid var(--border-color)', textAlign: 'left', color: 'var(--text-muted)' }}>
+                    <th style={{ padding: '1rem 0.5rem' }}>Tahun</th>
+                    <th style={{ padding: '1rem 0.5rem' }}>Nilai Capaian</th>
+                    <th style={{ padding: '1rem 0.5rem' }}>Label Capaian</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {selectedChart.data.map((row) => (
+                    <tr key={row.tahun} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                      <td style={{ padding: '1rem 0.5rem', fontWeight: '600', color: 'var(--text-main)' }}>{row.tahun}</td>
+                      <td style={{ padding: '1rem 0.5rem', color: 'var(--text-main)' }}>{row.nilai_teks}</td>
+                      <td style={{ padding: '1rem 0.5rem' }}>
+                        <span style={{ 
+                          padding: '0.3rem 0.75rem', 
+                          borderRadius: '6px', 
+                          backgroundColor: row.label_capaian?.toLowerCase().includes('baik') || row.label_capaian?.toLowerCase().includes('atas') ? '#dcfce7' : 
+                                           row.label_capaian?.toLowerCase().includes('kurang') || row.label_capaian?.toLowerCase().includes('bawah') ? '#fee2e2' : '#f1f5f9',
+                          color: row.label_capaian?.toLowerCase().includes('baik') || row.label_capaian?.toLowerCase().includes('atas') ? '#166534' : 
+                                 row.label_capaian?.toLowerCase().includes('kurang') || row.label_capaian?.toLowerCase().includes('bawah') ? '#991b1b' : '#334155',
+                          fontSize: '0.85rem',
+                          fontWeight: '600'
+                        }}>
+                          {row.label_capaian || '-'}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
