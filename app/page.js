@@ -264,14 +264,80 @@ export default function DashboardPage() {
         {/* Panel Kanan: Grafik atau SPM */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           {selectedIndikator === 'SPM' ? (
-            <div className="card">
-              <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0, marginBottom: '1.5rem', color: 'var(--primary-color)' }}>
-                <BarChart3 size={20} color="var(--primary-color)" />
-                Data Indeks Pencapaian SPM
+            <div className="card" style={{ borderTop: '4px solid var(--primary-color)' }}>
+              <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', margin: 0, marginBottom: '2rem', color: 'var(--primary-color)', fontSize: '1.4rem' }}>
+                <TrendingUp size={28} color="var(--primary-color)" />
+                Highlight Rapor Pendidikan: Indeks Pencapaian SPM
               </h3>
               {spmData.length > 0 ? (
                 <>
-                  <div style={{ height: '300px', marginBottom: '2.5rem', position: 'relative' }}>
+                  {/* KPI Highlight Card */}
+                  {(() => {
+                    const sortedSpm = [...spmData].sort((a, b) => a.tahun - b.tahun);
+                    const latest = sortedSpm[sortedSpm.length - 1];
+                    const previous = sortedSpm.length > 1 ? sortedSpm[sortedSpm.length - 2] : null;
+                    const diff = previous ? (latest.nilai_capaian - previous.nilai_capaian).toFixed(2) : null;
+                    const isUp = diff > 0;
+                    const isDown = diff < 0;
+
+                    return (
+                      <div style={{ marginBottom: '2.5rem' }}>
+                        <div style={{ 
+                          background: 'linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)', 
+                          borderRadius: '16px', 
+                          padding: '2.5rem 2rem', 
+                          color: 'white',
+                          boxShadow: '0 10px 25px -5px rgba(59, 130, 246, 0.4)',
+                          position: 'relative',
+                          overflow: 'hidden'
+                        }}>
+                          {/* Decorative circles */}
+                          <div style={{ position: 'absolute', top: '-20px', right: '-20px', width: '150px', height: '150px', borderRadius: '50%', background: 'rgba(255,255,255,0.1)' }}></div>
+                          <div style={{ position: 'absolute', bottom: '-50px', right: '50px', width: '100px', height: '100px', borderRadius: '50%', background: 'rgba(255,255,255,0.1)' }}></div>
+                          
+                          <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '2rem' }}>
+                            <div>
+                              <div style={{ fontSize: '1.1rem', opacity: 0.9, marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '1px' }}>Capaian Tahun {latest.tahun}</div>
+                              <div style={{ fontSize: '4rem', fontWeight: '800', lineHeight: '1', marginBottom: '0.5rem' }}>{latest.nilai_capaian}</div>
+                              
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginTop: '1rem' }}>
+                                <span style={{ 
+                                  padding: '0.5rem 1.25rem', 
+                                  borderRadius: '30px', 
+                                  backgroundColor: 'rgba(255,255,255,0.2)',
+                                  backdropFilter: 'blur(8px)',
+                                  fontWeight: '600',
+                                  fontSize: '1rem',
+                                  border: '1px solid rgba(255,255,255,0.3)'
+                                }}>
+                                  {latest.label_capaian || 'Tidak ada label'}
+                                </span>
+                              </div>
+                            </div>
+
+                            {diff && (
+                              <div style={{ 
+                                display: 'flex', flexDirection: 'column', alignItems: 'flex-end', 
+                                backgroundColor: 'rgba(255,255,255,0.15)', padding: '1.5rem', borderRadius: '12px',
+                                backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.2)'
+                              }}>
+                                <div style={{ fontSize: '0.9rem', opacity: 0.9, marginBottom: '0.5rem' }}>Dibanding Tahun {previous.tahun}</div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1.5rem', fontWeight: '700', color: isUp ? '#86efac' : isDown ? '#fca5a5' : 'white' }}>
+                                  {isUp ? '↑ Naik' : isDown ? '↓ Turun' : '≈ Sama'} {Math.abs(diff)}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })()}
+
+                  <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0, marginBottom: '1.5rem', color: 'var(--text-main)', fontSize: '1.1rem' }}>
+                    <BarChart3 size={18} color="var(--primary-color)" />
+                    Grafik Perkembangan Indeks SPM
+                  </h3>
+                  <div style={{ height: '320px', marginBottom: '3rem', position: 'relative' }}>
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart data={spmData} margin={{ top: 20, right: 10, left: -20, bottom: 0 }}>
                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
@@ -306,19 +372,21 @@ export default function DashboardPage() {
                         />
                         <Bar 
                           dataKey="nilai_capaian" 
-                          fill="var(--primary-color)" 
-                          radius={[4, 4, 0, 0]} 
-                          barSize={60}
+                          fill="#3b82f6" 
+                          radius={[6, 6, 0, 0]} 
+                          barSize={50}
                         />
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
-                  <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0, marginBottom: '1rem', color: 'var(--text-main)', fontSize: '1.1rem' }}>
-                    <TrendingUp size={18} color="var(--primary-color)" />
-                    Rincian Tabel
-                  </h3>
-                  <div style={{ overflowX: 'auto' }}>
-                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.95rem' }}>
+                  
+                  <div style={{ padding: '1.5rem', backgroundColor: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                    <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0, marginBottom: '1rem', color: 'var(--text-main)', fontSize: '1.1rem' }}>
+                      <TrendingUp size={18} color="var(--primary-color)" />
+                      Rincian Histori Capaian
+                    </h3>
+                    <div style={{ overflowX: 'auto' }}>
+                      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.95rem' }}>
                     <thead>
                       <tr style={{ borderBottom: '2px solid var(--border-color)', textAlign: 'left', color: 'var(--text-muted)' }}>
                         <th style={{ padding: '0.75rem 0.5rem' }}>Tahun</th>
@@ -352,8 +420,9 @@ export default function DashboardPage() {
                     </tbody>
                   </table>
                 </div>
-                </>
-              ) : (
+              </div>
+              </>
+            ) : (
                 <div style={{ textAlign: 'center', padding: '3rem 1rem', color: 'var(--text-muted)' }}>
                   Belum ada data SPM. Silakan input dari menu Admin.
                 </div>
