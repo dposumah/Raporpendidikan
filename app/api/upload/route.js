@@ -1,9 +1,6 @@
 import { NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
 import { parseExcelData } from '../../../utils/excelParser';
-
-const DATA_FILE_PATH = path.join(process.cwd(), 'data', 'data.json');
+import { supabase } from '../../../utils/supabase';
 
 export async function POST(request) {
   try {
@@ -18,27 +15,41 @@ export async function POST(request) {
     const buffer = Buffer.from(await file.arrayBuffer());
     const parsedData = parseExcelData(buffer, tahun);
 
-    // Baca data yang ada
-    let existingData = [];
-    if (fs.existsSync(DATA_FILE_PATH)) {
-      const fileContent = fs.readFileSync(DATA_FILE_PATH, 'utf-8');
-      if (fileContent) {
-        existingData = JSON.parse(fileContent);
+    if (!parsedData || parsedData.length === 0) {
+      return NextResponse.json({ error: 'Tidak ada data valid yang bisa dibaca dari Excel' }, { status: 400 });
+    }
+
+    const uniqueYears = [...new Set(parsedData.map(item => item.tahun))];
+
+    // 1. Hapus data lama untuk tahun-tahun yang terdeteksi (overwrite)
+    const { error: deleteError } = await supabase
+      .from('rapor_data')
+      .delete()
+      .in('tahun', uniqueYears);
+
+    if (deleteError) {
+      console.error('Error deleting old data:', deleteError);
+      throw new Error('Gagal menghapus data lama dari database');
+    }
+
+    // 2. Insert data baru secara batch/chunk (untuk menghindari limit payload Supabase)
+    const chunkSize = 1000;
+    for (let i = 0; i < parsedData.length; i += chunkSize) {
+      const chunk = parsedData.slice(i, i + chunkSize);
+      
+      const { error: insertError } = await supabase
+        .from('rapor_data')
+        .insert(chunk);
+
+      if (insertError) {
+        console.error('Error inserting chunk:', insertError);
+        throw new Error('Gagal menyimpan sebagian data ke database');
       }
     }
 
-    // Hapus data dengan tahun yang sama (overwrite)
-    const filteredData = existingData.filter(item => item.tahun !== parseInt(tahun, 10));
-    
-    // Gabungkan data baru
-    const newData = [...filteredData, ...parsedData];
-
-    // Simpan ke file JSON
-    fs.writeFileSync(DATA_FILE_PATH, JSON.stringify(newData, null, 2));
-
-    return NextResponse.json({ success: true, message: `Berhasil memproses ${parsedData.length} baris untuk tahun ${tahun}` });
+    return NextResponse.json({ success: true, message: `Berhasil menyimpan ${parsedData.length} baris untuk tahun ${tahun} ke Database` });
   } catch (error) {
     console.error('Error processing upload:', error);
-    return NextResponse.json({ error: 'Gagal memproses file' }, { status: 500 });
+    return NextResponse.json({ error: error.message || 'Gagal memproses file' }, { status: 500 });
   }
 }

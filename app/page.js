@@ -20,7 +20,6 @@ export default function DashboardPage() {
   const [error, setError] = useState(null);
   const [selectedIndikator, setSelectedIndikator] = useState('');
   const [selectedJenis, setSelectedJenis] = useState('');
-  const [selectedStatus, setSelectedStatus] = useState('');
   const [selectedKategori, setSelectedKategori] = useState('Utama');
   const [chartType, setChartType] = useState('bar');
 
@@ -45,11 +44,8 @@ export default function DashboardPage() {
             
             const statusesForJenis = [...new Set(jsonData.filter(i => i.jenis_satuan_pendidikan === firstJenis).map(item => item.status_satuan_pendidikan))];
             if (statusesForJenis.length > 0) {
-              const firstStatus = statusesForJenis[0];
-              setSelectedStatus(firstStatus);
-              
               const regexUtama = /^[a-zA-Z]\.\d+$/;
-              const indikatorsForSelection = [...new Set(jsonData.filter(i => i.jenis_satuan_pendidikan === firstJenis && i.status_satuan_pendidikan === firstStatus && regexUtama.test(i.kode_indikator)).map(item => item.kode_indikator))];
+              const indikatorsForSelection = [...new Set(jsonData.filter(i => i.jenis_satuan_pendidikan === firstJenis && regexUtama.test(i.kode_indikator)).map(item => item.kode_indikator))];
               if (indikatorsForSelection.length > 0) {
                 setSelectedIndikator(indikatorsForSelection[0]);
               }
@@ -69,20 +65,15 @@ export default function DashboardPage() {
     return uniqueJenis.filter(jenis => allowedJenis.includes(jenis));
   }, [data]);
 
-  const statusList = useMemo(() => {
-    if (!selectedJenis) return [];
-    return [...new Set(data.filter(item => item.jenis_satuan_pendidikan === selectedJenis).map(item => item.status_satuan_pendidikan))];
-  }, [data, selectedJenis]);
-
   const indikatorList = useMemo(() => {
-    if (!selectedJenis || !selectedStatus) return [];
+    if (!selectedJenis) return [];
     const list = [];
     const map = new Map();
     const regexUtama = /^[a-zA-Z]\.\d+$/; 
     const indikatorUtamaCodes = ['A.1', 'A.2', 'A.3', 'C.1', 'C.7', 'D.1', 'D.10', 'D.4', 'D.8'];
     
     for (const item of data) {
-      if (item.jenis_satuan_pendidikan === selectedJenis && item.status_satuan_pendidikan === selectedStatus && regexUtama.test(item.kode_indikator)) {
+      if (item.jenis_satuan_pendidikan === selectedJenis && regexUtama.test(item.kode_indikator)) {
         
         const isUtama = indikatorUtamaCodes.includes(item.kode_indikator);
         const nameLower = item.nama_indikator.toLowerCase();
@@ -99,14 +90,7 @@ export default function DashboardPage() {
       }
     }
     return list.sort((a, b) => a.kode.localeCompare(b.kode));
-  }, [data, selectedJenis, selectedStatus, selectedKategori]);
-
-  // Efek bertingkat untuk mereset dropdown jika parent berubah
-  useEffect(() => {
-    if (statusList.length > 0 && !statusList.includes(selectedStatus)) {
-      setSelectedStatus(statusList[0]);
-    }
-  }, [statusList, selectedStatus]);
+  }, [data, selectedJenis, selectedKategori]);
 
   useEffect(() => {
     if (indikatorList.length > 0 && !indikatorList.some(i => i.kode === selectedIndikator)) {
@@ -115,14 +99,23 @@ export default function DashboardPage() {
   }, [indikatorList, selectedIndikator]);
 
   const selectedData = useMemo(() => {
-    return data
-      .filter((item) => 
-        item.kode_indikator === selectedIndikator &&
-        item.jenis_satuan_pendidikan === selectedJenis &&
-        item.status_satuan_pendidikan === selectedStatus
-      )
-      .sort((a, b) => a.tahun - b.tahun);
-  }, [data, selectedIndikator, selectedJenis, selectedStatus]);
+    const filtered = data.filter((item) => 
+      item.kode_indikator === selectedIndikator &&
+      item.jenis_satuan_pendidikan === selectedJenis
+    );
+    
+    const grouped = {};
+    for (const item of filtered) {
+      if (!grouped[item.tahun]) {
+        grouped[item.tahun] = { tahun: item.tahun, labels: {}, nilai_teks: {} };
+      }
+      grouped[item.tahun][item.status_satuan_pendidikan] = item.nilai_angka;
+      grouped[item.tahun].labels[item.status_satuan_pendidikan] = item.label_capaian;
+      grouped[item.tahun].nilai_teks[item.status_satuan_pendidikan] = item.nilai_teks;
+    }
+    
+    return Object.values(grouped).sort((a, b) => a.tahun - b.tahun);
+  }, [data, selectedIndikator, selectedJenis]);
 
   const currentIndikatorInfo = indikatorList.find(i => i.kode === selectedIndikator);
 
@@ -182,16 +175,7 @@ export default function DashboardPage() {
               </select>
             </div>
 
-            <div className="form-group" style={{ marginBottom: '1rem' }}>
-              <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Status Satuan Pendidikan</label>
-              <select 
-                className="form-select" 
-                value={selectedStatus} 
-                onChange={(e) => setSelectedStatus(e.target.value)}
-              >
-                {statusList.map((status) => <option key={status} value={status}>{status}</option>)}
-              </select>
-            </div>
+            {/* Removed Status Dropdown */}
 
             <div style={{ marginBottom: '1.5rem' }}>
               <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '0.75rem', fontWeight: '500' }}>Kategori Indikator</label>
@@ -258,31 +242,39 @@ export default function DashboardPage() {
                 <thead>
                   <tr style={{ borderBottom: '2px solid var(--border-color)', textAlign: 'left' }}>
                     <th style={{ padding: '0.5rem' }}>Tahun</th>
+                    <th style={{ padding: '0.5rem' }}>Status</th>
                     <th style={{ padding: '0.5rem' }}>Nilai</th>
                     <th style={{ padding: '0.5rem' }}>Label</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {selectedData.length > 0 ? selectedData.map((row) => (
-                    <tr key={row.id} style={{ borderBottom: '1px solid var(--border-color)' }}>
-                      <td style={{ padding: '0.75rem 0.5rem', fontWeight: '600' }}>{row.tahun}</td>
-                      <td style={{ padding: '0.75rem 0.5rem' }}>{row.nilai_teks}</td>
-                      <td style={{ padding: '0.75rem 0.5rem' }}>
-                        <span style={{ 
-                          padding: '0.2rem 0.5rem', 
-                          borderRadius: '4px', 
-                          backgroundColor: row.label_capaian?.toLowerCase().includes('baik') || row.label_capaian?.toLowerCase().includes('atas') ? '#dcfce7' : 
-                                           row.label_capaian?.toLowerCase().includes('kurang') || row.label_capaian?.toLowerCase().includes('bawah') ? '#fee2e2' : '#f1f5f9',
-                          color: row.label_capaian?.toLowerCase().includes('baik') || row.label_capaian?.toLowerCase().includes('atas') ? '#166534' : 
-                                 row.label_capaian?.toLowerCase().includes('kurang') || row.label_capaian?.toLowerCase().includes('bawah') ? '#991b1b' : '#334155',
-                          fontSize: '0.8rem',
-                          fontWeight: '500'
-                        }}>
-                          {row.label_capaian || '-'}
-                        </span>
-                      </td>
-                    </tr>
-                  )) : (
+                  {selectedData.length > 0 ? selectedData.flatMap((row) => 
+                    ['Semua', 'Negeri', 'Swasta'].map(status => {
+                      if (row[status] === undefined) return null;
+                      const label = row.labels[status];
+                      return (
+                        <tr key={`${row.tahun}-${status}`} style={{ borderBottom: '1px solid var(--border-color)' }}>
+                          <td style={{ padding: '0.75rem 0.5rem', fontWeight: '600' }}>{row.tahun}</td>
+                          <td style={{ padding: '0.75rem 0.5rem' }}>{status}</td>
+                          <td style={{ padding: '0.75rem 0.5rem' }}>{row.nilai_teks[status]}</td>
+                          <td style={{ padding: '0.75rem 0.5rem' }}>
+                            <span style={{ 
+                              padding: '0.2rem 0.5rem', 
+                              borderRadius: '4px', 
+                              backgroundColor: label?.toLowerCase().includes('baik') || label?.toLowerCase().includes('atas') ? '#dcfce7' : 
+                                               label?.toLowerCase().includes('kurang') || label?.toLowerCase().includes('bawah') ? '#fee2e2' : '#f1f5f9',
+                              color: label?.toLowerCase().includes('baik') || label?.toLowerCase().includes('atas') ? '#166534' : 
+                                     label?.toLowerCase().includes('kurang') || label?.toLowerCase().includes('bawah') ? '#991b1b' : '#334155',
+                              fontSize: '0.8rem',
+                              fontWeight: '500'
+                            }}>
+                              {label || '-'}
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  ) : (
                     <tr>
                       <td colSpan="3" style={{ textAlign: 'center', padding: '1rem', color: 'var(--text-muted)' }}>
                         Belum ada data untuk indikator ini
@@ -342,13 +334,9 @@ export default function DashboardPage() {
                       cursor={{ fill: '#f8fafc' }}
                       contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}
                     />
-                    <Bar 
-                      dataKey="nilai_angka" 
-                      fill="var(--primary-color)" 
-                      radius={[4, 4, 0, 0]} 
-                      name="Nilai Capaian"
-                      barSize={40}
-                    />
+                    <Bar dataKey="Semua" fill="var(--primary-color)" radius={[4, 4, 0, 0]} name="Semua" />
+                    <Bar dataKey="Negeri" fill="#10b981" radius={[4, 4, 0, 0]} name="Negeri" />
+                    <Bar dataKey="Swasta" fill="#f59e0b" radius={[4, 4, 0, 0]} name="Swasta" />
                   </BarChart>
                 ) : (
                   <LineChart data={selectedData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
@@ -358,14 +346,9 @@ export default function DashboardPage() {
                     <RechartsTooltip 
                       contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}
                     />
-                    <Line 
-                      type="monotone" 
-                      dataKey="nilai_angka" 
-                      stroke="#7c3aed" 
-                      strokeWidth={3}
-                      activeDot={{ r: 8 }} 
-                      name="Nilai Capaian"
-                    />
+                    <Line type="monotone" dataKey="Semua" stroke="var(--primary-color)" strokeWidth={3} activeDot={{ r: 8 }} name="Semua" />
+                    <Line type="monotone" dataKey="Negeri" stroke="#10b981" strokeWidth={3} activeDot={{ r: 8 }} name="Negeri" />
+                    <Line type="monotone" dataKey="Swasta" stroke="#f59e0b" strokeWidth={3} activeDot={{ r: 8 }} name="Swasta" />
                   </LineChart>
                 )}
               </ResponsiveContainer>

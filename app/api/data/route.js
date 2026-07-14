@@ -1,22 +1,26 @@
 import { NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
+import { supabase } from '../../../utils/supabase';
 
-const DATA_FILE_PATH = path.join(process.cwd(), 'data', 'data.json');
+// Supabase membutuhkan revalidation atau pengalihan cache khusus 
+// untuk menghindari cache Next.js yang agresif.
+export const revalidate = 0; 
+export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
-    if (!fs.existsSync(DATA_FILE_PATH)) {
-      return NextResponse.json([]);
+    const { data, error } = await supabase
+      .from('rapor_data')
+      .select('*')
+      .order('tahun', { ascending: true });
+
+    if (error) {
+      console.error('Supabase fetch error:', error);
+      throw error;
     }
-    const fileContent = fs.readFileSync(DATA_FILE_PATH, 'utf-8');
-    if (!fileContent) {
-      return NextResponse.json([]);
-    }
-    const data = JSON.parse(fileContent);
-    return NextResponse.json(data);
+
+    return NextResponse.json(data || []);
   } catch (error) {
     console.error('Error fetching data:', error);
-    return NextResponse.json({ error: 'Gagal memuat data' }, { status: 500 });
+    return NextResponse.json({ error: 'Gagal memuat data dari database' }, { status: 500 });
   }
 }
