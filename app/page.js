@@ -79,6 +79,8 @@ export default function DashboardPage() {
       'karakter'
     ];
     
+    const regexUtama = /^[a-zA-Z]\.\d+$/;
+    
     for (const item of data) {
       if (item.jenis_satuan_pendidikan === selectedJenis) {
         
@@ -86,7 +88,7 @@ export default function DashboardPage() {
         // Cek apakah indikator ini ada di daftar (exact match)
         const isAllowed = allowedIndicators.some(allowed => nameLower === allowed);
         
-        if (isAllowed && !map.has(item.kode_indikator)) {
+        if (isAllowed && regexUtama.test(item.kode_indikator) && !map.has(item.kode_indikator)) {
           map.set(item.kode_indikator, true);
           list.push({ kode: item.kode_indikator, nama: item.nama_indikator, definisi: item.definisi_capaian });
         }
