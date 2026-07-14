@@ -192,7 +192,30 @@ export default function DashboardPage() {
 
             {/* Removed Status Dropdown */}
 
-            {/* Removed Kategori Indikator UI */}
+            <div style={{ marginBottom: '1.5rem' }}>
+              <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '0.75rem', fontWeight: '500' }}>Highlight Rapor</label>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <button 
+                  onClick={() => setSelectedIndikator('SPM')}
+                  style={{
+                    textAlign: 'left',
+                    padding: '0.75rem 1rem',
+                    border: 'none',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    backgroundColor: selectedIndikator === 'SPM' ? 'var(--primary-color)' : '#f8fafc',
+                    color: selectedIndikator === 'SPM' ? 'white' : 'var(--text-main)',
+                    fontWeight: selectedIndikator === 'SPM' ? '600' : '500',
+                    transition: 'all 0.2s',
+                    boxShadow: selectedIndikator === 'SPM' ? '0 4px 6px -1px rgba(37, 99, 235, 0.2)' : 'none',
+                    border: selectedIndikator !== 'SPM' ? '1px solid var(--border-color)' : '1px solid transparent'
+                  }}
+                >
+                  Indeks Pencapaian SPM
+                </button>
+              </div>
+            </div>
+
             <div style={{ marginBottom: '1.5rem' }}>
               <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '0.75rem', fontWeight: '500' }}>Menu Indikator</label>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
@@ -221,30 +244,6 @@ export default function DashboardPage() {
                     Tidak ada data indikator
                   </div>
                 )}
-              </div>
-            </div>
-
-            <div style={{ marginBottom: '1.5rem' }}>
-              <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '0.75rem', fontWeight: '500' }}>Menu Khusus</label>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                <button 
-                  onClick={() => setSelectedIndikator('SPM')}
-                  style={{
-                    textAlign: 'left',
-                    padding: '0.75rem 1rem',
-                    border: 'none',
-                    borderRadius: '8px',
-                    cursor: 'pointer',
-                    backgroundColor: selectedIndikator === 'SPM' ? 'var(--primary-color)' : '#f8fafc',
-                    color: selectedIndikator === 'SPM' ? 'white' : 'var(--text-main)',
-                    fontWeight: selectedIndikator === 'SPM' ? '600' : '500',
-                    transition: 'all 0.2s',
-                    boxShadow: selectedIndikator === 'SPM' ? '0 4px 6px -1px rgba(37, 99, 235, 0.2)' : 'none',
-                    border: selectedIndikator !== 'SPM' ? '1px solid var(--border-color)' : '1px solid transparent'
-                  }}
-                >
-                  Indeks Pencapaian SPM
-                </button>
               </div>
             </div>
             
