@@ -175,23 +175,6 @@ export default function DashboardPage() {
         {/* Panel Kiri: Pemilihan Indikator */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           <div className="card">
-            <h3 style={{ marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Info size={20} color="var(--primary-color)" />
-              Pilih Indikator
-            </h3>
-            <div className="form-group" style={{ marginBottom: '1rem' }}>
-              <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Jenis Satuan Pendidikan</label>
-              <select 
-                className="form-select" 
-                value={selectedJenis} 
-                onChange={(e) => setSelectedJenis(e.target.value)}
-              >
-                {jenisList.map((jenis) => <option key={jenis} value={jenis}>{jenis}</option>)}
-              </select>
-            </div>
-
-            {/* Removed Status Dropdown */}
-
             <div style={{ marginBottom: '1.5rem' }}>
               <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '0.75rem', fontWeight: '500' }}>Highlight Rapor</label>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
@@ -214,6 +197,23 @@ export default function DashboardPage() {
                   Indeks Pencapaian SPM
                 </button>
               </div>
+            </div>
+
+            <hr style={{ border: 'none', borderTop: '1px solid var(--border-color)', margin: '1rem 0 1.5rem 0' }} />
+
+            <h3 style={{ marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Info size={20} color="var(--primary-color)" />
+              Pilih Indikator
+            </h3>
+            <div className="form-group" style={{ marginBottom: '1.5rem' }}>
+              <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Jenis Satuan Pendidikan</label>
+              <select 
+                className="form-select" 
+                value={selectedJenis} 
+                onChange={(e) => setSelectedJenis(e.target.value)}
+              >
+                {jenisList.map((jenis) => <option key={jenis} value={jenis}>{jenis}</option>)}
+              </select>
             </div>
 
             <div style={{ marginBottom: '1.5rem' }}>
