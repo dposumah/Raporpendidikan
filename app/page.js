@@ -40,10 +40,6 @@ export default function DashboardPage() {
           if (filteredJenis.length > 0) {
             const firstJenis = filteredJenis[0];
             setSelectedJenis(firstJenis);
-              if (indikatorsForSelection.length > 0) {
-                setSelectedIndikator(indikatorsForSelection[0]);
-              }
-            }
           }
         }
       })
