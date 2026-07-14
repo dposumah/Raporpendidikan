@@ -270,8 +270,55 @@ export default function DashboardPage() {
                 Data Indeks Pencapaian SPM
               </h3>
               {spmData.length > 0 ? (
-                <div style={{ overflowX: 'auto' }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.95rem' }}>
+                <>
+                  <div style={{ height: '300px', marginBottom: '2.5rem', position: 'relative' }}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={spmData} margin={{ top: 20, right: 10, left: -20, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                        <XAxis dataKey="tahun" tick={{ fill: '#64748b', fontSize: 12 }} tickLine={false} axisLine={{ stroke: '#cbd5e1' }} />
+                        <YAxis tick={{ fill: '#64748b', fontSize: 12 }} tickLine={false} axisLine={{ stroke: '#cbd5e1' }} />
+                        <RechartsTooltip 
+                          cursor={{ fill: '#f8fafc' }}
+                          content={({ active, payload, label }) => {
+                            if (active && payload && payload.length) {
+                              const data = payload[0].payload;
+                              return (
+                                <div style={{ backgroundColor: 'white', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '0.75rem 1rem', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)', fontSize: '0.85rem' }}>
+                                  <h4 style={{ margin: '0 0 0.5rem 0', color: 'var(--primary-color)' }}>Tahun {label}</h4>
+                                  <div style={{ marginBottom: '0.25rem', color: 'var(--text-main)' }}><strong>Nilai Capaian:</strong> {data.nilai_capaian}</div>
+                                  {data.label_capaian && data.label_capaian.trim() !== '' && (
+                                    <div>
+                                      <strong>Label:</strong> <span style={{
+                                        padding: '0.15rem 0.4rem', 
+                                        borderRadius: '4px', 
+                                        backgroundColor: data.label_capaian.toLowerCase().includes('tuntas') || data.label_capaian.toLowerCase().includes('baik') ? '#dcfce7' : 
+                                                         data.label_capaian.toLowerCase().includes('belum') || data.label_capaian.toLowerCase().includes('kurang') ? '#fee2e2' : '#f1f5f9',
+                                        color: data.label_capaian.toLowerCase().includes('tuntas') || data.label_capaian.toLowerCase().includes('baik') ? '#166534' : 
+                                               data.label_capaian.toLowerCase().includes('belum') || data.label_capaian.toLowerCase().includes('kurang') ? '#991b1b' : '#334155',
+                                      }}>{data.label_capaian}</span>
+                                    </div>
+                                  )}
+                                </div>
+                              );
+                            }
+                            return null;
+                          }}
+                        />
+                        <Bar 
+                          dataKey="nilai_capaian" 
+                          fill="var(--primary-color)" 
+                          radius={[4, 4, 0, 0]} 
+                          barSize={60}
+                        />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                  <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0, marginBottom: '1rem', color: 'var(--text-main)', fontSize: '1.1rem' }}>
+                    <TrendingUp size={18} color="var(--primary-color)" />
+                    Rincian Tabel
+                  </h3>
+                  <div style={{ overflowX: 'auto' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.95rem' }}>
                     <thead>
                       <tr style={{ borderBottom: '2px solid var(--border-color)', textAlign: 'left', color: 'var(--text-muted)' }}>
                         <th style={{ padding: '0.75rem 0.5rem' }}>Tahun</th>
@@ -305,6 +352,7 @@ export default function DashboardPage() {
                     </tbody>
                   </table>
                 </div>
+                </>
               ) : (
                 <div style={{ textAlign: 'center', padding: '3rem 1rem', color: 'var(--text-muted)' }}>
                   Belum ada data SPM. Silakan input dari menu Admin.

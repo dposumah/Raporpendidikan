@@ -15,7 +15,6 @@ export default function AdminPage() {
 
   // State untuk Input SPM
   const [spmTahun, setSpmTahun] = useState('2025');
-  const [spmIndeks, setSpmIndeks] = useState('');
   const [spmNilai, setSpmNilai] = useState('');
   const [spmLabel, setSpmLabel] = useState('');
   const [spmStatus, setSpmStatus] = useState({ loading: false, error: null, success: null });
@@ -60,8 +59,8 @@ export default function AdminPage() {
 
   const handleSpmSubmit = async (e) => {
     e.preventDefault();
-    if (!spmTahun || !spmIndeks || !spmNilai) {
-      setSpmStatus({ loading: false, error: 'Tahun, Indeks SPM, dan Nilai wajib diisi.', success: null });
+    if (!spmTahun || !spmNilai) {
+      setSpmStatus({ loading: false, error: 'Tahun dan Nilai wajib diisi.', success: null });
       return;
     }
 
@@ -75,7 +74,7 @@ export default function AdminPage() {
         },
         body: JSON.stringify({
           tahun: spmTahun,
-          indeks_spm: spmIndeks,
+          indeks_spm: 'Indeks Pencapaian SPM',
           nilai_capaian: spmNilai,
           label_capaian: spmLabel
         }),
@@ -86,7 +85,6 @@ export default function AdminPage() {
       if (response.ok) {
         setSpmStatus({ loading: false, error: null, success: 'Data SPM berhasil disimpan!' });
         // Kosongkan form yang tidak perlu disimpan default-nya
-        setSpmIndeks('');
         setSpmNilai('');
         setSpmLabel('');
         router.refresh();
@@ -213,19 +211,6 @@ export default function AdminPage() {
                 <option value="2023">2023</option>
                 <option value="2022">2022</option>
               </select>
-            </div>
-
-            <div className="form-group">
-              <label className="form-label">Indeks SPM (Contoh: Literasi, Numerasi)</label>
-              <input 
-                type="text" 
-                className="form-input" 
-                placeholder="Masukkan nama indikator SPM"
-                value={spmIndeks}
-                onChange={(e) => setSpmIndeks(e.target.value)}
-                required
-                style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', fontSize: '0.95rem' }}
-              />
             </div>
 
             <div className="form-group">
