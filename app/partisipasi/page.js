@@ -66,6 +66,11 @@ export default function PartisipasiPage() {
             nilai_teks: item.nilai_teks,
             label_capaian: item.label_capaian
           });
+        } else if (existingYear.nilai_angka === null && item.nilai_angka !== null) {
+          // Ganti data null dengan data yang aktual
+          existingYear.nilai_angka = item.nilai_angka;
+          existingYear.nilai_teks = item.nilai_teks;
+          existingYear.label_capaian = item.label_capaian;
         }
       }
     }
