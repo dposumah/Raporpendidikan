@@ -20,7 +20,6 @@ export default function DashboardPage() {
   const [error, setError] = useState(null);
   const [selectedIndikator, setSelectedIndikator] = useState('');
   const [selectedJenis, setSelectedJenis] = useState('');
-  const [selectedKategori, setSelectedKategori] = useState('Utama');
   const [chartType, setChartType] = useState('bar');
 
   useEffect(() => {
@@ -69,28 +68,32 @@ export default function DashboardPage() {
     if (!selectedJenis) return [];
     const list = [];
     const map = new Map();
-    const regexUtama = /^[a-zA-Z]\.\d+$/; 
-    const indikatorUtamaCodes = ['A.1', 'A.2', 'A.3', 'C.1', 'C.7', 'D.1', 'D.10', 'D.4', 'D.8'];
+    
+    // Daftar 6 indikator yang ingin ditampilkan
+    const allowedIndicators = [
+      'kemampuan literasi',
+      'kemampuan numerasi',
+      'iklim keamanan sekolah',
+      'iklim inklusivitas',
+      'iklim kebinekaan',
+      'karakter'
+    ];
     
     for (const item of data) {
-      if (item.jenis_satuan_pendidikan === selectedJenis && regexUtama.test(item.kode_indikator)) {
+      if (item.jenis_satuan_pendidikan === selectedJenis) {
         
-        const isUtama = indikatorUtamaCodes.includes(item.kode_indikator);
         const nameLower = item.nama_indikator.toLowerCase();
-        const isAngkaPartisipasi = nameLower.includes('angka partisipasi') || nameLower.includes('apk ') || nameLower.includes('apm ') || nameLower.includes('aps ');
+        // Cek apakah indikator ini ada di daftar (menggunakan includes untuk fleksibilitas)
+        const isAllowed = allowedIndicators.some(allowed => nameLower.includes(allowed));
         
-        let categoryMatches = false;
-        if (selectedKategori === 'Utama' && isUtama) categoryMatches = true;
-        if (selectedKategori === 'Pendukung' && !isUtama && !isAngkaPartisipasi) categoryMatches = true;
-
-        if (categoryMatches && !map.has(item.kode_indikator)) {
+        if (isAllowed && !map.has(item.kode_indikator)) {
           map.set(item.kode_indikator, true);
           list.push({ kode: item.kode_indikator, nama: item.nama_indikator, definisi: item.definisi_capaian });
         }
       }
     }
     return list.sort((a, b) => a.kode.localeCompare(b.kode));
-  }, [data, selectedJenis, selectedKategori]);
+  }, [data, selectedJenis]);
 
   useEffect(() => {
     if (indikatorList.length > 0 && !indikatorList.some(i => i.kode === selectedIndikator)) {
@@ -177,33 +180,7 @@ export default function DashboardPage() {
 
             {/* Removed Status Dropdown */}
 
-            <div style={{ marginBottom: '1.5rem' }}>
-              <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '0.75rem', fontWeight: '500' }}>Kategori Indikator</label>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                {['Utama', 'Pendukung'].map(cat => (
-                  <button 
-                    key={cat}
-                    onClick={() => setSelectedKategori(cat)}
-                    style={{
-                      textAlign: 'left',
-                      padding: '0.75rem 1rem',
-                      border: 'none',
-                      borderRadius: '8px',
-                      cursor: 'pointer',
-                      backgroundColor: selectedKategori === cat ? 'var(--primary-color)' : '#f8fafc',
-                      color: selectedKategori === cat ? 'white' : 'var(--text-main)',
-                      fontWeight: selectedKategori === cat ? '600' : '500',
-                      transition: 'all 0.2s',
-                      boxShadow: selectedKategori === cat ? '0 4px 6px -1px rgba(37, 99, 235, 0.2)' : 'none',
-                      border: selectedKategori !== cat ? '1px solid var(--border-color)' : '1px solid transparent'
-                    }}
-                  >
-                    {cat}
-                  </button>
-                ))}
-              </div>
-            </div>
-
+            {/* Removed Kategori Indikator UI */}
             <div className="form-group">
               <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Pilih Indikator Terkait</label>
               <select 
