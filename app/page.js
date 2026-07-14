@@ -318,7 +318,7 @@ export default function DashboardPage() {
               Data tidak tersedia atau tidak memiliki nilai numerik untuk dibuatkan grafik.
             </div>
           )}
-        </div>
+          
           {/* Rincian Per Tahun di dalam Panel Kanan */}
           <div style={{ marginTop: '1rem' }}>
             <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0, marginBottom: '1.5rem', color: 'var(--text-main)' }}>
