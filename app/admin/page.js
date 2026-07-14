@@ -1,12 +1,22 @@
 'use client';
 
 import { useState } from 'react';
-import { UploadCloud, CheckCircle, AlertCircle } from 'lucide-react';
+import { UploadCloud, CheckCircle, AlertCircle, FileText, Database } from 'lucide-react';
 
 export default function AdminPage() {
+  const [activeTab, setActiveTab] = useState('upload'); // 'upload' atau 'spm'
+
+  // State untuk Upload Rapor
   const [file, setFile] = useState(null);
   const [tahun, setTahun] = useState('2025');
   const [status, setStatus] = useState({ loading: false, error: null, success: null });
+
+  // State untuk Input SPM
+  const [spmTahun, setSpmTahun] = useState('2025');
+  const [spmIndeks, setSpmIndeks] = useState('');
+  const [spmNilai, setSpmNilai] = useState('');
+  const [spmLabel, setSpmLabel] = useState('');
+  const [spmStatus, setSpmStatus] = useState({ loading: false, error: null, success: null });
 
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files[0]) {
@@ -45,69 +55,227 @@ export default function AdminPage() {
     }
   };
 
+  const handleSpmSubmit = async (e) => {
+    e.preventDefault();
+    if (!spmTahun || !spmIndeks || !spmNilai) {
+      setSpmStatus({ loading: false, error: 'Tahun, Indeks SPM, dan Nilai wajib diisi.', success: null });
+      return;
+    }
+
+    setSpmStatus({ loading: true, error: null, success: null });
+
+    try {
+      const response = await fetch('/api/spm', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          tahun: spmTahun,
+          indeks_spm: spmIndeks,
+          nilai_capaian: spmNilai,
+          label_capaian: spmLabel
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setSpmStatus({ loading: false, error: null, success: 'Data SPM berhasil disimpan!' });
+        // Kosongkan form yang tidak perlu disimpan default-nya
+        setSpmIndeks('');
+        setSpmNilai('');
+        setSpmLabel('');
+      } else {
+        setSpmStatus({ loading: false, error: data.error, success: null });
+      }
+    } catch (err) {
+      setSpmStatus({ loading: false, error: 'Terjadi kesalahan jaringan.', success: null });
+    }
+  };
+
   return (
     <main className="container">
-      <div className="header">
-        <h1 className="title">Upload Data Rapor Pendidikan</h1>
+      <div className="header" style={{ marginBottom: '2rem' }}>
+        <h1 className="title">Halaman Administrator</h1>
       </div>
 
-      <div className="card" style={{ maxWidth: '600px', margin: '0 auto' }}>
-        <div className="form-group">
-          <label className="form-label">Tahun Data</label>
-          <select 
-            className="form-select" 
-            value={tahun} 
-            onChange={(e) => setTahun(e.target.value)}
-          >
-            <option value="2025">2025</option>
-            <option value="2024">2024</option>
-            <option value="2023">2023</option>
-            <option value="2022">2022</option>
-          </select>
-        </div>
-
-        <div className="form-group">
-          <label className="form-label">File Excel (.xlsx)</label>
-          <div className="dropzone" onClick={() => document.getElementById('fileUpload').click()}>
-            <UploadCloud className="dropzone-icon" />
-            {file ? (
-              <p style={{ fontWeight: 500, color: 'var(--primary-color)' }}>{file.name}</p>
-            ) : (
-              <p style={{ color: 'var(--text-muted)' }}>Klik atau drag file ke sini</p>
-            )}
-            <input 
-              id="fileUpload" 
-              type="file" 
-              accept=".xlsx, .xls" 
-              style={{ display: 'none' }} 
-              onChange={handleFileChange} 
-            />
-          </div>
-        </div>
-
-        {status.error && (
-          <div style={{ padding: '1rem', backgroundColor: '#fef2f2', color: '#ef4444', borderRadius: '8px', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <AlertCircle size={20} />
-            {status.error}
-          </div>
-        )}
-
-        {status.success && (
-          <div style={{ padding: '1rem', backgroundColor: '#f0fdf4', color: '#22c55e', borderRadius: '8px', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <CheckCircle size={20} />
-            {status.success}
-          </div>
-        )}
-
+      <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', flexWrap: 'wrap' }}>
         <button 
-          className="btn btn-primary" 
-          style={{ width: '100%' }}
-          onClick={handleUpload}
-          disabled={status.loading}
+          onClick={() => setActiveTab('upload')}
+          style={{
+            display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.75rem 1.5rem',
+            border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: '600',
+            backgroundColor: activeTab === 'upload' ? 'var(--primary-color)' : '#f1f5f9',
+            color: activeTab === 'upload' ? 'white' : 'var(--text-main)',
+            transition: 'all 0.2s'
+          }}
         >
-          {status.loading ? 'Mengunggah dan Memproses...' : 'Upload Data'}
+          <Database size={20} />
+          Upload Rapor Pendidikan
+        </button>
+        <button 
+          onClick={() => setActiveTab('spm')}
+          style={{
+            display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.75rem 1.5rem',
+            border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: '600',
+            backgroundColor: activeTab === 'spm' ? 'var(--primary-color)' : '#f1f5f9',
+            color: activeTab === 'spm' ? 'white' : 'var(--text-main)',
+            transition: 'all 0.2s'
+          }}
+        >
+          <FileText size={20} />
+          Input Indeks SPM
         </button>
       </div>
+
+      {activeTab === 'upload' && (
+        <div className="card" style={{ maxWidth: '600px' }}>
+          <h2 style={{ marginBottom: '1.5rem', color: 'var(--primary-color)' }}>Upload Data Rapor Pendidikan</h2>
+          <div className="form-group">
+            <label className="form-label">Tahun Data</label>
+            <select 
+              className="form-select" 
+              value={tahun} 
+              onChange={(e) => setTahun(e.target.value)}
+            >
+              <option value="2026">2026</option>
+              <option value="2025">2025</option>
+              <option value="2024">2024</option>
+              <option value="2023">2023</option>
+              <option value="2022">2022</option>
+            </select>
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">File Excel (.xlsx)</label>
+            <div className="dropzone" onClick={() => document.getElementById('fileUpload').click()}>
+              <UploadCloud className="dropzone-icon" />
+              {file ? (
+                <p style={{ fontWeight: 500, color: 'var(--primary-color)' }}>{file.name}</p>
+              ) : (
+                <p style={{ color: 'var(--text-muted)' }}>Klik atau drag file ke sini</p>
+              )}
+              <input 
+                id="fileUpload" 
+                type="file" 
+                accept=".xlsx, .xls" 
+                style={{ display: 'none' }} 
+                onChange={handleFileChange} 
+              />
+            </div>
+          </div>
+
+          {status.error && (
+            <div style={{ padding: '1rem', backgroundColor: '#fef2f2', color: '#ef4444', borderRadius: '8px', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <AlertCircle size={20} />
+              {status.error}
+            </div>
+          )}
+
+          {status.success && (
+            <div style={{ padding: '1rem', backgroundColor: '#f0fdf4', color: '#22c55e', borderRadius: '8px', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <CheckCircle size={20} />
+              {status.success}
+            </div>
+          )}
+
+          <button 
+            className="btn btn-primary" 
+            style={{ width: '100%' }}
+            onClick={handleUpload}
+            disabled={status.loading}
+          >
+            {status.loading ? 'Mengunggah dan Memproses...' : 'Upload Data'}
+          </button>
+        </div>
+      )}
+
+      {activeTab === 'spm' && (
+        <div className="card" style={{ maxWidth: '600px' }}>
+          <h2 style={{ marginBottom: '1.5rem', color: 'var(--primary-color)' }}>Input Indeks Pencapaian SPM</h2>
+          
+          <form onSubmit={handleSpmSubmit}>
+            <div className="form-group">
+              <label className="form-label">Tahun</label>
+              <select 
+                className="form-select" 
+                value={spmTahun} 
+                onChange={(e) => setSpmTahun(e.target.value)}
+              >
+                <option value="2026">2026</option>
+                <option value="2025">2025</option>
+                <option value="2024">2024</option>
+                <option value="2023">2023</option>
+                <option value="2022">2022</option>
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Indeks SPM (Contoh: Literasi, Numerasi)</label>
+              <input 
+                type="text" 
+                className="form-input" 
+                placeholder="Masukkan nama indikator SPM"
+                value={spmIndeks}
+                onChange={(e) => setSpmIndeks(e.target.value)}
+                required
+                style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', fontSize: '0.95rem' }}
+              />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Nilai Capaian</label>
+              <input 
+                type="number" 
+                step="0.01"
+                className="form-input" 
+                placeholder="0.00"
+                value={spmNilai}
+                onChange={(e) => setSpmNilai(e.target.value)}
+                required
+                style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', fontSize: '0.95rem' }}
+              />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Label Capaian (Contoh: Tuntas, Baik, Kurang)</label>
+              <input 
+                type="text" 
+                className="form-input" 
+                placeholder="Masukkan label capaian"
+                value={spmLabel}
+                onChange={(e) => setSpmLabel(e.target.value)}
+                style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', fontSize: '0.95rem' }}
+              />
+            </div>
+
+            {spmStatus.error && (
+              <div style={{ padding: '1rem', backgroundColor: '#fef2f2', color: '#ef4444', borderRadius: '8px', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <AlertCircle size={20} />
+                {spmStatus.error}
+              </div>
+            )}
+
+            {spmStatus.success && (
+              <div style={{ padding: '1rem', backgroundColor: '#f0fdf4', color: '#22c55e', borderRadius: '8px', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <CheckCircle size={20} />
+                {spmStatus.success}
+              </div>
+            )}
+
+            <button 
+              type="submit"
+              className="btn btn-primary" 
+              style={{ width: '100%' }}
+              disabled={spmStatus.loading}
+            >
+              {spmStatus.loading ? 'Menyimpan...' : 'Simpan Data SPM'}
+            </button>
+          </form>
+        </div>
+      )}
+
     </main>
   );
 }

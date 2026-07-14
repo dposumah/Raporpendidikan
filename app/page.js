@@ -21,6 +21,7 @@ export default function DashboardPage() {
   const [selectedIndikator, setSelectedIndikator] = useState('');
   const [selectedJenis, setSelectedJenis] = useState('');
   const [chartType, setChartType] = useState('bar');
+  const [spmData, setSpmData] = useState([]);
 
   useEffect(() => {
     fetch('/api/data')
@@ -47,6 +48,14 @@ export default function DashboardPage() {
         setError(err.message);
         setLoading(false);
       });
+
+    fetch('/api/spm')
+      .then(res => {
+        if (!res.ok) throw new Error('Gagal memuat SPM');
+        return res.json();
+      })
+      .then(data => setSpmData(data || []))
+      .catch(err => console.error('Error load SPM:', err));
   }, []);
 
   const jenisList = useMemo(() => {
@@ -214,8 +223,32 @@ export default function DashboardPage() {
                 )}
               </div>
             </div>
+
+            <div style={{ marginBottom: '1.5rem' }}>
+              <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '0.75rem', fontWeight: '500' }}>Menu Khusus</label>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <button 
+                  onClick={() => setSelectedIndikator('SPM')}
+                  style={{
+                    textAlign: 'left',
+                    padding: '0.75rem 1rem',
+                    border: 'none',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    backgroundColor: selectedIndikator === 'SPM' ? 'var(--primary-color)' : '#f8fafc',
+                    color: selectedIndikator === 'SPM' ? 'white' : 'var(--text-main)',
+                    fontWeight: selectedIndikator === 'SPM' ? '600' : '500',
+                    transition: 'all 0.2s',
+                    boxShadow: selectedIndikator === 'SPM' ? '0 4px 6px -1px rgba(37, 99, 235, 0.2)' : 'none',
+                    border: selectedIndikator !== 'SPM' ? '1px solid var(--border-color)' : '1px solid transparent'
+                  }}
+                >
+                  Indeks Pencapaian SPM
+                </button>
+              </div>
+            </div>
             
-            {currentIndikatorInfo && (
+            {currentIndikatorInfo && selectedIndikator !== 'SPM' && (
               <div style={{ marginTop: '1.5rem' }}>
                 <h4 style={{ color: 'var(--text-muted)', fontSize: '0.875rem', marginBottom: '0.5rem' }}>Definisi:</h4>
                 <p style={{ fontSize: '0.95rem', lineHeight: '1.5', color: 'var(--text-main)' }}>
@@ -228,9 +261,59 @@ export default function DashboardPage() {
 
         </div>
 
-        {/* Panel Kanan: Grafik */}
+        {/* Panel Kanan: Grafik atau SPM */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-          <div className="card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          {selectedIndikator === 'SPM' ? (
+            <div className="card">
+              <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0, marginBottom: '1.5rem', color: 'var(--primary-color)' }}>
+                <BarChart3 size={20} color="var(--primary-color)" />
+                Data Indeks Pencapaian SPM
+              </h3>
+              {spmData.length > 0 ? (
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.95rem' }}>
+                    <thead>
+                      <tr style={{ borderBottom: '2px solid var(--border-color)', textAlign: 'left', color: 'var(--text-muted)' }}>
+                        <th style={{ padding: '0.75rem 0.5rem' }}>Tahun</th>
+                        <th style={{ padding: '0.75rem 0.5rem' }}>Indeks SPM</th>
+                        <th style={{ padding: '0.75rem 0.5rem' }}>Nilai Capaian</th>
+                        <th style={{ padding: '0.75rem 0.5rem' }}>Label Capaian</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {spmData.map((row) => (
+                        <tr key={row.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                          <td style={{ padding: '1rem 0.5rem', fontWeight: '600' }}>{row.tahun}</td>
+                          <td style={{ padding: '1rem 0.5rem', color: 'var(--primary-color)', fontWeight: '500' }}>{row.indeks_spm}</td>
+                          <td style={{ padding: '1rem 0.5rem' }}>{row.nilai_capaian}</td>
+                          <td style={{ padding: '1rem 0.5rem' }}>
+                            <span style={{ 
+                              padding: '0.3rem 0.75rem', 
+                              borderRadius: '6px', 
+                              backgroundColor: row.label_capaian?.toLowerCase().includes('tuntas') || row.label_capaian?.toLowerCase().includes('baik') ? '#dcfce7' : 
+                                               row.label_capaian?.toLowerCase().includes('belum') || row.label_capaian?.toLowerCase().includes('kurang') ? '#fee2e2' : '#f1f5f9',
+                              color: row.label_capaian?.toLowerCase().includes('tuntas') || row.label_capaian?.toLowerCase().includes('baik') ? '#166534' : 
+                                     row.label_capaian?.toLowerCase().includes('belum') || row.label_capaian?.toLowerCase().includes('kurang') ? '#991b1b' : '#334155',
+                              fontSize: '0.85rem',
+                              fontWeight: '600'
+                            }}>
+                              {row.label_capaian || '-'}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <div style={{ textAlign: 'center', padding: '3rem 1rem', color: 'var(--text-muted)' }}>
+                  Belum ada data SPM. Silakan input dari menu Admin.
+                </div>
+              )}
+            </div>
+          ) : (
+            <>
+              <div className="card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0 }}>
               <BarChart3 size={20} color="var(--primary-color)" />
               Grafik Progress Capaian
@@ -377,7 +460,8 @@ export default function DashboardPage() {
               )}
             </div>
           </div>
-
+          </>
+          )}
         </div>
       </div>
     </main>
