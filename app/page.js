@@ -108,7 +108,7 @@ export default function DashboardPage() {
   }, [data, selectedJenis]);
 
   useEffect(() => {
-    if (indikatorList.length > 0 && !indikatorList.some(i => i.kode === selectedIndikator)) {
+    if (selectedIndikator !== 'SPM' && indikatorList.length > 0 && !indikatorList.some(i => i.kode === selectedIndikator)) {
       setSelectedIndikator(indikatorList[0].kode);
     }
   }, [indikatorList, selectedIndikator]);
