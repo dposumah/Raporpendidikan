@@ -181,22 +181,35 @@ export default function DashboardPage() {
             {/* Removed Status Dropdown */}
 
             {/* Removed Kategori Indikator UI */}
-            <div className="form-group">
-              <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Pilih Indikator Terkait</label>
-              <select 
-                className="form-select" 
-                value={selectedIndikator} 
-                onChange={(e) => setSelectedIndikator(e.target.value)}
-                style={{ height: 'auto', minHeight: '45px' }}
-              >
+            <div style={{ marginBottom: '1.5rem' }}>
+              <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '0.75rem', fontWeight: '500' }}>Menu Indikator</label>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                 {indikatorList.length > 0 ? indikatorList.map((ind) => (
-                  <option key={ind.kode} value={ind.kode}>
-                    [{ind.kode}] {ind.nama.substring(0, 70)}{ind.nama.length > 70 ? '...' : ''}
-                  </option>
+                  <button 
+                    key={ind.kode}
+                    onClick={() => setSelectedIndikator(ind.kode)}
+                    style={{
+                      textAlign: 'left',
+                      padding: '0.75rem 1rem',
+                      border: 'none',
+                      borderRadius: '8px',
+                      cursor: 'pointer',
+                      backgroundColor: selectedIndikator === ind.kode ? 'var(--primary-color)' : '#f8fafc',
+                      color: selectedIndikator === ind.kode ? 'white' : 'var(--text-main)',
+                      fontWeight: selectedIndikator === ind.kode ? '600' : '500',
+                      transition: 'all 0.2s',
+                      boxShadow: selectedIndikator === ind.kode ? '0 4px 6px -1px rgba(37, 99, 235, 0.2)' : 'none',
+                      border: selectedIndikator !== ind.kode ? '1px solid var(--border-color)' : '1px solid transparent'
+                    }}
+                  >
+                    {ind.nama}
+                  </button>
                 )) : (
-                  <option disabled>Tidak ada indikator di kategori ini</option>
+                  <div style={{ padding: '1rem', textAlign: 'center', color: 'var(--text-muted)', backgroundColor: '#f8fafc', borderRadius: '8px' }}>
+                    Tidak ada data indikator
+                  </div>
                 )}
-              </select>
+              </div>
             </div>
             
             {currentIndikatorInfo && (
