@@ -24,7 +24,7 @@ export default function DashboardPage() {
   const [spmData, setSpmData] = useState([]);
 
   useEffect(() => {
-    fetch('/api/data')
+    fetch('/api/data', { cache: 'no-store' })
       .then((res) => {
         if (!res.ok) throw new Error('Gagal memuat data');
         return res.json();
@@ -49,7 +49,7 @@ export default function DashboardPage() {
         setLoading(false);
       });
 
-    fetch('/api/spm')
+    fetch('/api/spm', { cache: 'no-store' })
       .then(res => {
         if (!res.ok) throw new Error('Gagal memuat SPM');
         return res.json();

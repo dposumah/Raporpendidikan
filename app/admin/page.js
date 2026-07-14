@@ -1,9 +1,11 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { UploadCloud, CheckCircle, AlertCircle, FileText, Database } from 'lucide-react';
 
 export default function AdminPage() {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState('upload'); // 'upload' atau 'spm'
 
   // State untuk Upload Rapor
@@ -47,6 +49,7 @@ export default function AdminPage() {
       if (response.ok) {
         setStatus({ loading: false, error: null, success: data.message });
         setFile(null); // reset
+        router.refresh();
       } else {
         setStatus({ loading: false, error: data.error, success: null });
       }
@@ -86,6 +89,7 @@ export default function AdminPage() {
         setSpmIndeks('');
         setSpmNilai('');
         setSpmLabel('');
+        router.refresh();
       } else {
         setSpmStatus({ loading: false, error: data.error, success: null });
       }

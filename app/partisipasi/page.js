@@ -38,7 +38,7 @@ export default function PartisipasiPage() {
   const [activeMenu, setActiveMenu] = useState('APS');
 
   useEffect(() => {
-    fetch('/api/data')
+    fetch('/api/data', { cache: 'no-store' })
       .then((res) => {
         if (!res.ok) throw new Error('Gagal memuat data');
         return res.json();
