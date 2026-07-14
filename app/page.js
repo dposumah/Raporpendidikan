@@ -34,17 +34,12 @@ export default function DashboardPage() {
         // Set default berjenjang jika ada data
         if (jsonData.length > 0) {
           const uniqueJenis = [...new Set(jsonData.map(item => item.jenis_satuan_pendidikan))];
-          const allowedJenis = ['PAUD', 'SD Umum', 'SD Kesetaraan', 'SMP Umum', 'SMP Kesetaraan', 'SMA Umum', 'SMA Kesetaraan', 'SMK Umum'];
-          const filteredJenis = uniqueJenis.filter(j => allowedJenis.includes(j));
+          const allowedJenis = ['SD Umum', 'SMP Umum', 'SD Kesetaraan', 'SMP Kesetaraan', 'PAUD'];
+          const filteredJenis = allowedJenis.filter(j => uniqueJenis.includes(j));
           
           if (filteredJenis.length > 0) {
             const firstJenis = filteredJenis[0];
             setSelectedJenis(firstJenis);
-            
-            const statusesForJenis = [...new Set(jsonData.filter(i => i.jenis_satuan_pendidikan === firstJenis).map(item => item.status_satuan_pendidikan))];
-            if (statusesForJenis.length > 0) {
-              const regexUtama = /^[a-zA-Z]\.\d+$/;
-              const indikatorsForSelection = [...new Set(jsonData.filter(i => i.jenis_satuan_pendidikan === firstJenis && regexUtama.test(i.kode_indikator)).map(item => item.kode_indikator))];
               if (indikatorsForSelection.length > 0) {
                 setSelectedIndikator(indikatorsForSelection[0]);
               }
@@ -59,9 +54,9 @@ export default function DashboardPage() {
   }, []);
 
   const jenisList = useMemo(() => {
-    const allowedJenis = ['PAUD', 'SD Umum', 'SD Kesetaraan', 'SMP Umum', 'SMP Kesetaraan', 'SMA Umum', 'SMA Kesetaraan', 'SMK Umum'];
+    const allowedJenis = ['SD Umum', 'SMP Umum', 'SD Kesetaraan', 'SMP Kesetaraan', 'PAUD'];
     const uniqueJenis = [...new Set(data.map(item => item.jenis_satuan_pendidikan))];
-    return uniqueJenis.filter(jenis => allowedJenis.includes(jenis));
+    return allowedJenis.filter(jenis => uniqueJenis.includes(jenis));
   }, [data]);
 
   const indikatorList = useMemo(() => {
@@ -69,8 +64,8 @@ export default function DashboardPage() {
     const list = [];
     const map = new Map();
     
-    // Daftar 6 indikator yang ingin ditampilkan
-    const allowedIndicators = [
+    // Daftar indikator SD/SMP
+    const allowedIndicatorsSD_SMP = [
       'kemampuan literasi',
       'kemampuan numerasi',
       'iklim keamanan sekolah',
@@ -79,7 +74,16 @@ export default function DashboardPage() {
       'karakter'
     ];
     
-    const regexUtama = /^[a-zA-Z]\.\d+$/;
+    // Daftar indikator PAUD
+    const allowedIndicatorsPAUD = [
+      'proporsi jumlah satuan paud terakreditasi minimal b',
+      'indeks distribusi guru',
+      'proses belajar yang sesuai bagi anak usia dini',
+      'kemitraan dengan orang tua/wali',
+      'penyediaan layanan holistik integratif'
+    ];
+
+    const allowedIndicators = selectedJenis === 'PAUD' ? allowedIndicatorsPAUD : allowedIndicatorsSD_SMP;
     
     for (const item of data) {
       if (item.jenis_satuan_pendidikan === selectedJenis) {
@@ -88,7 +92,8 @@ export default function DashboardPage() {
         // Cek apakah indikator ini ada di daftar (exact match)
         const isAllowed = allowedIndicators.some(allowed => nameLower === allowed);
         
-        if (isAllowed && regexUtama.test(item.kode_indikator) && !map.has(item.kode_indikator)) {
+        // Memastikan tidak mengambil varian skor
+        if (isAllowed && !item.kode_indikator.toLowerCase().endsWith('.skor') && !map.has(item.kode_indikator)) {
           map.set(item.kode_indikator, true);
           list.push({ kode: item.kode_indikator, nama: item.nama_indikator, definisi: item.definisi_capaian });
         }
@@ -310,52 +315,62 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {['Semua', 'Negeri', 'Swasta'].map((status) => {
-            // Cek apakah ada data untuk status ini di selectedData
-            const hasData = selectedData.some(row => row[status] !== undefined);
-            if (!hasData) return null;
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
+            {['Semua', 'Negeri', 'Swasta'].map((status) => {
+              // Cek apakah ada data untuk status ini di selectedData
+              const hasData = selectedData.some(row => row[status] !== undefined);
+              if (!hasData) return null;
 
-            const statusColors = {
-              'Semua': 'var(--primary-color)',
-              'Negeri': '#10b981',
-              'Swasta': '#f59e0b'
-            };
+              const statusColors = {
+                'Semua': 'var(--primary-color)',
+                'Negeri': '#10b981',
+                'Swasta': '#f59e0b'
+              };
 
-            return (
-              <div key={status} className="card" style={{ display: 'flex', flexDirection: 'column' }}>
-                <h4 style={{ marginBottom: '1rem', color: statusColors[status], fontSize: '1.1rem' }}>Status: {status}</h4>
-                <div style={{ flex: 1, minHeight: '300px', position: 'relative' }}>
-                  <ResponsiveContainer width="100%" height="100%">
-                    {chartType === 'bar' ? (
-                      <BarChart data={selectedData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                        <XAxis dataKey="tahun" tick={{ fill: '#64748b' }} tickLine={false} axisLine={{ stroke: '#cbd5e1' }} />
-                        <YAxis tick={{ fill: '#64748b' }} tickLine={false} axisLine={{ stroke: '#cbd5e1' }} />
-                        <RechartsTooltip 
-                          cursor={{ fill: '#f8fafc' }}
-                          contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}
-                        />
-                        <Bar dataKey={status} fill={statusColors[status]} radius={[4, 4, 0, 0]} name={status} barSize={40} />
-                      </BarChart>
-                    ) : (
-                      <LineChart data={selectedData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                        <XAxis dataKey="tahun" tick={{ fill: '#64748b' }} tickLine={false} axisLine={{ stroke: '#cbd5e1' }} />
-                        <YAxis tick={{ fill: '#64748b' }} tickLine={false} axisLine={{ stroke: '#cbd5e1' }} />
-                        <RechartsTooltip 
-                          contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}
-                        />
-                        <Line type="monotone" dataKey={status} stroke={statusColors[status]} strokeWidth={3} activeDot={{ r: 8 }} name={status} />
-                      </LineChart>
-                    )}
-                  </ResponsiveContainer>
+              return (
+                <div key={status} className="card" style={{ display: 'flex', flexDirection: 'column', padding: '1rem' }}>
+                  <h4 style={{ marginBottom: '1rem', color: statusColors[status], fontSize: '1rem' }}>{status}</h4>
+                  <div style={{ flex: 1, minHeight: '220px', position: 'relative' }}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      {chartType === 'bar' ? (
+                        <BarChart data={selectedData} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
+                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                          <XAxis dataKey="tahun" tick={{ fill: '#64748b', fontSize: 11 }} tickLine={false} axisLine={{ stroke: '#cbd5e1' }} />
+                          <YAxis tick={{ fill: '#64748b', fontSize: 11 }} tickLine={false} axisLine={{ stroke: '#cbd5e1' }} />
+                          <RechartsTooltip 
+                            cursor={{ fill: '#f8fafc' }}
+                            contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)', fontSize: '0.85rem' }}
+                            formatter={(value, name, props) => {
+                              const lbl = props.payload.labels ? props.payload.labels[status] : '';
+                              return [value, `${status} ${lbl ? `(${lbl})` : ''}`];
+                            }}
+                          />
+                          <Bar dataKey={status} fill={statusColors[status]} radius={[4, 4, 0, 0]} name={status} barSize={25} />
+                        </BarChart>
+                      ) : (
+                        <LineChart data={selectedData} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
+                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                          <XAxis dataKey="tahun" tick={{ fill: '#64748b', fontSize: 11 }} tickLine={false} axisLine={{ stroke: '#cbd5e1' }} />
+                          <YAxis tick={{ fill: '#64748b', fontSize: 11 }} tickLine={false} axisLine={{ stroke: '#cbd5e1' }} />
+                          <RechartsTooltip 
+                            contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)', fontSize: '0.85rem' }}
+                            formatter={(value, name, props) => {
+                              const lbl = props.payload.labels ? props.payload.labels[status] : '';
+                              return [value, `${status} ${lbl ? `(${lbl})` : ''}`];
+                            }}
+                          />
+                          <Line type="monotone" dataKey={status} stroke={statusColors[status]} strokeWidth={3} activeDot={{ r: 6 }} name={status} />
+                        </LineChart>
+                      )}
+                    </ResponsiveContainer>
+                  </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
           
           {selectedData.length === 0 && (
-            <div className="card" style={{ minHeight: '400px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' }}>
+            <div className="card" style={{ minHeight: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' }}>
               Data tidak tersedia atau tidak memiliki nilai numerik untuk dibuatkan grafik.
             </div>
           )}
