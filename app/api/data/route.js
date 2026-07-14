@@ -8,34 +8,42 @@ export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
-    let allData = [];
-    let page = 0;
-    const pageSize = 1000;
-    let hasMore = true;
+    const { count, error: countError } = await supabase
+      .from('rapor_data')
+      .select('*', { count: 'exact', head: true });
 
-    while (hasMore) {
-      const { data, error } = await supabase
-        .from('rapor_data')
-        .select('*')
-        .range(page * pageSize, (page + 1) * pageSize - 1)
-        .order('tahun', { ascending: true });
-
-      if (error) {
-        console.error('Supabase fetch error:', error);
-        throw error;
-      }
-
-      if (data && data.length > 0) {
-        allData = [...allData, ...data];
-        if (data.length < pageSize) {
-          hasMore = false;
-        } else {
-          page++;
-        }
-      } else {
-        hasMore = false;
-      }
+    if (countError) {
+      console.error('Supabase count error:', countError);
+      throw countError;
     }
+
+    const pageSize = 1000;
+    const promises = [];
+    
+    // Siapkan semua request secara paralel (concurrent)
+    for (let i = 0; i < count; i += pageSize) {
+      promises.push(
+        supabase
+          .from('rapor_data')
+          .select('*')
+          .range(i, i + pageSize - 1)
+          .order('tahun', { ascending: true })
+      );
+    }
+
+    // Jalankan semua request sekaligus
+    const results = await Promise.all(promises);
+    
+    let allData = [];
+    results.forEach(res => {
+      if (res.error) {
+        console.error('Supabase fetch error:', res.error);
+        throw res.error;
+      }
+      if (res.data) {
+        allData.push(...res.data);
+      }
+    });
 
     return NextResponse.json(allData);
   } catch (error) {
