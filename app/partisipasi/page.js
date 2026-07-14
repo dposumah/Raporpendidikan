@@ -8,7 +8,8 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip as RechartsTooltip,
-  ResponsiveContainer
+  ResponsiveContainer,
+  LabelList
 } from 'recharts';
 import { BarChart3, Users } from 'lucide-react';
 
@@ -138,15 +139,39 @@ export default function PartisipasiPage() {
                       <YAxis tick={{ fill: '#64748b', fontSize: 12 }} tickLine={false} axisLine={{ stroke: '#cbd5e1' }} />
                       <RechartsTooltip 
                         cursor={{ fill: '#f8fafc' }}
-                        contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}
-                        formatter={(value, name, props) => [`${props.payload.nilai_teks}`, 'Nilai']}
+                        content={({ active, payload, label }) => {
+                          if (active && payload && payload.length) {
+                            const data = payload[0].payload;
+                            return (
+                              <div style={{ backgroundColor: 'white', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '0.75rem 1rem', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)', fontSize: '0.85rem' }}>
+                                <h4 style={{ margin: '0 0 0.5rem 0', color: 'var(--primary-color)' }}>Tahun {label}</h4>
+                                <div style={{ marginBottom: '0.25rem', color: 'var(--text-main)' }}><strong>Nilai:</strong> {data.nilai_teks}</div>
+                                {data.label_capaian && data.label_capaian !== '-' && data.label_capaian.trim() !== '' && (
+                                  <div>
+                                    <strong>Status:</strong> <span style={{
+                                      padding: '0.15rem 0.4rem', 
+                                      borderRadius: '4px', 
+                                      backgroundColor: data.label_capaian.toLowerCase().includes('baik') || data.label_capaian.toLowerCase().includes('atas') ? '#dcfce7' : 
+                                                       data.label_capaian.toLowerCase().includes('kurang') || data.label_capaian.toLowerCase().includes('bawah') ? '#fee2e2' : '#f1f5f9',
+                                      color: data.label_capaian.toLowerCase().includes('baik') || data.label_capaian.toLowerCase().includes('atas') ? '#166534' : 
+                                             data.label_capaian.toLowerCase().includes('kurang') || data.label_capaian.toLowerCase().includes('bawah') ? '#991b1b' : '#334155',
+                                    }}>{data.label_capaian}</span>
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          }
+                          return null;
+                        }}
                       />
                       <Bar 
                         dataKey="nilai_angka" 
                         fill="var(--primary-color)" 
                         radius={[4, 4, 0, 0]} 
-                        barSize={30}
-                      />
+                        barSize={40}
+                      >
+                        <LabelList dataKey="nilai_teks" position="top" style={{ fill: '#64748b', fontSize: '0.85rem', fontWeight: 600 }} />
+                      </Bar>
                     </BarChart>
                   </ResponsiveContainer>
                 )}
