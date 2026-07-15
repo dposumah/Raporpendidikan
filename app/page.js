@@ -12,7 +12,7 @@ import {
   LineChart,
   Line
 } from 'recharts';
-import { Info, BarChart3, TrendingUp } from 'lucide-react';
+import { Info, BarChart3, TrendingUp, Download, X } from 'lucide-react';
 
 export default function DashboardPage() {
   const [data, setData] = useState([]);
@@ -22,6 +22,12 @@ export default function DashboardPage() {
   const [selectedJenis, setSelectedJenis] = useState('');
   const [chartType, setChartType] = useState('bar');
   const [spmData, setSpmData] = useState([]);
+  
+  // Export Modal State
+  const [showExportModal, setShowExportModal] = useState(false);
+  const [exportStartYear, setExportStartYear] = useState('');
+  const [exportEndYear, setExportEndYear] = useState('');
+  const [exportSelectedIndicators, setExportSelectedIndicators] = useState([]);
 
   useEffect(() => {
     fetch('/api/data', { cache: 'no-store' })
@@ -113,6 +119,79 @@ export default function DashboardPage() {
     }
   }, [indikatorList, selectedIndikator]);
 
+  const availableYears = useMemo(() => {
+    const years = new Set();
+    data.forEach(d => years.add(d.tahun));
+    spmData.forEach(d => years.add(d.tahun));
+    return Array.from(years).sort();
+  }, [data, spmData]);
+
+  const allAvailableIndicators = useMemo(() => {
+    const inds = [{ kode: 'SPM', nama: 'Indeks Pencapaian SPM' }];
+    const uniqueKodes = new Set();
+    data.forEach(d => {
+      if (!uniqueKodes.has(d.indikator_kode)) {
+        uniqueKodes.add(d.indikator_kode);
+        inds.push({ kode: d.indikator_kode, nama: d.indikator });
+      }
+    });
+    return inds;
+  }, [data]);
+
+  // Set default export years when available
+  useEffect(() => {
+    if (availableYears.length > 0 && !exportStartYear && !exportEndYear) {
+      setExportStartYear(availableYears[0]);
+      setExportEndYear(availableYears[availableYears.length - 1]);
+      // Also pre-select all indicators by default
+      setExportSelectedIndicators(allAvailableIndicators.map(i => i.kode));
+    }
+  }, [availableYears, allAvailableIndicators]);
+
+  const handleSelectIndicator = (kode) => {
+    if (exportSelectedIndicators.includes(kode)) {
+      setExportSelectedIndicators(exportSelectedIndicators.filter(k => k !== kode));
+    } else {
+      setExportSelectedIndicators([...exportSelectedIndicators, kode]);
+    }
+  };
+
+  const handleExportData = () => {
+    if (exportSelectedIndicators.length === 0) {
+      alert('Pilih setidaknya satu indikator untuk di-export.');
+      return;
+    }
+
+    let csvContent = "Tahun,Jenis Satuan Pendidikan,Indikator,Nilai Capaian,Label Capaian\n";
+    const start = parseInt(exportStartYear);
+    const end = parseInt(exportEndYear);
+
+    if (exportSelectedIndicators.includes('SPM')) {
+      const spmFiltered = spmData.filter(d => parseInt(d.tahun) >= start && parseInt(d.tahun) <= end);
+      spmFiltered.forEach(d => {
+        csvContent += `"${d.tahun}","Semua","${d.indeks_spm}",${d.nilai_capaian},"${d.label_capaian || ''}"\n`;
+      });
+    }
+
+    const regularSelected = exportSelectedIndicators.filter(k => k !== 'SPM');
+    if (regularSelected.length > 0) {
+      const regFiltered = data.filter(d => parseInt(d.tahun) >= start && parseInt(d.tahun) <= end && regularSelected.includes(d.indikator_kode));
+      regFiltered.forEach(d => {
+        csvContent += `"${d.tahun}","${d.jenis_satuan_pendidikan}","${d.indikator}",${d.nilai_capaian},"${d.label_capaian || ''}"\n`;
+      });
+    }
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `Export_Capaian_${start}-${end}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setShowExportModal(false);
+  };
+
   const selectedData = useMemo(() => {
     const filtered = data.filter((item) => 
       item.kode_indikator === selectedIndikator &&
@@ -167,8 +246,15 @@ export default function DashboardPage() {
 
   return (
     <main className="container">
-      <div className="header">
-        <h1 className="title">Analisis Detail Capaian</h1>
+      <div className="header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+        <h1 className="title" style={{ margin: 0 }}>Analisis Detail Capaian</h1>
+        <button 
+          onClick={() => setShowExportModal(true)}
+          style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', backgroundColor: 'var(--primary-color)', color: 'white', padding: '0.5rem 1rem', borderRadius: '8px', border: 'none', cursor: 'pointer', fontWeight: '600', boxShadow: '0 2px 4px rgba(37,99,235,0.2)' }}
+        >
+          <Download size={18} />
+          Export Data
+        </button>
       </div>
 
       <div className="grid grid-cols-2" style={{ gridTemplateColumns: '300px 1fr', alignItems: 'start' }}>
@@ -580,6 +666,78 @@ export default function DashboardPage() {
           )}
         </div>
       </div>
+
+      {/* Export Modal */}
+      {showExportModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '1rem', backdropFilter: 'blur(4px)' }}>
+          <div className="card" style={{ width: '100%', maxWidth: '550px', padding: '2rem', maxHeight: '90vh', overflowY: 'auto', animation: 'fadeIn 0.2s ease-out' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+              <h3 style={{ margin: 0, fontSize: '1.25rem', color: 'var(--primary-color)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <Download size={22} /> Export Data Capaian
+              </h3>
+              <button onClick={() => setShowExportModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}>
+                <X size={24} />
+              </button>
+            </div>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
+              <div className="form-group">
+                <label className="form-label">Tahun Awal</label>
+                <select className="form-select" value={exportStartYear} onChange={e => setExportStartYear(e.target.value)}>
+                  {availableYears.map(y => <option key={`start-${y}`} value={y}>{y}</option>)}
+                </select>
+              </div>
+              <div className="form-group">
+                <label className="form-label">Tahun Akhir</label>
+                <select className="form-select" value={exportEndYear} onChange={e => setExportEndYear(e.target.value)}>
+                  {availableYears.map(y => <option key={`end-${y}`} value={y}>{y}</option>)}
+                </select>
+              </div>
+            </div>
+
+            <div style={{ marginBottom: '1.5rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                <label className="form-label" style={{ margin: 0 }}>Pilih Indikator</label>
+                <button 
+                  onClick={() => {
+                    if (exportSelectedIndicators.length === allAvailableIndicators.length) {
+                      setExportSelectedIndicators([]);
+                    } else {
+                      setExportSelectedIndicators(allAvailableIndicators.map(i => i.kode));
+                    }
+                  }}
+                  style={{ background: 'none', border: 'none', color: 'var(--primary-color)', fontSize: '0.85rem', cursor: 'pointer', fontWeight: '600' }}
+                >
+                  {exportSelectedIndicators.length === allAvailableIndicators.length ? 'Batal Pilih Semua' : 'Pilih Semua'}
+                </button>
+              </div>
+              <div style={{ border: '1px solid var(--border-color)', borderRadius: '8px', padding: '0.5rem', maxHeight: '250px', overflowY: 'auto', backgroundColor: '#f8fafc' }}>
+                {allAvailableIndicators.map(ind => (
+                  <label key={ind.kode} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', padding: '0.5rem', cursor: 'pointer', borderBottom: '1px solid #e2e8f0', borderRadius: '4px', transition: 'background-color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'white'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
+                    <input 
+                      type="checkbox" 
+                      checked={exportSelectedIndicators.includes(ind.kode)} 
+                      onChange={() => handleSelectIndicator(ind.kode)}
+                      style={{ width: '16px', height: '16px', cursor: 'pointer', marginTop: '3px' }}
+                    />
+                    <span style={{ fontSize: '0.9rem', color: 'var(--text-main)', lineHeight: '1.3' }}>{ind.nama}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <button 
+              onClick={handleExportData}
+              style={{ width: '100%', backgroundColor: 'var(--primary-color)', color: 'white', padding: '0.85rem', borderRadius: '8px', border: 'none', cursor: 'pointer', fontWeight: '600', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem', fontSize: '1rem', transition: 'all 0.2s' }}
+              onMouseEnter={(e) => e.currentTarget.style.opacity = '0.9'}
+              onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+            >
+              <Download size={20} />
+              Download CSV
+            </button>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
