@@ -144,17 +144,29 @@ export default function AdminSiswaPage() {
             throw new Error("Tidak ada data valid yang ditemukan (Pastikan ada kolom NISN dan NIK).");
           }
 
-          // Insert into Supabase (upsert based on NISN or NIK)
-          // Since Supabase RPC or upsert with multiple unique constraints can be tricky, 
-          // we use standard upsert assuming 'nisn' is the primary conflict target if set up in schema.
-          // For simplicity, we just do a bulk insert. If unique constraint fails, it throws an error.
-          const { error: dbError } = await supabase
-            .from('siswa')
-            .upsert(formattedData, { onConflict: 'nisn', ignoreDuplicates: false });
+          // Chunking array for massive uploads (e.g. 21,000+ rows)
+          const CHUNK_SIZE = 1000;
+          let successCount = 0;
+          
+          for (let i = 0; i < formattedData.length; i += CHUNK_SIZE) {
+            const chunk = formattedData.slice(i, i + CHUNK_SIZE);
+            
+            // Provide progress update to the UI
+            setMessage(`Memproses data: ${Math.min(i + CHUNK_SIZE, formattedData.length)} dari ${formattedData.length} baris... (Harap tunggu, proses ini butuh waktu)`);
+            
+            const { error: dbError } = await supabase
+              .from('siswa')
+              .upsert(chunk, { onConflict: 'nisn', ignoreDuplicates: false });
 
-          if (dbError) throw dbError;
+            if (dbError) {
+              console.error('Database Error on Chunk:', dbError);
+              throw new Error(`Gagal menyimpan baris ${i+1} sampai ${i+chunk.length}. Pesan Error: ${dbError.message}`);
+            }
+            
+            successCount += chunk.length;
+          }
 
-          setMessage(`Berhasil menyimpan ${formattedData.length} data siswa ke database.`);
+          setMessage(`✅ Berhasil menyimpan total ${successCount} data siswa secara bertahap ke database!`);
         } catch (err) {
           setError(err.message || 'Gagal memproses file Excel.');
         } finally {
