@@ -28,6 +28,9 @@ export default function DataPendidikanPage() {
   // Detail Modal
   const [selectedSiswa, setSelectedSiswa] = useState(null);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const rowsPerPage = 50;
+
   const supabase = createClient();
 
   useEffect(() => {
@@ -36,31 +39,52 @@ export default function DataPendidikanPage() {
 
   const fetchData = async () => {
     setLoading(true);
-    let query = supabase.from('siswa').select('*');
-
-    if (sekolah) query = query.eq('nama_sekolah', sekolah);
-    if (jenjang) query = query.eq('jenjang', jenjang);
-    if (kelas) query = query.eq('kelas', kelas);
-    if (statusPIP === 'layak') query = query.eq('layak_pip', true);
-    if (statusPIP === 'tidak_layak') query = query.eq('layak_pip', false);
-
-    const { data: result, error } = await query;
+    setCurrentPage(1); // Reset page on new fetch
     
-    if (error) {
-      console.error('Error fetching data:', error);
-    } else {
-      setData(result || []);
+    let allResult = [];
+    let from = 0;
+    const limit = 1000;
+    let hasMore = true;
+
+    while (hasMore) {
+      let query = supabase.from('siswa').select('*');
+
+      if (sekolah) query = query.eq('nama_sekolah', sekolah);
+      if (jenjang) query = query.eq('jenjang', jenjang);
+      if (kelas) query = query.eq('kelas', kelas);
+      if (statusPIP === 'layak') query = query.eq('layak_pip', true);
+      if (statusPIP === 'tidak_layak') query = query.eq('layak_pip', false);
+
+      query = query.range(from, from + limit - 1);
       
-      const total = result?.length || 0;
-      const pip = result?.filter(s => s.layak_pip).length || 0;
-      const uniqueSekolah = new Set(result?.map(s => s.nama_sekolah).filter(Boolean)).size;
+      const { data: result, error } = await query;
       
-      setStats({
-        totalSiswa: total,
-        persenPIP: total > 0 ? Math.round((pip / total) * 100) : 0,
-        totalSekolah: uniqueSekolah
-      });
+      if (error) {
+        console.error('Error fetching data:', error);
+        hasMore = false;
+      } else {
+        if (result && result.length > 0) {
+          allResult = [...allResult, ...result];
+          from += limit;
+          if (result.length < limit) hasMore = false;
+        } else {
+          hasMore = false;
+        }
+      }
     }
+
+    setData(allResult);
+    
+    const total = allResult.length;
+    const pip = allResult.filter(s => s.layak_pip).length;
+    const uniqueSekolah = new Set(allResult.map(s => s.nama_sekolah).filter(Boolean)).size;
+    
+    setStats({
+      totalSiswa: total,
+      persenPIP: total > 0 ? Math.round((pip / total) * 100) : 0,
+      totalSekolah: uniqueSekolah
+    });
+    
     setLoading(false);
   };
 
@@ -72,12 +96,16 @@ export default function DataPendidikanPage() {
     }
 
     setLoading(true);
+    setCurrentPage(1);
+    
+    // For search, we might just limit to 1000 since it's a specific search
     const { data: result, error } = await supabase.rpc('cari_siswa', { search_query: searchQuery });
     
     if (error) {
       console.error('Search error:', error);
       const fallback = await supabase.from('siswa').select('*')
-        .or(`nama_peserta_didik.ilike.%${searchQuery}%,nisn.ilike.%${searchQuery}%,nik.ilike.%${searchQuery}%`);
+        .or(`nama_peserta_didik.ilike.%${searchQuery}%,nisn.ilike.%${searchQuery}%,nik.ilike.%${searchQuery}%`)
+        .limit(1000);
       if (fallback.data) setData(fallback.data);
     } else {
       setData(result || []);
@@ -302,7 +330,7 @@ export default function DataPendidikanPage() {
                     ) : data.length === 0 ? (
                       <tr><td colSpan="6" style={{ padding: '2rem', textAlign: 'center', color: '#64748b' }}>Tidak ada data yang ditemukan.</td></tr>
                     ) : (
-                      data.map((row) => {
+                      data.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage).map((row) => {
                         const isUnmasked = unmaskedRows.has(row.id);
                         return (
                           <tr key={row.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
@@ -351,6 +379,31 @@ export default function DataPendidikanPage() {
                   </tbody>
                 </table>
               </div>
+              
+              {/* Pagination Controls */}
+              {data.length > 0 && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 1.5rem', background: '#f8fafc', borderTop: '1px solid #e2e8f0' }}>
+                  <div style={{ color: '#64748b', fontSize: '0.9rem' }}>
+                    Menampilkan <strong style={{ color: '#0f172a' }}>{((currentPage - 1) * rowsPerPage) + 1}</strong> hingga <strong style={{ color: '#0f172a' }}>{Math.min(currentPage * rowsPerPage, data.length)}</strong> dari <strong style={{ color: '#0f172a' }}>{data.length.toLocaleString('id-ID')}</strong> data
+                  </div>
+                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <button 
+                      onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                      disabled={currentPage === 1}
+                      style={{ background: 'white', border: '1px solid #cbd5e1', padding: '0.5rem 1rem', borderRadius: '6px', color: currentPage === 1 ? '#94a3b8' : '#334155', cursor: currentPage === 1 ? 'not-allowed' : 'pointer', fontWeight: '500' }}
+                    >
+                      Sebelumnya
+                    </button>
+                    <button 
+                      onClick={() => setCurrentPage(p => Math.min(Math.ceil(data.length / rowsPerPage), p + 1))}
+                      disabled={currentPage >= Math.ceil(data.length / rowsPerPage)}
+                      style={{ background: 'white', border: '1px solid #cbd5e1', padding: '0.5rem 1rem', borderRadius: '6px', color: currentPage >= Math.ceil(data.length / rowsPerPage) ? '#94a3b8' : '#334155', cursor: currentPage >= Math.ceil(data.length / rowsPerPage) ? 'not-allowed' : 'pointer', fontWeight: '500' }}
+                    >
+                      Berikutnya
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}
