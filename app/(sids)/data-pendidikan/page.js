@@ -6,21 +6,18 @@ import { Search, Filter, Eye, EyeOff, Users, CheckCircle, School, AlertCircle, M
 import Link from 'next/link';
 
 export default function DataPendidikanPage() {
-  const [data, setData] = useState([]);
+  const [allData, setAllData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
   
-  // Tabs
-  const [activeTab, setActiveTab] = useState('data'); // 'data' | 'rekap'
-
-  // Filters
+  // Real-time Search & Filters
+  const [searchQuery, setSearchQuery] = useState('');
   const [sekolah, setSekolah] = useState('');
   const [jenjang, setJenjang] = useState('');
   const [kelas, setKelas] = useState('');
   const [statusPIP, setStatusPIP] = useState('');
   
-  // KPI Stats
-  const [stats, setStats] = useState({ totalSiswa: 0, persenPIP: 0, totalSekolah: 0 });
+  // Tabs
+  const [activeTab, setActiveTab] = useState('data');
 
   // Unmask state
   const [unmaskedRows, setUnmaskedRows] = useState(new Set());
@@ -33,30 +30,20 @@ export default function DataPendidikanPage() {
 
   const supabase = createClient();
 
+  // 1. FETCH ALL DATA ONCE
   useEffect(() => {
     fetchData();
-  }, [sekolah, jenjang, kelas, statusPIP]);
+  }, []); // Only run once on mount!
 
   const fetchData = async () => {
     setLoading(true);
-    setCurrentPage(1); // Reset page on new fetch
-    
     let allResult = [];
     let from = 0;
     const limit = 1000;
     let hasMore = true;
 
     while (hasMore) {
-      let query = supabase.from('siswa').select('*');
-
-      if (sekolah) query = query.eq('nama_sekolah', sekolah);
-      if (jenjang) query = query.eq('jenjang', jenjang);
-      if (kelas) query = query.eq('kelas', kelas);
-      if (statusPIP === 'layak') query = query.eq('layak_pip', true);
-      if (statusPIP === 'tidak_layak') query = query.eq('layak_pip', false);
-
-      query = query.range(from, from + limit - 1);
-      
+      let query = supabase.from('siswa').select('*').range(from, from + limit - 1);
       const { data: result, error } = await query;
       
       if (error) {
@@ -73,44 +60,54 @@ export default function DataPendidikanPage() {
       }
     }
 
-    setData(allResult);
-    
-    const total = allResult.length;
-    const pip = allResult.filter(s => s.layak_pip).length;
-    const uniqueSekolah = new Set(allResult.map(s => s.nama_sekolah).filter(Boolean)).size;
-    
-    setStats({
-      totalSiswa: total,
-      persenPIP: total > 0 ? Math.round((pip / total) * 100) : 0,
-      totalSekolah: uniqueSekolah
-    });
-    
+    setAllData(allResult);
     setLoading(false);
   };
 
-  const handleSearch = async (e) => {
-    e.preventDefault();
-    if (!searchQuery.trim()) {
-      fetchData();
-      return;
-    }
+  // 2. CLIENT-SIDE FILTERING (Blazing Fast)
+  const filteredData = useMemo(() => {
+    return allData.filter(s => {
+      let match = true;
+      if (sekolah && s.nama_sekolah !== sekolah) match = false;
+      if (jenjang && s.jenjang !== jenjang) match = false;
+      if (kelas && String(s.kelas) !== String(kelas)) match = false;
+      if (statusPIP === 'layak' && !s.layak_pip) match = false;
+      if (statusPIP === 'tidak_layak' && s.layak_pip) match = false;
+      
+      if (searchQuery) {
+        const q = searchQuery.toLowerCase();
+        const nama = (s.nama_peserta_didik || '').toLowerCase();
+        const nisn = (s.nisn || '').toLowerCase();
+        const nik = (s.nik || '').toLowerCase();
+        
+        if (!nama.includes(q) && !nisn.includes(q) && !nik.includes(q)) {
+          match = false;
+        }
+      }
+      return match;
+    });
+  }, [allData, sekolah, jenjang, kelas, statusPIP, searchQuery]);
 
-    setLoading(true);
+  // Reset page when filters change
+  useEffect(() => {
     setCurrentPage(1);
-    
-    // For search, we might just limit to 1000 since it's a specific search
-    const { data: result, error } = await supabase.rpc('cari_siswa', { search_query: searchQuery });
-    
-    if (error) {
-      console.error('Search error:', error);
-      const fallback = await supabase.from('siswa').select('*')
-        .or(`nama_peserta_didik.ilike.%${searchQuery}%,nisn.ilike.%${searchQuery}%,nik.ilike.%${searchQuery}%`)
-        .limit(1000);
-      if (fallback.data) setData(fallback.data);
-    } else {
-      setData(result || []);
-    }
-    setLoading(false);
+  }, [sekolah, jenjang, kelas, statusPIP, searchQuery]);
+
+  // 3. DERIVED STATS FROM FILTERED DATA
+  const stats = useMemo(() => {
+    const total = filteredData.length;
+    const pip = filteredData.filter(s => s.layak_pip).length;
+    const uniqueSekolah = new Set(filteredData.map(s => s.nama_sekolah).filter(Boolean)).size;
+    return {
+      totalSiswa: total,
+      persenPIP: total > 0 ? Math.round((pip / total) * 100) : 0,
+      totalSekolah: uniqueSekolah
+    };
+  }, [filteredData]);
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    // No-op since search is now real-time through useMemo
   };
 
   const toggleMask = (id) => {
@@ -134,7 +131,7 @@ export default function DataPendidikanPage() {
   // Group data for Rekapitulasi: Jenjang -> Kecamatan -> Kelurahan -> Sekolah
   const rekapData = useMemo(() => {
     const grouped = {};
-    data.forEach(s => {
+    filteredData.forEach(s => {
       const j = s.jenjang || 'Tanpa Jenjang';
       const kec = s.sekolah_kecamatan || s.kecamatan_siswa || 'Tanpa Kecamatan';
       const kel = s.sekolah_desa_kelurahan || s.kelurahan_siswa || 'Tanpa Kelurahan';
@@ -327,10 +324,10 @@ export default function DataPendidikanPage() {
                   <tbody>
                     {loading ? (
                       <tr><td colSpan="6" style={{ padding: '2rem', textAlign: 'center', color: '#64748b' }}>Memuat data...</td></tr>
-                    ) : data.length === 0 ? (
+                    ) : filteredData.length === 0 ? (
                       <tr><td colSpan="6" style={{ padding: '2rem', textAlign: 'center', color: '#64748b' }}>Tidak ada data yang ditemukan.</td></tr>
                     ) : (
-                      data.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage).map((row) => {
+                      filteredData.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage).map((row) => {
                         const isUnmasked = unmaskedRows.has(row.id);
                         return (
                           <tr key={row.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
@@ -381,10 +378,10 @@ export default function DataPendidikanPage() {
               </div>
               
               {/* Pagination Controls */}
-              {data.length > 0 && (
+              {filteredData.length > 0 && (
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 1.5rem', background: '#f8fafc', borderTop: '1px solid #e2e8f0' }}>
                   <div style={{ color: '#64748b', fontSize: '0.9rem' }}>
-                    Menampilkan <strong style={{ color: '#0f172a' }}>{((currentPage - 1) * rowsPerPage) + 1}</strong> hingga <strong style={{ color: '#0f172a' }}>{Math.min(currentPage * rowsPerPage, data.length)}</strong> dari <strong style={{ color: '#0f172a' }}>{data.length.toLocaleString('id-ID')}</strong> data
+                    Menampilkan <strong style={{ color: '#0f172a' }}>{((currentPage - 1) * rowsPerPage) + 1}</strong> hingga <strong style={{ color: '#0f172a' }}>{Math.min(currentPage * rowsPerPage, filteredData.length)}</strong> dari <strong style={{ color: '#0f172a' }}>{filteredData.length.toLocaleString('id-ID')}</strong> data
                   </div>
                   <div style={{ display: 'flex', gap: '0.5rem' }}>
                     <button 
@@ -395,9 +392,9 @@ export default function DataPendidikanPage() {
                       Sebelumnya
                     </button>
                     <button 
-                      onClick={() => setCurrentPage(p => Math.min(Math.ceil(data.length / rowsPerPage), p + 1))}
-                      disabled={currentPage >= Math.ceil(data.length / rowsPerPage)}
-                      style={{ background: 'white', border: '1px solid #cbd5e1', padding: '0.5rem 1rem', borderRadius: '6px', color: currentPage >= Math.ceil(data.length / rowsPerPage) ? '#94a3b8' : '#334155', cursor: currentPage >= Math.ceil(data.length / rowsPerPage) ? 'not-allowed' : 'pointer', fontWeight: '500' }}
+                      onClick={() => setCurrentPage(p => Math.min(Math.ceil(filteredData.length / rowsPerPage), p + 1))}
+                      disabled={currentPage >= Math.ceil(filteredData.length / rowsPerPage)}
+                      style={{ background: 'white', border: '1px solid #cbd5e1', padding: '0.5rem 1rem', borderRadius: '6px', color: currentPage >= Math.ceil(filteredData.length / rowsPerPage) ? '#94a3b8' : '#334155', cursor: currentPage >= Math.ceil(filteredData.length / rowsPerPage) ? 'not-allowed' : 'pointer', fontWeight: '500' }}
                     >
                       Berikutnya
                     </button>
