@@ -20,6 +20,10 @@ export default function InternalLayout({ children }) {
           <Link href="/partisipasi" style={{ display: 'flex', alignItems: 'center' }}><Users size={16} style={{marginRight: '6px'}}/> Angka Partisipasi</Link>
           <Link href="/glosarium" style={{ display: 'flex', alignItems: 'center' }}><BookOpen size={16} style={{marginRight: '6px'}}/> Glosarium</Link>
           <Link href="/admin" style={{ display: 'flex', alignItems: 'center' }}><Settings size={16} style={{marginRight: '6px'}}/> Upload (Admin)</Link>
+          <div style={{ width: '1px', height: '24px', backgroundColor: 'var(--border-color)', margin: '0 0.5rem' }}></div>
+          <Link href="/" className="btn btn-primary" style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }}>
+            Kembali ke Portal
+          </Link>
         </div>
       </nav>
       {children}
