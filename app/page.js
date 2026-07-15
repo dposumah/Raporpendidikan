@@ -199,6 +199,7 @@ export default function DashboardPage() {
         excelData.push({
           "Tahun": d.tahun,
           "Jenis Satuan Pendidikan": "Semua",
+          "Status Satuan Pendidikan": "Semua",
           "Indikator": d.indeks_spm,
           "Nilai Capaian": d.nilai_capaian,
           "Label Capaian": d.label_capaian || ''
@@ -218,8 +219,9 @@ export default function DashboardPage() {
         excelData.push({
           "Tahun": d.tahun,
           "Jenis Satuan Pendidikan": d.jenis_satuan_pendidikan,
+          "Status Satuan Pendidikan": d.status_satuan_pendidikan || "Semua",
           "Indikator": d.nama_indikator,
-          "Nilai Capaian": d.nilai_capaian,
+          "Nilai Capaian": d.nilai_teks || d.nilai_angka || '',
           "Label Capaian": d.label_capaian || ''
         });
       });
