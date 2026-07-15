@@ -1,0 +1,28 @@
+import Link from 'next/link';
+import { Home, Users, BookOpen, Settings } from 'lucide-react';
+
+export default function InternalLayout({ children }) {
+  return (
+    <>
+      <nav className="navbar" style={{ padding: '0.75rem 2rem', alignItems: 'center' }}>
+        <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '1rem', textDecoration: 'none' }}>
+          <img src="/logo.png" alt="Logo Kota Tomohon" style={{ height: '45px', width: 'auto', objectFit: 'contain' }} />
+          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <div style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', lineHeight: '1.3' }}>
+              Pemerintah Kota Tomohon<br/>
+              Dinas Pendidikan dan Kebudayaan Daerah
+            </div>
+            <div className="title" style={{ fontSize: '1.25rem', margin: 0, lineHeight: '1.2', color: 'var(--primary-color)' }}>Rapor Pendidikan</div>
+          </div>
+        </Link>
+        <div className="nav-links">
+          <Link href="/rapor" style={{ display: 'flex', alignItems: 'center' }}><Home size={16} style={{marginRight: '6px'}}/> Dashboard</Link>
+          <Link href="/partisipasi" style={{ display: 'flex', alignItems: 'center' }}><Users size={16} style={{marginRight: '6px'}}/> Angka Partisipasi</Link>
+          <Link href="/glosarium" style={{ display: 'flex', alignItems: 'center' }}><BookOpen size={16} style={{marginRight: '6px'}}/> Glosarium</Link>
+          <Link href="/admin" style={{ display: 'flex', alignItems: 'center' }}><Settings size={16} style={{marginRight: '6px'}}/> Upload (Admin)</Link>
+        </div>
+      </nav>
+      {children}
+    </>
+  );
+}
