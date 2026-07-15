@@ -114,8 +114,10 @@ export default function DataPendidikanPage() {
       if (s.jenis_kelamin?.toLowerCase() === 'l') l++;
       else if (s.jenis_kelamin?.toLowerCase() === 'p') p++;
       
-      const kab = (s.kabupaten_siswa || '').toLowerCase();
-      if (kab.includes('tomohon')) tomohon++;
+      const kecRaw = (s.kecamatan_siswa || '').toLowerCase().trim();
+      const isTomohon = ['tomohon tengah', 'tomohon timur', 'tomohon barat', 'tomohon selatan', 'tomohon utara'].includes(kecRaw);
+      
+      if (isTomohon) tomohon++;
       else luarTomohon++;
     });
     
@@ -231,8 +233,9 @@ export default function DataPendidikanPage() {
     };
 
     filteredData.forEach(s => {
-      const kab = (s.kabupaten_siswa || '').toLowerCase();
-      const isTomohon = kab.includes('tomohon');
+      const kecRaw = (s.kecamatan_siswa || '').toLowerCase().trim();
+      const isTomohon = ['tomohon tengah', 'tomohon timur', 'tomohon barat', 'tomohon selatan', 'tomohon utara'].includes(kecRaw);
+      
       const kec = s.kecamatan_siswa || 'Tanpa Kecamatan';
       const kel = s.kelurahan_siswa || 'Tanpa Kelurahan';
       const kabAsli = s.kabupaten_siswa || 'Tanpa Kabupaten';
