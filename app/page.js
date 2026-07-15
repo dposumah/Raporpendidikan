@@ -129,10 +129,22 @@ export default function DashboardPage() {
   const allAvailableIndicators = useMemo(() => {
     const inds = [{ kode: 'SPM', nama: 'Indeks Pencapaian SPM' }];
     const uniqueKodes = new Set();
+    
+    const allowed = [
+      'kemampuan literasi', 'kemampuan numerasi', 'iklim keamanan sekolah', 
+      'iklim inklusivitas', 'iklim kebinekaan', 'karakter',
+      'proporsi jumlah satuan paud terakreditasi minimal b', 'indeks distribusi guru',
+      'proses belajar yang sesuai bagi anak usia dini', 'kemitraan dengan orang tua/wali',
+      'penyediaan layanan holistik integratif'
+    ];
+
     data.forEach(d => {
-      if (!uniqueKodes.has(d.indikator_kode)) {
-        uniqueKodes.add(d.indikator_kode);
-        inds.push({ kode: d.indikator_kode, nama: d.indikator });
+      const nameLower = d.nama_indikator?.toLowerCase();
+      if (nameLower && allowed.includes(nameLower) && !d.kode_indikator?.toLowerCase().endsWith('.skor')) {
+        if (!uniqueKodes.has(d.kode_indikator)) {
+          uniqueKodes.add(d.kode_indikator);
+          inds.push({ kode: d.kode_indikator, nama: d.nama_indikator });
+        }
       }
     });
     return inds;
@@ -175,9 +187,9 @@ export default function DashboardPage() {
 
     const regularSelected = exportSelectedIndicators.filter(k => k !== 'SPM');
     if (regularSelected.length > 0) {
-      const regFiltered = data.filter(d => parseInt(d.tahun) >= start && parseInt(d.tahun) <= end && regularSelected.includes(d.indikator_kode));
+      const regFiltered = data.filter(d => parseInt(d.tahun) >= start && parseInt(d.tahun) <= end && regularSelected.includes(d.kode_indikator));
       regFiltered.forEach(d => {
-        csvContent += `"${d.tahun}","${d.jenis_satuan_pendidikan}","${d.indikator}",${d.nilai_capaian},"${d.label_capaian || ''}"\n`;
+        csvContent += `"${d.tahun}","${d.jenis_satuan_pendidikan}","${d.nama_indikator}",${d.nilai_capaian},"${d.label_capaian || ''}"\n`;
       });
     }
 
