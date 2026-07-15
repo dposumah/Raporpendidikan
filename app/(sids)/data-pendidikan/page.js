@@ -107,10 +107,16 @@ export default function DataPendidikanPage() {
     const total = filteredData.length;
     let l = 0;
     let p = 0;
+    let tomohon = 0;
+    let luarTomohon = 0;
     
     filteredData.forEach(s => {
       if (s.jenis_kelamin?.toLowerCase() === 'l') l++;
       else if (s.jenis_kelamin?.toLowerCase() === 'p') p++;
+      
+      const kab = (s.kabupaten_siswa || '').toLowerCase();
+      if (kab.includes('tomohon')) tomohon++;
+      else luarTomohon++;
     });
     
     const uniqueSekolah = new Set(filteredData.map(s => s.nama_sekolah).filter(Boolean)).size;
@@ -118,7 +124,9 @@ export default function DataPendidikanPage() {
       totalSiswa: total,
       totalLaki: l,
       totalPerempuan: p,
-      totalSekolah: uniqueSekolah
+      totalSekolah: uniqueSekolah,
+      domisiliTomohon: tomohon,
+      domisiliLuar: luarTomohon
     };
   }, [filteredData]);
 
@@ -214,6 +222,46 @@ export default function DataPendidikanPage() {
       </div>
     );
   };
+
+  // Group data for Rekapitulasi Domisili: Tomohon (Kec -> Kel) / Luar Tomohon (Kab -> Kec)
+  const domisiliRekapData = useMemo(() => {
+    const grouped = {
+      'Kota Tomohon': {},
+      'Luar Kota Tomohon': {}
+    };
+
+    filteredData.forEach(s => {
+      const kab = (s.kabupaten_siswa || '').toLowerCase();
+      const isTomohon = kab.includes('tomohon');
+      const kec = s.kecamatan_siswa || 'Tanpa Kecamatan';
+      const kel = s.kelurahan_siswa || 'Tanpa Kelurahan';
+      const kabAsli = s.kabupaten_siswa || 'Tanpa Kabupaten';
+
+      if (isTomohon) {
+        if (!grouped['Kota Tomohon'][kec]) grouped['Kota Tomohon'][kec] = {};
+        if (!grouped['Kota Tomohon'][kec][kel]) grouped['Kota Tomohon'][kec][kel] = { total: 0, pip: 0, l: 0, p: 0 };
+        const node = grouped['Kota Tomohon'][kec][kel];
+        node.total++;
+        if (s.layak_pip) node.pip++;
+        if (s.jenis_kelamin?.toLowerCase() === 'l') node.l++;
+        else if (s.jenis_kelamin?.toLowerCase() === 'p') node.p++;
+      } else {
+        if (!grouped['Luar Kota Tomohon'][kabAsli]) grouped['Luar Kota Tomohon'][kabAsli] = {};
+        if (!grouped['Luar Kota Tomohon'][kabAsli][kec]) grouped['Luar Kota Tomohon'][kabAsli][kec] = { total: 0, pip: 0, l: 0, p: 0 };
+        const node = grouped['Luar Kota Tomohon'][kabAsli][kec];
+        node.total++;
+        if (s.layak_pip) node.pip++;
+        if (s.jenis_kelamin?.toLowerCase() === 'l') node.l++;
+        else if (s.jenis_kelamin?.toLowerCase() === 'p') node.p++;
+      }
+    });
+    
+    // Remove empty groups
+    if (Object.keys(grouped['Kota Tomohon']).length === 0) delete grouped['Kota Tomohon'];
+    if (Object.keys(grouped['Luar Kota Tomohon']).length === 0) delete grouped['Luar Kota Tomohon'];
+
+    return grouped;
+  }, [filteredData]);
 
   // Group data for Rekapitulasi: Jenjang -> Kecamatan -> Kelurahan -> Sekolah
   const rekapData = useMemo(() => {
@@ -351,7 +399,13 @@ export default function DataPendidikanPage() {
             onClick={() => setActiveTab('rekap')}
             style={{ background: 'none', border: 'none', padding: '0.5rem 1rem', fontSize: '1rem', fontWeight: '600', color: activeTab === 'rekap' ? '#0284c7' : '#64748b', borderBottom: activeTab === 'rekap' ? '3px solid #0284c7' : '3px solid transparent', marginBottom: '-9px', cursor: 'pointer', transition: 'all 0.2s' }}
           >
-            Analisis & Rekapitulasi (Multi-Level)
+            Analisis & Rekap Sekolah
+          </button>
+          <button 
+            onClick={() => setActiveTab('domisili')}
+            style={{ background: 'none', border: 'none', padding: '0.5rem 1rem', fontSize: '1rem', fontWeight: '600', color: activeTab === 'domisili' ? '#0284c7' : '#64748b', borderBottom: activeTab === 'domisili' ? '3px solid #0284c7' : '3px solid transparent', marginBottom: '-9px', cursor: 'pointer', transition: 'all 0.2s' }}
+          >
+            Rekapitulasi Domisili
           </button>
         </div>
 
@@ -403,6 +457,30 @@ export default function DataPendidikanPage() {
                 <div>
                   <p style={{ margin: 0, color: '#64748b', fontSize: '0.9rem', fontWeight: '500' }}>Siswa Perempuan</p>
                   <h2 style={{ margin: 0, fontSize: '1.8rem', color: '#0f172a', fontWeight: '700' }}>{stats.totalPerempuan.toLocaleString('id-ID')}</h2>
+                </div>
+              </div>
+            </div>
+
+            <div style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', border: '1px solid #e2e8f0' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <div style={{ background: '#ecfdf5', padding: '1rem', borderRadius: '12px' }}>
+                  <MapPin size={24} color="#10b981" />
+                </div>
+                <div>
+                  <p style={{ margin: 0, color: '#64748b', fontSize: '0.9rem', fontWeight: '500' }}>Domisili Tomohon</p>
+                  <h2 style={{ margin: 0, fontSize: '1.8rem', color: '#0f172a', fontWeight: '700' }}>{stats.domisiliTomohon.toLocaleString('id-ID')}</h2>
+                </div>
+              </div>
+            </div>
+
+            <div style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', border: '1px solid #e2e8f0' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <div style={{ background: '#fffbeb', padding: '1rem', borderRadius: '12px' }}>
+                  <MapPin size={24} color="#d97706" />
+                </div>
+                <div>
+                  <p style={{ margin: 0, color: '#64748b', fontSize: '0.9rem', fontWeight: '500' }}>Luar Tomohon</p>
+                  <h2 style={{ margin: 0, fontSize: '1.8rem', color: '#0f172a', fontWeight: '700' }}>{stats.domisiliLuar.toLocaleString('id-ID')}</h2>
                 </div>
               </div>
             </div>
@@ -587,7 +665,45 @@ export default function DataPendidikanPage() {
           </div>
         )}
 
-        {/* Modal Full Detail Siswa */}
+        {activeTab === 'domisili' && (
+          <div className="tab-content" style={{ animation: 'fadeIn 0.4s ease' }}>
+            <div style={{ background: 'white', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
+              <div style={{ padding: '1.5rem', borderBottom: '1px solid #e2e8f0', background: '#f8fafc' }}>
+                <h3 style={{ margin: 0, color: '#0f172a', fontSize: '1.1rem', fontWeight: '600' }}>
+                  Tabel Rekapitulasi Berdasarkan Wilayah Domisili
+                </h3>
+                <p style={{ margin: '0.5rem 0 0 0', color: '#64748b', fontSize: '0.9rem' }}>
+                  Dikelompokkan menjadi Kota Tomohon (Kecamatan → Kelurahan) dan Luar Kota Tomohon (Kabupaten → Kecamatan).
+                </p>
+              </div>
+              
+              <div style={{ width: '100%', overflowX: 'auto' }}>
+                <div style={{ minWidth: '800px' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'minmax(250px, 2fr) 1fr 1fr 1fr', gap: '1rem', padding: '1rem', background: '#f1f5f9', borderBottom: '2px solid #e2e8f0', color: '#475569', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase' }}>
+                    <div>Status & Wilayah Domisili</div>
+                    <div style={{ textAlign: 'center' }}>Total Siswa</div>
+                    <div style={{ textAlign: 'center' }}>Laki-Laki</div>
+                    <div style={{ textAlign: 'center' }}>Perempuan</div>
+                  </div>
+                  
+                  <div style={{ padding: '0' }}>
+                    {Object.entries(domisiliRekapData).length > 0 ? (
+                      Object.entries(domisiliRekapData).map(([wilayahLabel, data]) => (
+                        <RekapNode key={wilayahLabel} label={wilayahLabel} dataObj={data} depth={0} />
+                      ))
+                    ) : (
+                      <div style={{ padding: '3rem', textAlign: 'center', color: '#64748b' }}>
+                        Pilih filter untuk melihat rekapitulasi domisili
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Modal Full Detail Siswa (60+ Columns) */}
         {selectedSiswa && (
           <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.7)', backdropFilter: 'blur(4px)', zIndex: 1000, display: 'flex', justifyContent: 'flex-end', animation: 'fadeIn 0.3s ease' }}>
             <div style={{ width: '100%', maxWidth: '850px', background: '#f8fafc', height: '100%', overflowY: 'auto', boxShadow: '-10px 0 25px rgba(0,0,0,0.2)', position: 'relative', animation: 'slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1)' }}>
@@ -611,90 +727,160 @@ export default function DataPendidikanPage() {
               </div>
 
               <div style={{ padding: '2rem' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
-                  
-                  {/* Akademik Card */}
-                  <div style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-                    <h3 style={{ fontSize: '1.1rem', color: '#0f172a', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', borderBottom: '1px solid #f1f5f9', paddingBottom: '0.75rem' }}><School size={18} color="#0284c7"/> Data Sekolah</h3>
-                    <div style={{ display: 'grid', gap: '0.75rem' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Sekolah</span> <strong style={{ color: '#334155' }}>{selectedSiswa.nama_sekolah || '-'}</strong></div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>NPSN</span> <strong style={{ color: '#334155' }}>{selectedSiswa.npsn || '-'}</strong></div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Kelas / Rombel</span> <strong style={{ color: '#334155' }}>{selectedSiswa.kelas || '-'} {selectedSiswa.nama_rombel ? `/ ${selectedSiswa.nama_rombel}` : ''}</strong></div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Semester</span> <strong style={{ color: '#334155' }}>{selectedSiswa.semester || '-'}</strong></div>
-                    </div>
+                {/* Section 1: Akademik & Sekolah */}
+                <div style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', marginBottom: '1.5rem' }}>
+                  <h3 style={{ fontSize: '1.1rem', color: '#0f172a', margin: '0 0 1rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem', borderBottom: '1px solid #f1f5f9', paddingBottom: '0.75rem' }}><School size={18} color="#0284c7"/> Data Akademik & Sekolah Asal</h3>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
+                    <div><div style={{ color: '#64748b', fontSize: '0.85rem' }}>Nama Sekolah</div><div style={{ fontWeight: '600', color: '#334155' }}>{selectedSiswa.nama_sekolah || '-'}</div></div>
+                    <div><div style={{ color: '#64748b', fontSize: '0.85rem' }}>NPSN</div><div style={{ fontWeight: '600', color: '#334155' }}>{selectedSiswa.npsn || '-'}</div></div>
+                    <div><div style={{ color: '#64748b', fontSize: '0.85rem' }}>Jenjang</div><div style={{ fontWeight: '600', color: '#334155' }}>{selectedSiswa.jenjang || '-'}</div></div>
+                    <div><div style={{ color: '#64748b', fontSize: '0.85rem' }}>Kelas</div><div style={{ fontWeight: '600', color: '#334155' }}>{selectedSiswa.kelas || '-'}</div></div>
+                    <div><div style={{ color: '#64748b', fontSize: '0.85rem' }}>Jurusan</div><div style={{ fontWeight: '600', color: '#334155' }}>{selectedSiswa.nama_jurusan || '-'}</div></div>
+                    <div><div style={{ color: '#64748b', fontSize: '0.85rem' }}>Rombel</div><div style={{ fontWeight: '600', color: '#334155' }}>{selectedSiswa.nama_rombel || '-'}</div></div>
+                    <div><div style={{ color: '#64748b', fontSize: '0.85rem' }}>Semester</div><div style={{ fontWeight: '600', color: '#334155' }}>{selectedSiswa.semester || '-'}</div></div>
                   </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginTop: '1rem' }}>
+                    <div style={{ gridColumn: '1 / -1' }}><div style={{ color: '#64748b', fontSize: '0.85rem' }}>Alamat Sekolah</div><div style={{ fontWeight: '600', color: '#334155' }}>{selectedSiswa.alamat_sekolah || '-'}</div></div>
+                    <div><div style={{ color: '#64748b', fontSize: '0.85rem' }}>Provinsi Sekolah</div><div style={{ fontWeight: '600', color: '#334155' }}>{selectedSiswa.sekolah_provinsi || '-'}</div></div>
+                    <div><div style={{ color: '#64748b', fontSize: '0.85rem' }}>Kabupaten Sekolah</div><div style={{ fontWeight: '600', color: '#334155' }}>{selectedSiswa.sekolah_kabupaten || '-'}</div></div>
+                    <div><div style={{ color: '#64748b', fontSize: '0.85rem' }}>Kecamatan Sekolah</div><div style={{ fontWeight: '600', color: '#334155' }}>{selectedSiswa.sekolah_kecamatan || '-'}</div></div>
+                    <div><div style={{ color: '#64748b', fontSize: '0.85rem' }}>Kelurahan Sekolah</div><div style={{ fontWeight: '600', color: '#334155' }}>{selectedSiswa.sekolah_desa_kelurahan || '-'}</div></div>
+                    <div><div style={{ color: '#64748b', fontSize: '0.85rem' }}>Dusun Sekolah</div><div style={{ fontWeight: '600', color: '#334155' }}>{selectedSiswa.sekolah_dusun || '-'}</div></div>
+                    <div><div style={{ color: '#64748b', fontSize: '0.85rem' }}>Kode Pos Sekolah</div><div style={{ fontWeight: '600', color: '#334155' }}>{selectedSiswa.sekolah_kode_pos || '-'}</div></div>
+                  </div>
+                </div>
 
-                  {/* Personal Card */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
+                  {/* Section 2: Profil Pribadi & Fisik */}
                   <div style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-                    <h3 style={{ fontSize: '1.1rem', color: '#0f172a', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', borderBottom: '1px solid #f1f5f9', paddingBottom: '0.75rem' }}><FileText size={18} color="#0284c7"/> Profil Pribadi</h3>
+                    <h3 style={{ fontSize: '1.1rem', color: '#0f172a', margin: '0 0 1rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem', borderBottom: '1px solid #f1f5f9', paddingBottom: '0.75rem' }}><FileText size={18} color="#0284c7"/> Identitas & Fisik</h3>
                     <div style={{ display: 'grid', gap: '0.75rem' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Jenis Kelamin</span> <strong style={{ color: '#334155' }}>{selectedSiswa.jenis_kelamin || '-'}</strong></div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Tempat, Tgl Lahir</span> <strong style={{ color: '#334155' }}>{selectedSiswa.tempat_lahir || '-'}, {selectedSiswa.tanggal_lahir || '-'}</strong></div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Tempat Lahir</span> <strong style={{ color: '#334155' }}>{selectedSiswa.tempat_lahir || '-'}</strong></div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Tanggal Lahir</span> <strong style={{ color: '#334155' }}>{selectedSiswa.tanggal_lahir || '-'}</strong></div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>No. Akta Lahir</span> <strong style={{ color: '#334155' }}>{selectedSiswa.no_akta_lahir || '-'}</strong></div>
                       <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Agama</span> <strong style={{ color: '#334155' }}>{selectedSiswa.agama || '-'}</strong></div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Kebutuhan Khusus</span> <strong style={{ color: '#334155' }}>{selectedSiswa.kebutuhan_khusus || 'Tidak Ada'}</strong></div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Kebutuhan Khusus</span> <strong style={{ color: '#334155' }}>{selectedSiswa.kebutuhan_khusus || '-'}</strong></div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Anak Ke-</span> <strong style={{ color: '#334155' }}>{selectedSiswa.anak_ke || '-'}</strong></div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Jml Saudara Kandung</span> <strong style={{ color: '#334155' }}>{selectedSiswa.jumlah_saudara_kandung || '-'}</strong></div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Tinggi Badan</span> <strong style={{ color: '#334155' }}>{selectedSiswa.tinggi_badan ? `${selectedSiswa.tinggi_badan} cm` : '-'}</strong></div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Berat Badan</span> <strong style={{ color: '#334155' }}>{selectedSiswa.berat_badan ? `${selectedSiswa.berat_badan} kg` : '-'}</strong></div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Lingkar Kepala</span> <strong style={{ color: '#334155' }}>{selectedSiswa.lingkar_kepala ? `${selectedSiswa.lingkar_kepala} cm` : '-'}</strong></div>
+                    </div>
+                  </div>
+
+                  {/* Section 3: Kontak & Transportasi */}
+                  <div style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+                    <h3 style={{ fontSize: '1.1rem', color: '#0f172a', margin: '0 0 1rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem', borderBottom: '1px solid #f1f5f9', paddingBottom: '0.75rem' }}><MapPin size={18} color="#0284c7"/> Kontak & Domisili</h3>
+                    <div style={{ display: 'grid', gap: '0.75rem' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>No. HP / Telepon</span> <strong style={{ color: '#334155' }}>{selectedSiswa.nomor_telp || '-'}</strong></div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Email</span> <strong style={{ color: '#334155', wordBreak: 'break-all', marginLeft: '1rem', textAlign: 'right' }}>{selectedSiswa.email || '-'}</strong></div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Alamat Jalan</span> <strong style={{ color: '#334155', textAlign: 'right', marginLeft: '1rem' }}>{selectedSiswa.alamat_siswa || '-'}</strong></div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Dusun</span> <strong style={{ color: '#334155' }}>{selectedSiswa.dusun_siswa || '-'}</strong></div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Kelurahan / Desa</span> <strong style={{ color: '#334155' }}>{selectedSiswa.kelurahan_siswa || '-'}</strong></div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Kecamatan</span> <strong style={{ color: '#334155' }}>{selectedSiswa.kecamatan_siswa || '-'}</strong></div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Kabupaten / Kota</span> <strong style={{ color: '#334155' }}>{selectedSiswa.kabupaten_siswa || '-'}</strong></div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Provinsi</span> <strong style={{ color: '#334155' }}>{selectedSiswa.provinsi_siswa || '-'}</strong></div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Kode Pos</span> <strong style={{ color: '#334155' }}>{selectedSiswa.kode_pos_siswa || '-'}</strong></div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Jenis Tinggal</span> <strong style={{ color: '#334155' }}>{selectedSiswa.jenis_tinggal || '-'}</strong></div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Alat Transportasi</span> <strong style={{ color: '#334155' }}>{selectedSiswa.alat_transportasi || '-'}</strong></div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Section 4: Data Keluarga (Ortu & Wali) */}
+                <div style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', marginBottom: '1.5rem' }}>
+                  <h3 style={{ fontSize: '1.1rem', color: '#0f172a', margin: '0 0 1rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem', borderBottom: '1px solid #f1f5f9', paddingBottom: '0.75rem' }}><FamilyIcon size={18} color="#0284c7"/> Informasi Keluarga & Orang Tua</h3>
+                  <div style={{ marginBottom: '1rem' }}>
+                    <div style={{ display: 'flex', gap: '2rem' }}>
+                      <span style={{ color: '#64748b' }}>Nomor Kartu Keluarga (KK):</span>
+                      <strong style={{ color: '#334155' }}>{selectedSiswa.no_kk || '-'}</strong>
+                    </div>
+                  </div>
+                  
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1.5rem' }}>
+                    {/* Ayah */}
+                    <div style={{ background: '#f8fafc', padding: '1rem', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                      <h4 style={{ margin: '0 0 0.75rem 0', color: '#0f172a', fontSize: '0.95rem', borderBottom: '1px solid #cbd5e1', paddingBottom: '0.5rem' }}>Data Ayah</h4>
+                      <div style={{ display: 'grid', gap: '0.5rem', fontSize: '0.9rem' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Nama</span> <strong>{selectedSiswa.nama_ayah || '-'}</strong></div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>NIK</span> <strong>{selectedSiswa.nik_ayah || '-'}</strong></div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Pendidikan</span> <strong>{selectedSiswa.pendidikan_ayah || '-'}</strong></div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Pekerjaan</span> <strong>{selectedSiswa.pekerjaan_ayah || '-'}</strong></div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Penghasilan</span> <strong>{selectedSiswa.penghasilan_ayah || '-'}</strong></div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Keb. Khusus</span> <strong>{selectedSiswa.kebutuhan_khusus_ayah || '-'}</strong></div>
+                      </div>
+                    </div>
+                    {/* Ibu */}
+                    <div style={{ background: '#f8fafc', padding: '1rem', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                      <h4 style={{ margin: '0 0 0.75rem 0', color: '#0f172a', fontSize: '0.95rem', borderBottom: '1px solid #cbd5e1', paddingBottom: '0.5rem' }}>Data Ibu Kandung</h4>
+                      <div style={{ display: 'grid', gap: '0.5rem', fontSize: '0.9rem' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Nama</span> <strong>{selectedSiswa.nama_ibu_kandung || '-'}</strong></div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>NIK</span> <strong>{selectedSiswa.nik_ibu || '-'}</strong></div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Pendidikan</span> <strong>{selectedSiswa.pendidikan_ibu || '-'}</strong></div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Pekerjaan</span> <strong>{selectedSiswa.pekerjaan_ibu || '-'}</strong></div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Penghasilan</span> <strong>{selectedSiswa.penghasilan_ibu || '-'}</strong></div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Keb. Khusus</span> <strong>{selectedSiswa.kebutuhan_khusus_ibu || '-'}</strong></div>
+                      </div>
+                    </div>
+                    {/* Wali */}
+                    <div style={{ background: '#f8fafc', padding: '1rem', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                      <h4 style={{ margin: '0 0 0.75rem 0', color: '#0f172a', fontSize: '0.95rem', borderBottom: '1px solid #cbd5e1', paddingBottom: '0.5rem' }}>Data Wali</h4>
+                      <div style={{ display: 'grid', gap: '0.5rem', fontSize: '0.9rem' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Nama</span> <strong>{selectedSiswa.nama_wali || '-'}</strong></div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Pekerjaan</span> <strong>{selectedSiswa.pekerjaan_wali || '-'}</strong></div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Penghasilan</span> <strong>{selectedSiswa.penghasilan_wali || '-'}</strong></div>
+                      </div>
                     </div>
                   </div>
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
-                  {/* Family Card */}
+                  {/* Section 5: Kesejahteraan (PIP/KIP) */}
                   <div style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-                    <h3 style={{ fontSize: '1.1rem', color: '#0f172a', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', borderBottom: '1px solid #f1f5f9', paddingBottom: '0.75rem' }}><FamilyIcon size={18} color="#0284c7"/> Data Keluarga</h3>
-                    <div style={{ display: 'grid', gap: '0.75rem' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>No. KK</span> <strong style={{ color: '#334155' }}>{selectedSiswa.no_kk || '-'}</strong></div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Nama Ayah</span> <strong style={{ color: '#334155' }}>{selectedSiswa.nama_ayah || '-'}</strong></div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Nama Ibu</span> <strong style={{ color: '#334155' }}>{selectedSiswa.nama_ibu_kandung || '-'}</strong></div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Penghasilan Ortu</span> <strong style={{ color: '#334155' }}>{selectedSiswa.penghasilan_ayah || selectedSiswa.penghasilan_ortu || '-'}</strong></div>
-                    </div>
-                  </div>
-
-                  {/* Kesejahteraan Card */}
-                  <div style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-                    <h3 style={{ fontSize: '1.1rem', color: '#0f172a', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', borderBottom: '1px solid #f1f5f9', paddingBottom: '0.75rem' }}><Briefcase size={18} color="#0284c7"/> Kesejahteraan (PIP/KIP)</h3>
+                    <h3 style={{ fontSize: '1.1rem', color: '#0f172a', margin: '0 0 1rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem', borderBottom: '1px solid #f1f5f9', paddingBottom: '0.75rem' }}><Briefcase size={18} color="#0284c7"/> Kesejahteraan Sosial (PIP & KIP)</h3>
                     <div style={{ display: 'grid', gap: '0.75rem' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}><span style={{ color: '#64748b' }}>Status Layak PIP</span> 
-                        {selectedSiswa.layak_pip ? <span style={{ background: '#dcfce7', color: '#166534', padding: '0.2rem 0.6rem', borderRadius: '4px', fontSize: '0.8rem', fontWeight: '600' }}>Layak</span> : <span style={{ background: '#f1f5f9', color: '#475569', padding: '0.2rem 0.6rem', borderRadius: '4px', fontSize: '0.8rem', fontWeight: '600' }}>Tidak Layak</span>}
+                        {selectedSiswa.layak_pip ? <span style={{ background: '#dcfce7', color: '#166534', padding: '0.2rem 0.6rem', borderRadius: '4px', fontSize: '0.8rem', fontWeight: '600' }}>Layak PIP</span> : <span style={{ background: '#f1f5f9', color: '#475569', padding: '0.2rem 0.6rem', borderRadius: '4px', fontSize: '0.8rem', fontWeight: '600' }}>Tidak Layak</span>}
                       </div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Alasan PIP</span> <strong style={{ color: '#334155', textAlign: 'right', maxWidth: '150px' }}>{selectedSiswa.alasan_layak_pip || '-'}</strong></div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Alasan Layak PIP</span> <strong style={{ color: '#334155', textAlign: 'right', maxWidth: '150px' }}>{selectedSiswa.alasan_layak_pip || '-'}</strong></div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}><span style={{ color: '#64748b' }}>Penerima KIP</span> 
-                        {selectedSiswa.penerima_kip ? <span style={{ background: '#dcfce7', color: '#166534', padding: '0.2rem 0.6rem', borderRadius: '4px', fontSize: '0.8rem', fontWeight: '600' }}>Ya</span> : <span style={{ background: '#f1f5f9', color: '#475569', padding: '0.2rem 0.6rem', borderRadius: '4px', fontSize: '0.8rem', fontWeight: '600' }}>Tidak</span>}
+                        {selectedSiswa.penerima_kip ? <span style={{ background: '#dcfce7', color: '#166534', padding: '0.2rem 0.6rem', borderRadius: '4px', fontSize: '0.8rem', fontWeight: '600' }}>Ya (Penerima)</span> : <span style={{ background: '#f1f5f9', color: '#475569', padding: '0.2rem 0.6rem', borderRadius: '4px', fontSize: '0.8rem', fontWeight: '600' }}>Bukan Penerima</span>}
                       </div>
                       <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>No. KIP</span> <strong style={{ color: '#334155' }}>{selectedSiswa.no_kip || '-'}</strong></div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Nama Tertera di KIP</span> <strong style={{ color: '#334155' }}>{selectedSiswa.nama_kip || '-'}</strong></div>
                     </div>
                   </div>
-                </div>
 
-                {/* Lokasi & Peta Card */}
-                <div style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-                  <h3 style={{ fontSize: '1.1rem', color: '#0f172a', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', borderBottom: '1px solid #f1f5f9', paddingBottom: '0.75rem' }}><MapPin size={18} color="#0284c7"/> Lokasi & Koordinat Siswa</h3>
-                  
-                  <div style={{ display: 'flex', gap: '2rem', flexDirection: 'column' }}>
-                    <div style={{ display: 'grid', gap: '0.5rem', color: '#334155', fontSize: '0.95rem', lineHeight: '1.6' }}>
-                      <div><strong>Alamat:</strong> {selectedSiswa.alamat_siswa || '-'}</div>
-                      <div><strong>Dusun/Kel:</strong> {selectedSiswa.dusun_siswa || '-'}, {selectedSiswa.kelurahan_siswa || '-'}</div>
-                      <div><strong>Kecamatan/Kab:</strong> {selectedSiswa.kecamatan_siswa || '-'}, {selectedSiswa.kabupaten_siswa || '-'}</div>
-                      <div><strong>Koordinat:</strong> {selectedSiswa.lintang || '-'} (Lat), {selectedSiswa.bujur || '-'} (Lng)</div>
+                  {/* Section 6: Lokasi & Peta (Koordinat) */}
+                  <div style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+                    <h3 style={{ fontSize: '1.1rem', color: '#0f172a', margin: '0 0 1rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem', borderBottom: '1px solid #f1f5f9', paddingBottom: '0.75rem' }}><MapPin size={18} color="#0284c7"/> Peta Koordinat Domisili</h3>
+                    
+                    <div style={{ display: 'flex', gap: '2rem', flexDirection: 'column', height: '100%' }}>
+                      <div style={{ display: 'grid', gap: '0.5rem', color: '#334155', fontSize: '0.95rem' }}>
+                        <div><strong>Lintang (Latitude):</strong> {selectedSiswa.lintang || '-'}</div>
+                        <div><strong>Bujur (Longitude):</strong> {selectedSiswa.bujur || '-'}</div>
+                      </div>
+
+                      {selectedSiswa.lintang && selectedSiswa.bujur ? (
+                        <div style={{ width: '100%', flex: 1, minHeight: '180px', borderRadius: '8px', overflow: 'hidden', border: '1px solid #e2e8f0', background: '#f1f5f9' }}>
+                          <iframe 
+                            width="100%" 
+                            height="100%" 
+                            style={{ border: 0 }}
+                            loading="lazy" 
+                            allowFullScreen
+                            referrerPolicy="no-referrer-when-downgrade"
+                            src={`https://maps.google.com/maps?q=${selectedSiswa.lintang},${selectedSiswa.bujur}&z=16&output=embed`}
+                          ></iframe>
+                        </div>
+                      ) : (
+                        <div style={{ width: '100%', flex: 1, minHeight: '180px', padding: '2rem', borderRadius: '8px', border: '1px dashed #cbd5e1', background: '#f8fafc', color: '#64748b', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+                          <MapPin size={32} color="#cbd5e1"/>
+                          <span style={{ fontSize: '0.9rem' }}>Koordinat (Lintang/Bujur) kosong.<br/>Mini Map Google tidak dapat dirender.</span>
+                        </div>
+                      )}
                     </div>
-
-                    {selectedSiswa.lintang && selectedSiswa.bujur && (
-                      <div style={{ width: '100%', height: '300px', borderRadius: '12px', overflow: 'hidden', border: '1px solid #e2e8f0', background: '#f1f5f9' }}>
-                        <iframe 
-                          width="100%" 
-                          height="100%" 
-                          style={{ border: 0 }}
-                          loading="lazy" 
-                          allowFullScreen
-                          referrerPolicy="no-referrer-when-downgrade"
-                          src={`https://maps.google.com/maps?q=${selectedSiswa.lintang},${selectedSiswa.bujur}&z=16&output=embed`}
-                        ></iframe>
-                      </div>
-                    )}
-                    {(!selectedSiswa.lintang || !selectedSiswa.bujur) && (
-                      <div style={{ width: '100%', padding: '2rem', borderRadius: '12px', border: '1px dashed #cbd5e1', background: '#f8fafc', color: '#64748b', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
-                        <MapPin size={32} color="#cbd5e1"/>
-                        <span>Koordinat (Lintang/Bujur) tidak tersedia untuk siswa ini. Mini Map tidak dapat ditampilkan.</span>
-                      </div>
-                    )}
                   </div>
                 </div>
 
