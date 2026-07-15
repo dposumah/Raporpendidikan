@@ -41,32 +41,104 @@ export default function AdminSiswaPage() {
           // Map Excel columns to database schema
           // Expected Excel columns: Nama Peserta Didik, NISN, NIK, No KK, Jenis Kelamin, Kelas, Rombel, Sekolah, Jenjang, Layak PIP, KIP, Penghasilan Ortu
           const formattedData = json.map(row => {
-            // Helper to handle boolean variations in Excel (Ya/Tidak, Yes/No, True/False, 1/0)
+            // Helper to handle boolean variations in Excel
             const parseBoolean = (val) => {
               if (typeof val === 'boolean') return val;
               if (typeof val === 'string') {
                 const lower = val.toLowerCase().trim();
-                return ['ya', 'yes', 'true', '1', 'layak'].includes(lower);
+                return ['ya', 'yes', 'true', '1', 'layak', 'v'].includes(lower);
               }
               if (val === 1) return true;
               return false;
             };
 
-            return {
-              nama_peserta_didik: row['Nama Peserta Didik'] || row['NAMA'] || '-',
-              nisn: String(row['NISN'] || ''),
-              nik: String(row['NIK'] || ''),
-              no_kk: String(row['No KK'] || row['NO_KK'] || ''),
-              jenis_kelamin: row['Jenis Kelamin'] || row['JK'] || '',
-              kelas: String(row['Kelas'] || ''),
-              nama_rombel: String(row['Rombel'] || row['Nama Rombel'] || ''),
-              nama_sekolah: row['Sekolah'] || row['Nama Sekolah'] || '',
-              jenjang: row['Jenjang'] || '',
-              layak_pip: parseBoolean(row['Layak PIP']),
-              penerima_kip: parseBoolean(row['Penerima KIP'] || row['KIP']),
-              penghasilan_ortu: String(row['Penghasilan Ortu'] || row['Penghasilan'] || '')
+            const toStringOrEmpty = (val) => val !== undefined && val !== null ? String(val).trim() : '';
+
+            // Flexible column matching logic (ignores case and some spaces)
+            const getVal = (possibleKeys) => {
+              const rowKeys = Object.keys(row);
+              for (const pk of possibleKeys) {
+                const found = rowKeys.find(k => k.toLowerCase().trim() === pk.toLowerCase());
+                if (found) return toStringOrEmpty(row[found]);
+              }
+              return '';
             };
-          }).filter(row => row.nisn && row.nik); // Filter out rows without NISN or NIK (as they are required unique)
+
+            return {
+              semester: getVal(['semester']),
+              nama_sekolah: getVal(['nama sekolah', 'sekolah']),
+              npsn: getVal(['npsn']),
+              jenjang: getVal(['jenjang']),
+              alamat_sekolah: getVal(['alamat sekolah']),
+              sekolah_kabupaten: getVal(['kabupaten sekolah', 'kabupaten']), // careful with overlaps if they didn't prefix
+              sekolah_kecamatan: getVal(['kecamatan sekolah', 'kecamatan']),
+              sekolah_desa_kelurahan: getVal(['desa_kelurahan sekolah', 'desa kelurahan sekolah', 'desa_kelurahan']),
+              sekolah_dusun: getVal(['nama_dusun sekolah', 'dusun sekolah', 'nama_dusun']),
+              sekolah_provinsi: getVal(['provinsi sekolah', 'provinsi']),
+              sekolah_kode_pos: getVal(['kode_pos sekolah', 'kode pos sekolah', 'kode pos', 'kode_pos']),
+              
+              // We grab the specific names provided by user
+              nama_peserta_didik: getVal(['Nama Peserta Didik', 'nama', 'nama siswa']),
+              jenis_kelamin: getVal(['Jenis Kelamin', 'jk', 'l/p']),
+              nisn: getVal(['nisn']),
+              nik: getVal(['nik']),
+              no_kk: getVal(['No KK', 'NO_KK']),
+              tempat_lahir: getVal(['Tempat Lahir']),
+              tanggal_lahir: getVal(['Tanggal Lahir']),
+              agama: getVal(['Agama']),
+              kebutuhan_khusus: getVal(['Kebutuhan Khusus']),
+              
+              alamat_siswa: getVal(['Alamat', 'Alamat Siswa']),
+              dusun_siswa: getVal(['Nama Dusun', 'Dusun Siswa', 'Dusun']),
+              kelurahan_siswa: getVal(['Desa Kelurahan', 'Kelurahan Siswa', 'Kelurahan', 'Desa']),
+              kecamatan_siswa: getVal(['Kecamatan', 'Kecamatan Siswa']),
+              kabupaten_siswa: getVal(['Kabupaten', 'Kabupaten Siswa']),
+              provinsi_siswa: getVal(['Propinsi', 'Provinsi', 'Provinsi Siswa']),
+              kode_pos_siswa: getVal(['Kode Pos', 'Kode Pos Siswa']),
+              
+              lintang: getVal(['Lintang', 'Latitude', 'Lat']),
+              bujur: getVal(['Bujur', 'Longitude', 'Long', 'Lng']),
+              jenis_tinggal: getVal(['Jenis Tinggal']),
+              alat_transportasi: getVal(['Alat Transportasi']),
+              
+              nik_ayah: getVal(['NIK Ayah']),
+              nik_ibu: getVal(['Nik Ibu', 'NIK Ibu']),
+              anak_ke: getVal(['Anak ke']),
+              nomor_telp: getVal(['nomor telp', 'no telp', 'telepon', 'hp']),
+              email: getVal(['email']),
+              
+              layak_pip: parseBoolean(getVal(['Layak PIP'])),
+              alasan_layak_pip: getVal(['Alasan Layak PIP']),
+              penerima_kip: parseBoolean(getVal(['Penerima KIP', 'KIP'])),
+              no_kip: getVal(['No KIP']),
+              nama_kip: getVal(['Nama KIP']),
+              
+              no_akta_lahir: getVal(['No Akta Lahir', 'Akta Lahir']),
+              nama_ayah: getVal(['Nama Ayah']),
+              pendidikan_ayah: getVal(['Pendidikan Ayah']),
+              pekerjaan_ayah: getVal(['Pekerjaan Ayah']),
+              penghasilan_ayah: getVal(['Penghasilan Ayah']),
+              kebutuhan_khusus_ayah: getVal(['kebutuhan khusus ayah']),
+              
+              nama_ibu_kandung: getVal(['nama ibu kandung', 'nama ibu']),
+              pendidikan_ibu: getVal(['pendidikan ibu']),
+              pekerjaan_ibu: getVal(['pekerjaan ibu']),
+              penghasilan_ibu: getVal(['penghasilan ibu']),
+              kebutuhan_khusus_ibu: getVal(['kebutuhan khusus ibu']),
+              
+              nama_wali: getVal(['nama wali']),
+              pekerjaan_wali: getVal(['pekerjaan wali']),
+              penghasilan_wali: getVal(['penghasilan wali']),
+              
+              kelas: getVal(['kelas']),
+              nama_jurusan: getVal(['nama jurusan', 'jurusan']),
+              nama_rombel: getVal(['nama rombel', 'rombel']),
+              tinggi_badan: getVal(['tinggi badan']),
+              berat_badan: getVal(['berat bahan', 'berat badan']),
+              lingkar_kepala: getVal(['lingkar kepala']),
+              jumlah_saudara_kandung: getVal(['jumlah saudara kandung'])
+            };
+          }).filter(row => row.nisn && row.nik);
 
           if (formattedData.length === 0) {
             throw new Error("Tidak ada data valid yang ditemukan (Pastikan ada kolom NISN dan NIK).");
