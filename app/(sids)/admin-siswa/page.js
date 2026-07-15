@@ -144,15 +144,24 @@ export default function AdminSiswaPage() {
             throw new Error("Tidak ada data valid yang ditemukan (Pastikan ada kolom NISN dan NIK).");
           }
 
+          // Deduplicate the data based on NISN before sending to database.
+          // If the same NISN appears multiple times in the Excel file, we keep the last one.
+          // This prevents the PostgreSQL error: "ON CONFLICT DO UPDATE command cannot affect row a second time"
+          const uniqueDataMap = new Map();
+          formattedData.forEach(row => {
+            uniqueDataMap.set(row.nisn, row);
+          });
+          const deduplicatedData = Array.from(uniqueDataMap.values());
+
           // Chunking array for massive uploads (e.g. 21,000+ rows)
           const CHUNK_SIZE = 1000;
           let successCount = 0;
           
-          for (let i = 0; i < formattedData.length; i += CHUNK_SIZE) {
-            const chunk = formattedData.slice(i, i + CHUNK_SIZE);
+          for (let i = 0; i < deduplicatedData.length; i += CHUNK_SIZE) {
+            const chunk = deduplicatedData.slice(i, i + CHUNK_SIZE);
             
             // Provide progress update to the UI
-            setMessage(`Memproses data: ${Math.min(i + CHUNK_SIZE, formattedData.length)} dari ${formattedData.length} baris... (Harap tunggu, proses ini butuh waktu)`);
+            setMessage(`Memproses data unik: ${Math.min(i + CHUNK_SIZE, deduplicatedData.length)} dari ${deduplicatedData.length} baris... (Harap tunggu, proses ini butuh waktu)`);
             
             const { error: dbError } = await supabase
               .from('siswa')
