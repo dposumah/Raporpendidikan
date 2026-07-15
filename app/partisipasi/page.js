@@ -11,7 +11,10 @@ import {
   ResponsiveContainer,
   LabelList
 } from 'recharts';
-import { BarChart3, Users, X, List } from 'lucide-react';
+import { BarChart3, Users, X, List, Download, Printer } from 'lucide-react';
+import * as XLSX from 'xlsx';
+import html2canvas from 'html2canvas';
+import { jsPDF } from 'jspdf';
 
 const TARGET_INDICATORS = [
   'Angka Partisipasi Sekolah (5-6)',
@@ -36,6 +39,7 @@ export default function PartisipasiPage() {
   const [error, setError] = useState(null);
   const [selectedChart, setSelectedChart] = useState(null);
   const [activeMenu, setActiveMenu] = useState('APS');
+  const [isExportingPDF, setIsExportingPDF] = useState(false);
 
   useEffect(() => {
     fetch('/api/data', { cache: 'no-store' })
@@ -111,15 +115,89 @@ export default function PartisipasiPage() {
     );
   }
 
+  const handleExportExcel = () => {
+    const excelData = [];
+    
+    const currentIndicators = activeMenu === 'APS' ? TARGET_INDICATORS : APK_APM_INDICATORS;
+    
+    currentIndicators.forEach(indikatorName => {
+      const itemData = chartData[indikatorName] || [];
+      itemData.forEach(d => {
+        if (d.nilai_angka !== null) {
+          excelData.push({
+            "Tahun": d.tahun,
+            "Kelompok": activeMenu,
+            "Indikator": indikatorName,
+            "Nilai Angka": d.nilai_angka,
+            "Label Capaian": d.label_capaian || ''
+          });
+        }
+      });
+    });
+
+    if (excelData.length === 0) {
+      alert('Belum ada data untuk diekspor.');
+      return;
+    }
+
+    const ws = XLSX.utils.json_to_sheet(excelData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Data Partisipasi");
+    XLSX.writeFile(wb, `Export_Partisipasi_${activeMenu.replace('/', '_')}.xlsx`);
+  };
+
+  const handleDownloadPDF = async () => {
+    const element = document.getElementById('pdf-content');
+    if (!element) return;
+    
+    setIsExportingPDF(true);
+    try {
+      const canvas = await html2canvas(element, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
+      const imgData = canvas.toDataURL('image/png');
+      
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+      
+      pdf.setFontSize(14);
+      pdf.text("Laporan Angka Partisipasi Sekolah - " + activeMenu, 10, 10);
+      
+      pdf.addImage(imgData, 'PNG', 0, 15, pdfWidth, pdfHeight);
+      pdf.save(`Laporan_Partisipasi_${activeMenu.replace('/', '_')}.pdf`);
+    } catch (err) {
+      console.error("Error generating PDF:", err);
+      alert("Gagal menghasilkan PDF.");
+    } finally {
+      setIsExportingPDF(false);
+    }
+  };
+
   const currentIndicators = activeMenu === 'APS' ? TARGET_INDICATORS : APK_APM_INDICATORS;
 
   return (
     <main className="container">
-      <div className="header" style={{ marginBottom: '1rem' }}>
-        <h1 className="title" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+      <div className="header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', marginBottom: '1rem' }}>
+        <h1 className="title" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', margin: 0 }}>
           <Users size={32} color="var(--primary-color)" />
           Angka Partisipasi Sekolah
         </h1>
+        <div style={{ display: 'flex', gap: '0.75rem' }}>
+          <button 
+            onClick={handleDownloadPDF}
+            disabled={isExportingPDF}
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', backgroundColor: 'white', color: 'var(--primary-color)', padding: '0.5rem 1rem', borderRadius: '8px', border: '1px solid var(--primary-color)', cursor: isExportingPDF ? 'wait' : 'pointer', fontWeight: '600', boxShadow: '0 2px 4px rgba(37,99,235,0.1)' }}
+          >
+            <Printer size={18} />
+            {isExportingPDF ? 'Memproses...' : 'Download PDF'}
+          </button>
+          <button 
+            onClick={handleExportExcel}
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', backgroundColor: 'var(--primary-color)', color: 'white', padding: '0.5rem 1rem', borderRadius: '8px', border: 'none', cursor: 'pointer', fontWeight: '600', boxShadow: '0 2px 4px rgba(37,99,235,0.2)' }}
+          >
+            <Download size={18} />
+            Export Data Excel
+          </button>
+        </div>
       </div>
       <p style={{ color: 'var(--text-muted)', marginBottom: '2.5rem', fontSize: '1.05rem' }}>
         Pantau tingkat partisipasi siswa secara global untuk berbagai rentang usia dan jenjang pendidikan.
@@ -175,7 +253,7 @@ export default function PartisipasiPage() {
         </div>
 
         {/* Panel Kanan: Charts */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '1.5rem' }}>
+        <div id="pdf-content" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '1.5rem', padding: '1rem', backgroundColor: 'white' }}>
           {currentIndicators.map((indikatorName) => {
             const itemData = chartData[indikatorName] || [];
             const hasData = itemData.some(d => d.nilai_angka !== null);
