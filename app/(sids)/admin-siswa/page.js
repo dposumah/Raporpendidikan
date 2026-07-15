@@ -144,14 +144,21 @@ export default function AdminSiswaPage() {
             throw new Error("Tidak ada data valid yang ditemukan (Pastikan ada kolom NISN dan NIK).");
           }
 
-          // Deduplicate the data based on NISN before sending to database.
-          // If the same NISN appears multiple times in the Excel file, we keep the last one.
-          // This prevents the PostgreSQL error: "ON CONFLICT DO UPDATE command cannot affect row a second time"
-          const uniqueDataMap = new Map();
+          // Deduplicate the data based on NISN and NIK before sending to database.
+          // This prevents the PostgreSQL error for both constraints.
+          const uniqueNisnMap = new Map();
           formattedData.forEach(row => {
-            uniqueDataMap.set(row.nisn, row);
+            uniqueNisnMap.set(row.nisn, row);
           });
-          const deduplicatedData = Array.from(uniqueDataMap.values());
+          
+          let deduplicatedData = Array.from(uniqueNisnMap.values());
+          
+          const uniqueNikMap = new Map();
+          deduplicatedData.forEach(row => {
+            uniqueNikMap.set(row.nik, row);
+          });
+          
+          deduplicatedData = Array.from(uniqueNikMap.values());
 
           // Chunking array for massive uploads (e.g. 21,000+ rows)
           const CHUNK_SIZE = 1000;
