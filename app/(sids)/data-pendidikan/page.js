@@ -11,8 +11,10 @@ export default function DataPendidikanPage() {
   
   // Real-time Search & Filters
   const [searchQuery, setSearchQuery] = useState('');
-  const [sekolah, setSekolah] = useState('');
   const [jenjang, setJenjang] = useState('');
+  const [sekolah, setSekolah] = useState('');
+  const [kecamatanFilter, setKecamatanFilter] = useState('');
+  const [kelurahanFilter, setKelurahanFilter] = useState('');
   const [kelas, setKelas] = useState('');
   const [statusPIP, setStatusPIP] = useState('');
   
@@ -68,8 +70,15 @@ export default function DataPendidikanPage() {
   const filteredData = useMemo(() => {
     return allData.filter(s => {
       let match = true;
-      if (sekolah && s.nama_sekolah !== sekolah) match = false;
       if (jenjang && s.jenjang !== jenjang) match = false;
+      if (sekolah && s.nama_sekolah !== sekolah) match = false;
+      
+      const sKec = s.sekolah_kecamatan || s.kecamatan_siswa || '';
+      if (kecamatanFilter && sKec !== kecamatanFilter) match = false;
+      
+      const sKel = s.sekolah_desa_kelurahan || s.kelurahan_siswa || '';
+      if (kelurahanFilter && sKel !== kelurahanFilter) match = false;
+      
       if (kelas && String(s.kelas) !== String(kelas)) match = false;
       if (statusPIP === 'layak' && !s.layak_pip) match = false;
       if (statusPIP === 'tidak_layak' && s.layak_pip) match = false;
@@ -86,12 +95,12 @@ export default function DataPendidikanPage() {
       }
       return match;
     });
-  }, [allData, sekolah, jenjang, kelas, statusPIP, searchQuery]);
+  }, [allData, jenjang, sekolah, kecamatanFilter, kelurahanFilter, kelas, statusPIP, searchQuery]);
 
   // Reset page when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [sekolah, jenjang, kelas, statusPIP, searchQuery]);
+  }, [jenjang, sekolah, kecamatanFilter, kelurahanFilter, kelas, statusPIP, searchQuery]);
 
   // 3. DERIVED STATS FROM FILTERED DATA
   const stats = useMemo(() => {
@@ -267,24 +276,49 @@ export default function DataPendidikanPage() {
                   <label style={{ display: 'block', fontSize: '0.85rem', color: '#64748b', marginBottom: '0.5rem', fontWeight: '500' }}>Jenjang</label>
                   <select value={jenjang} onChange={e => setJenjang(e.target.value)} style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #cbd5e1', color: '#334155', outline: 'none' }}>
                     <option value="">Semua Jenjang</option>
-                    <option value="SD">SD</option><option value="SMP">SMP</option>
+                    {Array.from(new Set(allData.map(s => s.jenjang).filter(Boolean))).sort().map(j => (
+                      <option key={j} value={j}>{j}</option>
+                    ))}
                   </select>
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.85rem', color: '#64748b', marginBottom: '0.5rem', fontWeight: '500' }}>Kelas</label>
-                  <select value={kelas} onChange={e => setKelas(e.target.value)} style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #cbd5e1', color: '#334155', outline: 'none' }}>
-                    <option value="">Semua Kelas</option>
-                    <option value="1">1</option><option value="2">2</option><option value="3">3</option>
-                    <option value="4">4</option><option value="5">5</option><option value="6">6</option>
-                    <option value="7">7</option><option value="8">8</option><option value="9">9</option>
+                  <label style={{ display: 'block', fontSize: '0.85rem', color: '#64748b', marginBottom: '0.5rem', fontWeight: '500' }}>Kecamatan</label>
+                  <select value={kecamatanFilter} onChange={e => setKecamatanFilter(e.target.value)} style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #cbd5e1', color: '#334155', outline: 'none' }}>
+                    <option value="">Semua Kecamatan</option>
+                    {Array.from(new Set(allData.map(s => s.sekolah_kecamatan || s.kecamatan_siswa).filter(Boolean))).sort().map(k => (
+                      <option key={k} value={k}>{k}</option>
+                    ))}
                   </select>
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.85rem', color: '#64748b', marginBottom: '0.5rem', fontWeight: '500' }}>Status PIP</label>
-                  <select value={statusPIP} onChange={e => setStatusPIP(e.target.value)} style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #cbd5e1', color: '#334155', outline: 'none' }}>
-                    <option value="">Semua Status</option>
-                    <option value="layak">Layak PIP</option><option value="tidak_layak">Non-PIP</option>
-                  </select>
+                  <label style={{ display: 'block', fontSize: '0.85rem', color: '#64748b', marginBottom: '0.5rem', fontWeight: '500' }}>Kelurahan / Desa (Cari)</label>
+                  <input 
+                    list="kelurahan-list" 
+                    value={kelurahanFilter} 
+                    onChange={e => setKelurahanFilter(e.target.value)} 
+                    placeholder="Ketik/Pilih Kelurahan..."
+                    style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #cbd5e1', color: '#334155', outline: 'none' }} 
+                  />
+                  <datalist id="kelurahan-list">
+                    {Array.from(new Set(allData.map(s => s.sekolah_desa_kelurahan || s.kelurahan_siswa).filter(Boolean))).sort().map(k => (
+                      <option key={k} value={k} />
+                    ))}
+                  </datalist>
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.85rem', color: '#64748b', marginBottom: '0.5rem', fontWeight: '500' }}>Sekolah (Cari)</label>
+                  <input 
+                    list="sekolah-list" 
+                    value={sekolah} 
+                    onChange={e => setSekolah(e.target.value)} 
+                    placeholder="Ketik/Pilih Sekolah..."
+                    style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #cbd5e1', color: '#334155', outline: 'none' }} 
+                  />
+                  <datalist id="sekolah-list">
+                    {Array.from(new Set(allData.map(s => s.nama_sekolah).filter(Boolean))).sort().map(k => (
+                      <option key={k} value={k} />
+                    ))}
+                  </datalist>
                 </div>
               </div>
 
