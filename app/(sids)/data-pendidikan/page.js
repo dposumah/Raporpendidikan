@@ -149,7 +149,7 @@ export default function DataPendidikanPage() {
       else if (s.jenis_kelamin?.toLowerCase() === 'p') node.p++;
     });
     return grouped;
-  }, [data]);
+  }, [filteredData]);
 
   const RekapNode = ({ label, dataObj, depth = 0 }) => {
     const [open, setOpen] = useState(depth < 1);
@@ -313,11 +313,10 @@ export default function DataPendidikanPage() {
                 <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '800px' }}>
                   <thead>
                     <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
-                      <th style={{ padding: '1rem 1.5rem', color: '#475569', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase' }}>Nama Siswa / Sekolah</th>
+                      <th style={{ padding: '1rem 1.5rem', color: '#475569', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase' }}>Nama Siswa</th>
                       <th style={{ padding: '1rem 1.5rem', color: '#475569', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase' }}>NISN</th>
-                      <th style={{ padding: '1rem 1.5rem', color: '#475569', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase' }}>NIK & No KK (Masked)</th>
+                      <th style={{ padding: '1rem 1.5rem', color: '#475569', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase' }}>Sekolah</th>
                       <th style={{ padding: '1rem 1.5rem', color: '#475569', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase' }}>Kelas</th>
-                      <th style={{ padding: '1rem 1.5rem', color: '#475569', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase' }}>Status PIP</th>
                       <th style={{ padding: '1rem 1.5rem', color: '#475569', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase' }}>Aksi</th>
                     </tr>
                   </thead>
@@ -328,37 +327,14 @@ export default function DataPendidikanPage() {
                       <tr><td colSpan="6" style={{ padding: '2rem', textAlign: 'center', color: '#64748b' }}>Tidak ada data yang ditemukan.</td></tr>
                     ) : (
                       filteredData.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage).map((row) => {
-                        const isUnmasked = unmaskedRows.has(row.id);
                         return (
                           <tr key={row.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
                             <td style={{ padding: '1rem 1.5rem' }}>
                               <div style={{ fontWeight: '600', color: '#0f172a' }}>{row.nama_peserta_didik}</div>
-                              <div style={{ fontSize: '0.8rem', color: '#64748b' }}>{row.nama_sekolah}</div>
                             </td>
                             <td style={{ padding: '1rem 1.5rem', color: '#334155' }}>{row.nisn || '-'}</td>
-                            <td style={{ padding: '1rem 1.5rem' }}>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#334155', fontFamily: 'monospace', fontSize: '0.9rem' }}>
-                                <div>
-                                  <div><span style={{color: '#94a3b8', fontSize: '0.75rem', width: '30px', display: 'inline-block'}}>NIK:</span> {isUnmasked ? row.nik : maskData(row.nik)}</div>
-                                  <div><span style={{color: '#94a3b8', fontSize: '0.75rem', width: '30px', display: 'inline-block'}}>KK:</span> {isUnmasked ? row.no_kk : maskData(row.no_kk)}</div>
-                                </div>
-                                <button 
-                                  onClick={() => toggleMask(row.id)}
-                                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: isUnmasked ? '#0284c7' : '#94a3b8', padding: '0.25rem' }}
-                                  title={isUnmasked ? "Sembunyikan NIK/KK" : "Tampilkan NIK/KK"}
-                                >
-                                  {isUnmasked ? <EyeOff size={16} /> : <Eye size={16} />}
-                                </button>
-                              </div>
-                            </td>
+                            <td style={{ padding: '1rem 1.5rem', color: '#334155' }}>{row.nama_sekolah || '-'}</td>
                             <td style={{ padding: '1rem 1.5rem', color: '#334155' }}>{row.kelas} {row.nama_rombel ? `- ${row.nama_rombel}` : ''}</td>
-                            <td style={{ padding: '1rem 1.5rem' }}>
-                              {row.layak_pip ? (
-                                <span style={{ background: '#dcfce7', color: '#166534', padding: '0.25rem 0.75rem', borderRadius: '999px', fontSize: '0.8rem', fontWeight: '600' }}>Layak PIP</span>
-                              ) : (
-                                <span style={{ background: '#f1f5f9', color: '#475569', padding: '0.25rem 0.75rem', borderRadius: '999px', fontSize: '0.8rem', fontWeight: '600' }}>Non-PIP</span>
-                              )}
-                            </td>
                             <td style={{ padding: '1rem 1.5rem' }}>
                               <button 
                                 onClick={() => setSelectedSiswa(row)}
