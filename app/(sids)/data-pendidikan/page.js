@@ -105,11 +105,19 @@ export default function DataPendidikanPage() {
   // 3. DERIVED STATS FROM FILTERED DATA
   const stats = useMemo(() => {
     const total = filteredData.length;
-    const pip = filteredData.filter(s => s.layak_pip).length;
+    let l = 0;
+    let p = 0;
+    
+    filteredData.forEach(s => {
+      if (s.jenis_kelamin?.toLowerCase() === 'l') l++;
+      else if (s.jenis_kelamin?.toLowerCase() === 'p') p++;
+    });
+    
     const uniqueSekolah = new Set(filteredData.map(s => s.nama_sekolah).filter(Boolean)).size;
     return {
       totalSiswa: total,
-      persenPIP: total > 0 ? Math.round((pip / total) * 100) : 0,
+      totalLaki: l,
+      totalPerempuan: p,
       totalSekolah: uniqueSekolah
     };
   }, [filteredData]);
@@ -137,6 +145,76 @@ export default function DataPendidikanPage() {
     return '***';
   };
 
+  // Custom Searchable Dropdown Component
+  const SearchableSelect = ({ value, onChange, options, placeholder, label }) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
+    const wrapperRef = useRef(null);
+
+    useEffect(() => {
+      const handleClickOutside = (event) => {
+        if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
+          setIsOpen(false);
+        }
+      };
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    const filteredOptions = options.filter(opt => opt.toLowerCase().includes(searchTerm.toLowerCase()));
+
+    return (
+      <div ref={wrapperRef} style={{ position: 'relative' }}>
+        <label style={{ display: 'block', fontSize: '0.85rem', color: '#64748b', marginBottom: '0.5rem', fontWeight: '500' }}>{label}</label>
+        <div 
+          onClick={() => setIsOpen(!isOpen)}
+          style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #cbd5e1', color: value ? '#0f172a' : '#94a3b8', background: 'white', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+        >
+          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{value || placeholder}</span>
+          <ChevronDown size={16} color="#64748b" style={{ transform: isOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
+        </div>
+        
+        {isOpen && (
+          <div style={{ position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 0, background: 'white', border: '1px solid #e2e8f0', borderRadius: '8px', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)', zIndex: 50, maxHeight: '250px', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ padding: '0.5rem', borderBottom: '1px solid #f1f5f9' }}>
+              <input 
+                type="text" 
+                autoFocus
+                placeholder="Ketik untuk mencari..." 
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
+                style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #cbd5e1', outline: 'none', fontSize: '0.9rem' }}
+              />
+            </div>
+            <div style={{ overflowY: 'auto', flex: 1 }}>
+              <div 
+                onClick={() => { onChange(''); setIsOpen(false); setSearchTerm(''); }}
+                style={{ padding: '0.5rem 1rem', cursor: 'pointer', fontSize: '0.9rem', color: '#64748b', background: !value ? '#f1f5f9' : 'transparent' }}
+                onMouseEnter={e => e.currentTarget.style.background = '#f8fafc'}
+                onMouseLeave={e => e.currentTarget.style.background = !value ? '#f1f5f9' : 'transparent'}
+              >
+                {placeholder} (Semua)
+              </div>
+              {filteredOptions.length > 0 ? filteredOptions.map(opt => (
+                <div 
+                  key={opt}
+                  onClick={() => { onChange(opt); setIsOpen(false); setSearchTerm(''); }}
+                  style={{ padding: '0.5rem 1rem', cursor: 'pointer', fontSize: '0.9rem', color: '#0f172a', background: value === opt ? '#e0f2fe' : 'transparent' }}
+                  onMouseEnter={e => e.currentTarget.style.background = value === opt ? '#e0f2fe' : '#f8fafc'}
+                  onMouseLeave={e => e.currentTarget.style.background = value === opt ? '#e0f2fe' : 'transparent'}
+                >
+                  {opt}
+                </div>
+              )) : (
+                <div style={{ padding: '0.5rem 1rem', fontSize: '0.9rem', color: '#94a3b8', textAlign: 'center' }}>Tidak ditemukan</div>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
   // Group data for Rekapitulasi: Jenjang -> Kecamatan -> Kelurahan -> Sekolah
   const rekapData = useMemo(() => {
     const grouped = {};
@@ -150,7 +228,7 @@ export default function DataPendidikanPage() {
       if (!grouped[j][kec]) grouped[j][kec] = {};
       if (!grouped[j][kec][kel]) grouped[j][kec][kel] = {};
       if (!grouped[j][kec][kel][sek]) grouped[j][kec][kel][sek] = { total: 0, pip: 0, l: 0, p: 0 };
-      
+
       const node = grouped[j][kec][kel][sek];
       node.total++;
       if (s.layak_pip) node.pip++;
@@ -160,40 +238,80 @@ export default function DataPendidikanPage() {
     return grouped;
   }, [filteredData]);
 
+  // Premium Rekapitulasi Node
   const RekapNode = ({ label, dataObj, depth = 0 }) => {
     const [open, setOpen] = useState(depth < 1);
-    const isLeaf = dataObj.total !== undefined; // Leaf is Sekolah level
     
-    if (isLeaf) {
-      return (
-        <div style={{ marginLeft: `${depth * 1.5}rem`, padding: '0.75rem 1rem', background: 'white', borderLeft: '2px solid #cbd5e1', marginBottom: '0.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderRadius: '4px', boxShadow: '0 1px 2px rgba(0,0,0,0.02)' }}>
-          <div style={{ fontWeight: '600', color: '#334155', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><School size={16} color="#64748b"/> {label}</div>
-          <div style={{ display: 'flex', gap: '1.5rem', fontSize: '0.85rem' }}>
-            <span style={{color: '#64748b'}}>L: <strong style={{color: '#0f172a'}}>{dataObj.l}</strong></span>
-            <span style={{color: '#64748b'}}>P: <strong style={{color: '#0f172a'}}>{dataObj.p}</strong></span>
-            <span style={{color: '#64748b'}}>PIP: <strong style={{color: '#059669'}}>{dataObj.pip}</strong></span>
-            <span style={{color: '#0f172a', fontWeight: '700'}}>Total: {dataObj.total}</span>
-          </div>
-        </div>
-      );
+    // Check if leaf node (sekolah)
+    const isLeaf = dataObj.total !== undefined;
+    
+    // Calculate aggregate totals for this node
+    let aggTotal = 0;
+    let aggL = 0;
+    let aggP = 0;
+    
+    const calculateAggregates = (obj) => {
+      if (obj.total !== undefined) {
+        aggTotal += obj.total;
+        aggL += obj.l;
+        aggP += obj.p;
+      } else {
+        Object.values(obj).forEach(child => calculateAggregates(child));
+      }
+    };
+    
+    if (!isLeaf) {
+      calculateAggregates(dataObj);
+    } else {
+      aggTotal = dataObj.total;
+      aggL = dataObj.l;
+      aggP = dataObj.p;
     }
 
+    const paddingLeft = depth * 24 + 16;
+    
     return (
-      <div style={{ marginLeft: `${depth * 1.5}rem`, marginBottom: '0.5rem' }}>
-        <button 
-          onClick={() => setOpen(!open)}
-          style={{ width: '100%', background: depth === 0 ? '#f1f5f9' : 'transparent', border: depth === 0 ? '1px solid #e2e8f0' : 'none', borderBottom: depth !== 0 ? '1px solid #e2e8f0' : '', padding: '0.75rem 1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', textAlign: 'left', borderRadius: depth === 0 ? '8px' : '0' }}
+      <div style={{ borderBottom: '1px solid #f1f5f9' }}>
+        <div 
+          onClick={() => !isLeaf && setOpen(!open)}
+          style={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'minmax(250px, 2fr) 1fr 1fr 1fr', 
+            gap: '1rem', 
+            padding: '1rem', 
+            background: depth === 0 ? '#f8fafc' : depth === 1 ? '#ffffff' : '#fcfcfc',
+            cursor: isLeaf ? 'default' : 'pointer',
+            alignItems: 'center',
+            transition: 'background 0.2s',
+            fontWeight: depth === 0 ? '700' : depth === 1 ? '600' : '500',
+            color: depth === 0 ? '#0f172a' : '#334155'
+          }}
+          onMouseEnter={e => !isLeaf && (e.currentTarget.style.background = '#f1f5f9')}
+          onMouseLeave={e => !isLeaf && (e.currentTarget.style.background = depth === 0 ? '#f8fafc' : depth === 1 ? '#ffffff' : '#fcfcfc')}
         >
-          {open ? <ChevronDown size={18} color="#64748b"/> : <ChevronRight size={18} color="#64748b"/>}
-          <strong style={{ color: '#0f172a', fontSize: depth === 0 ? '1rem' : '0.95rem' }}>{label}</strong>
-          <span style={{ marginLeft: 'auto', fontSize: '0.8rem', color: '#64748b', background: '#e2e8f0', padding: '0.1rem 0.5rem', borderRadius: '99px' }}>
-            {Object.keys(dataObj).length} sub-item
-          </span>
-        </button>
-        {open && (
-          <div style={{ marginTop: '0.5rem' }}>
-            {Object.entries(dataObj).map(([key, val]) => (
-              <RekapNode key={key} label={key} dataObj={val} depth={depth + 1} />
+          <div style={{ display: 'flex', alignItems: 'center', paddingLeft: `${paddingLeft}px` }}>
+            {!isLeaf ? (
+              <span style={{ marginRight: '8px', transform: open ? 'rotate(90deg)' : 'none', transition: 'transform 0.2s', display: 'flex' }}>
+                <ChevronRight size={16} color="#64748b" />
+              </span>
+            ) : (
+              <span style={{ marginRight: '8px', width: '16px', display: 'inline-block' }}></span>
+            )}
+            {label}
+          </div>
+          <div style={{ textAlign: 'center' }}>
+            <span style={{ background: '#e0f2fe', color: '#0369a1', padding: '0.25rem 0.75rem', borderRadius: '999px', fontSize: '0.85rem' }}>
+              {aggTotal.toLocaleString('id-ID')} Siswa
+            </span>
+          </div>
+          <div style={{ textAlign: 'center', color: '#64748b', fontSize: '0.9rem' }}>{aggL.toLocaleString('id-ID')} L</div>
+          <div style={{ textAlign: 'center', color: '#64748b', fontSize: '0.9rem' }}>{aggP.toLocaleString('id-ID')} P</div>
+        </div>
+        
+        {open && !isLeaf && (
+          <div>
+            {Object.entries(dataObj).map(([childLabel, childData]) => (
+              <RekapNode key={childLabel} label={childLabel} dataObj={childData} depth={depth + 1} />
             ))}
           </div>
         )}
@@ -239,30 +357,56 @@ export default function DataPendidikanPage() {
 
         {activeTab === 'data' && (
           <div className="tab-content" style={{ animation: 'fadeIn 0.4s ease' }}>
-            {/* KPI Dashboard */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
-              <div style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
-                <div style={{ background: '#e0f2fe', padding: '1rem', borderRadius: '12px', color: '#0284c7' }}><Users size={28} /></div>
-                <div>
-                  <div style={{ color: '#64748b', fontSize: '0.9rem', fontWeight: '500' }}>Total Siswa Terdata</div>
-                  <div style={{ color: '#0f172a', fontSize: '1.75rem', fontWeight: '700' }}>{stats.totalSiswa.toLocaleString('id-ID')}</div>
+            {/* KPI Cards */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
+            <div style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', border: '1px solid #e2e8f0' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <div style={{ background: '#eff6ff', padding: '1rem', borderRadius: '12px' }}>
+                  <Users size={24} color="#3b82f6" />
                 </div>
-              </div>
-              <div style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
-                <div style={{ background: '#d1fae5', padding: '1rem', borderRadius: '12px', color: '#059669' }}><CheckCircle size={28} /></div>
                 <div>
-                  <div style={{ color: '#64748b', fontSize: '0.9rem', fontWeight: '500' }}>Persentase Layak PIP</div>
-                  <div style={{ color: '#0f172a', fontSize: '1.75rem', fontWeight: '700' }}>{stats.persenPIP}%</div>
-                </div>
-              </div>
-              <div style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
-                <div style={{ background: '#f3e8ff', padding: '1rem', borderRadius: '12px', color: '#9333ea' }}><School size={28} /></div>
-                <div>
-                  <div style={{ color: '#64748b', fontSize: '0.9rem', fontWeight: '500' }}>Total Sekolah Terdata</div>
-                  <div style={{ color: '#0f172a', fontSize: '1.75rem', fontWeight: '700' }}>{stats.totalSekolah}</div>
+                  <p style={{ margin: 0, color: '#64748b', fontSize: '0.9rem', fontWeight: '500' }}>Total Siswa Terdata</p>
+                  <h2 style={{ margin: 0, fontSize: '1.8rem', color: '#0f172a', fontWeight: '700' }}>{stats.totalSiswa.toLocaleString('id-ID')}</h2>
                 </div>
               </div>
             </div>
+            
+            <div style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', border: '1px solid #e2e8f0' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <div style={{ background: '#f0fdfa', padding: '1rem', borderRadius: '12px' }}>
+                  <School size={24} color="#0d9488" />
+                </div>
+                <div>
+                  <p style={{ margin: 0, color: '#64748b', fontSize: '0.9rem', fontWeight: '500' }}>Total Sekolah</p>
+                  <h2 style={{ margin: 0, fontSize: '1.8rem', color: '#0f172a', fontWeight: '700' }}>{stats.totalSekolah.toLocaleString('id-ID')}</h2>
+                </div>
+              </div>
+            </div>
+            
+            <div style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', border: '1px solid #e2e8f0' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <div style={{ background: '#eff6ff', padding: '1rem', borderRadius: '12px' }}>
+                  <Users size={24} color="#0284c7" />
+                </div>
+                <div>
+                  <p style={{ margin: 0, color: '#64748b', fontSize: '0.9rem', fontWeight: '500' }}>Siswa Laki-laki</p>
+                  <h2 style={{ margin: 0, fontSize: '1.8rem', color: '#0f172a', fontWeight: '700' }}>{stats.totalLaki.toLocaleString('id-ID')}</h2>
+                </div>
+              </div>
+            </div>
+
+            <div style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', border: '1px solid #e2e8f0' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <div style={{ background: '#fdf4ff', padding: '1rem', borderRadius: '12px' }}>
+                  <Users size={24} color="#d946ef" />
+                </div>
+                <div>
+                  <p style={{ margin: 0, color: '#64748b', fontSize: '0.9rem', fontWeight: '500' }}>Siswa Perempuan</p>
+                  <h2 style={{ margin: 0, fontSize: '1.8rem', color: '#0f172a', fontWeight: '700' }}>{stats.totalPerempuan.toLocaleString('id-ID')}</h2>
+                </div>
+              </div>
+            </div>
+          </div>
 
             {/* Filters and Search */}
             <div style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', marginBottom: '2rem' }}>
@@ -291,34 +435,22 @@ export default function DataPendidikanPage() {
                   </select>
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.85rem', color: '#64748b', marginBottom: '0.5rem', fontWeight: '500' }}>Kelurahan / Desa (Cari)</label>
-                  <input 
-                    list="kelurahan-list" 
-                    value={kelurahanFilter} 
-                    onChange={e => setKelurahanFilter(e.target.value)} 
-                    placeholder="Ketik/Pilih Kelurahan..."
-                    style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #cbd5e1', color: '#334155', outline: 'none' }} 
+                  <SearchableSelect 
+                    label="Kelurahan / Desa"
+                    placeholder="Pilih Kelurahan"
+                    value={kelurahanFilter}
+                    onChange={setKelurahanFilter}
+                    options={Array.from(new Set(allData.map(s => s.sekolah_desa_kelurahan || s.kelurahan_siswa).filter(Boolean))).sort()}
                   />
-                  <datalist id="kelurahan-list">
-                    {Array.from(new Set(allData.map(s => s.sekolah_desa_kelurahan || s.kelurahan_siswa).filter(Boolean))).sort().map(k => (
-                      <option key={k} value={k} />
-                    ))}
-                  </datalist>
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.85rem', color: '#64748b', marginBottom: '0.5rem', fontWeight: '500' }}>Sekolah (Cari)</label>
-                  <input 
-                    list="sekolah-list" 
-                    value={sekolah} 
-                    onChange={e => setSekolah(e.target.value)} 
-                    placeholder="Ketik/Pilih Sekolah..."
-                    style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #cbd5e1', color: '#334155', outline: 'none' }} 
+                  <SearchableSelect 
+                    label="Sekolah"
+                    placeholder="Pilih Sekolah"
+                    value={sekolah}
+                    onChange={setSekolah}
+                    options={Array.from(new Set(allData.map(s => s.nama_sekolah).filter(Boolean))).sort()}
                   />
-                  <datalist id="sekolah-list">
-                    {Array.from(new Set(allData.map(s => s.nama_sekolah).filter(Boolean))).sort().map(k => (
-                      <option key={k} value={k} />
-                    ))}
-                  </datalist>
                 </div>
               </div>
 
@@ -417,23 +549,39 @@ export default function DataPendidikanPage() {
 
         {activeTab === 'rekap' && (
           <div className="tab-content" style={{ animation: 'fadeIn 0.4s ease' }}>
-            <div style={{ background: 'white', padding: '2rem', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '1rem' }}>
-                <div style={{ background: '#fef3c7', padding: '0.75rem', borderRadius: '8px', color: '#d97706' }}><School size={24} /></div>
-                <div>
-                  <h3 style={{ margin: 0, fontSize: '1.25rem', color: '#0f172a' }}>Struktur Hierarki Data</h3>
-                  <p style={{ margin: 0, color: '#64748b', fontSize: '0.9rem' }}>Pengelompokan: Jenjang → Kecamatan → Kelurahan → Sekolah</p>
-                </div>
+            <div style={{ background: 'white', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
+              <div style={{ padding: '1.5rem', borderBottom: '1px solid #e2e8f0', background: '#f8fafc' }}>
+                <h3 style={{ margin: 0, color: '#0f172a', fontSize: '1.1rem', fontWeight: '600' }}>
+                  Tabel Analisis & Agregasi Multi-Level
+                </h3>
+                <p style={{ margin: '0.5rem 0 0 0', color: '#64748b', fontSize: '0.9rem' }}>
+                  Klik pada baris Jenjang, Kecamatan, atau Kelurahan untuk melihat rincian datanya hingga tingkat Sekolah.
+                </p>
               </div>
               
-              <div style={{ background: '#f8fafc', padding: '1rem', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                {Object.keys(rekapData).length === 0 ? (
-                  <div style={{ textAlign: 'center', color: '#64748b', padding: '2rem' }}>Memuat rekapitulasi atau data kosong...</div>
-                ) : (
-                  Object.entries(rekapData).map(([jenjangLabel, dataKec]) => (
-                    <RekapNode key={jenjangLabel} label={jenjangLabel} dataObj={dataKec} depth={0} />
-                  ))
-                )}
+              <div style={{ width: '100%', overflowX: 'auto' }}>
+                <div style={{ minWidth: '800px' }}>
+                  {/* Table Header */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'minmax(250px, 2fr) 1fr 1fr 1fr', gap: '1rem', padding: '1rem', background: '#f1f5f9', borderBottom: '2px solid #e2e8f0', color: '#475569', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase' }}>
+                    <div>Klasifikasi Wilayah & Sekolah</div>
+                    <div style={{ textAlign: 'center' }}>Total Siswa</div>
+                    <div style={{ textAlign: 'center' }}>Laki-Laki</div>
+                    <div style={{ textAlign: 'center' }}>Perempuan</div>
+                  </div>
+                  
+                  {/* Table Body (Accordions) */}
+                  <div style={{ padding: '0' }}>
+                    {Object.entries(rekapData).length > 0 ? (
+                      Object.entries(rekapData).map(([jenjangLabel, data]) => (
+                        <RekapNode key={jenjangLabel} label={jenjangLabel} dataObj={data} depth={0} />
+                      ))
+                    ) : (
+                      <div style={{ padding: '3rem', textAlign: 'center', color: '#64748b' }}>
+                        Pilih filter untuk melihat rekapitulasi data
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
