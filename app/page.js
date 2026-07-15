@@ -31,6 +31,7 @@ export default function DashboardPage() {
   const [exportStartYear, setExportStartYear] = useState('');
   const [exportEndYear, setExportEndYear] = useState('');
   const [exportSelectedIndicators, setExportSelectedIndicators] = useState([]);
+  const [exportSelectedJenis, setExportSelectedJenis] = useState([]);
   const [isExportingPDF, setIsExportingPDF] = useState(false);
 
   useEffect(() => {
@@ -161,14 +162,24 @@ export default function DashboardPage() {
       setExportEndYear(availableYears[availableYears.length - 1]);
       // Also pre-select all indicators by default
       setExportSelectedIndicators(allAvailableIndicators.map(i => i.kode));
+      // Also pre-select all jenis by default
+      setExportSelectedJenis([...jenisList]);
     }
-  }, [availableYears, allAvailableIndicators]);
+  }, [availableYears, allAvailableIndicators, jenisList]);
 
   const handleSelectIndicator = (kode) => {
     if (exportSelectedIndicators.includes(kode)) {
       setExportSelectedIndicators(exportSelectedIndicators.filter(k => k !== kode));
     } else {
       setExportSelectedIndicators([...exportSelectedIndicators, kode]);
+    }
+  };
+
+  const handleSelectJenis = (jenis) => {
+    if (exportSelectedJenis.includes(jenis)) {
+      setExportSelectedJenis(exportSelectedJenis.filter(j => j !== jenis));
+    } else {
+      setExportSelectedJenis([...exportSelectedJenis, jenis]);
     }
   };
 
@@ -197,7 +208,12 @@ export default function DashboardPage() {
 
     const regularSelected = exportSelectedIndicators.filter(k => k !== 'SPM');
     if (regularSelected.length > 0) {
-      const regFiltered = data.filter(d => parseInt(d.tahun) >= start && parseInt(d.tahun) <= end && regularSelected.includes(d.kode_indikator));
+      const regFiltered = data.filter(d => 
+        parseInt(d.tahun) >= start && 
+        parseInt(d.tahun) <= end && 
+        regularSelected.includes(d.kode_indikator) &&
+        exportSelectedJenis.includes(d.jenis_satuan_pendidikan)
+      );
       regFiltered.forEach(d => {
         excelData.push({
           "Tahun": d.tahun,
@@ -759,6 +775,37 @@ export default function DashboardPage() {
 
             <div style={{ marginBottom: '1.5rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                <label className="form-label" style={{ margin: 0 }}>Pilih Jenis Satuan Pendidikan</label>
+                <button 
+                  onClick={() => {
+                    if (exportSelectedJenis.length === jenisList.length) {
+                      setExportSelectedJenis([]);
+                    } else {
+                      setExportSelectedJenis([...jenisList]);
+                    }
+                  }}
+                  style={{ background: 'none', border: 'none', color: 'var(--primary-color)', fontSize: '0.85rem', cursor: 'pointer', fontWeight: '600' }}
+                >
+                  {exportSelectedJenis.length === jenisList.length ? 'Batal Pilih Semua' : 'Pilih Semua'}
+                </button>
+              </div>
+              <div style={{ border: '1px solid var(--border-color)', borderRadius: '8px', padding: '0.5rem', maxHeight: '150px', overflowY: 'auto', backgroundColor: '#f8fafc' }}>
+                {jenisList.map(jenis => (
+                  <label key={jenis} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', padding: '0.5rem', cursor: 'pointer', borderBottom: '1px solid #e2e8f0', borderRadius: '4px', transition: 'background-color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'white'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
+                    <input 
+                      type="checkbox" 
+                      checked={exportSelectedJenis.includes(jenis)} 
+                      onChange={() => handleSelectJenis(jenis)}
+                      style={{ width: '16px', height: '16px', cursor: 'pointer', marginTop: '3px' }}
+                    />
+                    <span style={{ fontSize: '0.9rem', color: 'var(--text-main)', lineHeight: '1.3' }}>{jenis}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <div style={{ marginBottom: '1.5rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
                 <label className="form-label" style={{ margin: 0 }}>Pilih Indikator</label>
                 <button 
                   onClick={() => {
@@ -773,7 +820,7 @@ export default function DashboardPage() {
                   {exportSelectedIndicators.length === allAvailableIndicators.length ? 'Batal Pilih Semua' : 'Pilih Semua'}
                 </button>
               </div>
-              <div style={{ border: '1px solid var(--border-color)', borderRadius: '8px', padding: '0.5rem', maxHeight: '250px', overflowY: 'auto', backgroundColor: '#f8fafc' }}>
+              <div style={{ border: '1px solid var(--border-color)', borderRadius: '8px', padding: '0.5rem', maxHeight: '200px', overflowY: 'auto', backgroundColor: '#f8fafc' }}>
                 {allAvailableIndicators.map(ind => (
                   <label key={ind.kode} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', padding: '0.5rem', cursor: 'pointer', borderBottom: '1px solid #e2e8f0', borderRadius: '4px', transition: 'background-color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'white'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
                     <input 
