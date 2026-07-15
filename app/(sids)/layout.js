@@ -30,7 +30,7 @@ export default function SidsLayout({ children }) {
         zIndex: 50
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <Image src="/tomohon.png" alt="Logo Tomohon" width={40} height={45} style={{ objectFit: 'contain' }} priority />
+          <Image src="/logo.png" alt="Logo Tomohon" width={40} height={45} style={{ objectFit: 'contain' }} priority />
           <div>
             <h1 style={{ fontSize: '1.25rem', margin: 0, color: 'white', fontWeight: '600' }}>Sistem Informasi Data Siswa (SIDS)</h1>
             <p style={{ margin: 0, color: '#94a3b8', fontSize: '0.85rem' }}>Dinas Pendidikan Daerah Kota Tomohon</p>
