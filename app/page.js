@@ -5,8 +5,6 @@ import Link from 'next/link';
 import { BarChart2, Database, ChevronRight, X } from 'lucide-react';
 
 export default function PortalPage() {
-  const [showComingSoon, setShowComingSoon] = useState(false);
-
   return (
     <div style={{
       minHeight: '100vh',
@@ -86,48 +84,49 @@ export default function PortalPage() {
         </Link>
 
         {/* Card 2: Data Pendidikan */}
-        <div 
-          onClick={() => setShowComingSoon(true)}
-          style={{
-            background: 'rgba(255, 255, 255, 0.03)',
-            backdropFilter: 'blur(16px)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-            borderRadius: '16px',
-            padding: '2.5rem 2rem',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            textAlign: 'center',
-            cursor: 'pointer',
-            transition: 'all 0.3s ease',
-            height: '100%',
-            boxShadow: '0 10px 30px rgba(0,0,0,0.2)'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'translateY(-8px)';
-            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)';
-            e.currentTarget.style.borderColor = 'rgba(168, 85, 247, 0.5)';
-            e.currentTarget.style.boxShadow = '0 20px 40px rgba(0,0,0,0.4)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'translateY(0)';
-            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.03)';
-            e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
-            e.currentTarget.style.boxShadow = '0 10px 30px rgba(0,0,0,0.2)';
-          }}
-        >
-          <div style={{ background: 'linear-gradient(135deg, #a855f7 0%, #7e22ce 100%)', padding: '1.2rem', borderRadius: '50%', marginBottom: '1.5rem', boxShadow: '0 4px 15px rgba(168,85,247,0.4)' }}>
-            <Database size={40} color="white" />
+        <Link href="/data-pendidikan" style={{ textDecoration: 'none' }}>
+          <div 
+            style={{
+              background: 'rgba(255, 255, 255, 0.03)',
+              backdropFilter: 'blur(16px)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              borderRadius: '16px',
+              padding: '2.5rem 2rem',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              textAlign: 'center',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease',
+              height: '100%',
+              boxShadow: '0 10px 30px rgba(0,0,0,0.2)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-8px)';
+              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)';
+              e.currentTarget.style.borderColor = 'rgba(168, 85, 247, 0.5)';
+              e.currentTarget.style.boxShadow = '0 20px 40px rgba(0,0,0,0.4)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.03)';
+              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+              e.currentTarget.style.boxShadow = '0 10px 30px rgba(0,0,0,0.2)';
+            }}
+          >
+            <div style={{ background: 'linear-gradient(135deg, #a855f7 0%, #7e22ce 100%)', padding: '1.2rem', borderRadius: '50%', marginBottom: '1.5rem', boxShadow: '0 4px 15px rgba(168,85,247,0.4)' }}>
+              <Database size={40} color="white" />
+            </div>
+            <h3 style={{ fontSize: '1.5rem', fontWeight: '600', color: 'white', marginBottom: '0.75rem' }}>Data Pendidikan</h3>
+            <p style={{ color: '#94a3b8', fontSize: '0.95rem', lineHeight: '1.5', marginBottom: '2rem' }}>
+              Akses ke berbagai pangkalan data pendidikan termasuk profil sekolah, daftar tenaga pengajar, dan siswa.
+            </p>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#c084fc', fontWeight: '600', fontSize: '1rem', marginTop: 'auto' }}>
+              Lihat Data <ChevronRight size={18} />
+            </div>
           </div>
-          <h3 style={{ fontSize: '1.5rem', fontWeight: '600', color: 'white', marginBottom: '0.75rem' }}>Data Pendidikan</h3>
-          <p style={{ color: '#94a3b8', fontSize: '0.95rem', lineHeight: '1.5', marginBottom: '2rem' }}>
-            Akses ke berbagai pangkalan data pendidikan termasuk profil sekolah, daftar tenaga pengajar, dan siswa.
-          </p>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#c084fc', fontWeight: '600', fontSize: '1rem', marginTop: 'auto' }}>
-            Lihat Data <ChevronRight size={18} />
-          </div>
-        </div>
+        </Link>
 
       </div>
 
@@ -136,70 +135,7 @@ export default function PortalPage() {
         &copy; {new Date().getFullYear()} Dinas Pendidikan dan Kebudayaan Kota Tomohon
       </div>
 
-      {/* Coming Soon Modal */}
-      {showComingSoon && (
-        <div style={{
-          position: 'fixed',
-          top: 0, left: 0, right: 0, bottom: 0,
-          background: 'rgba(0, 0, 0, 0.6)',
-          backdropFilter: 'blur(8px)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 1000,
-          padding: '1rem'
-        }}>
-          <div style={{
-            background: 'linear-gradient(180deg, #1e293b 0%, #0f172a 100%)',
-            border: '1px solid rgba(255,255,255,0.1)',
-            borderRadius: '16px',
-            padding: '3rem 2rem',
-            width: '100%',
-            maxWidth: '450px',
-            textAlign: 'center',
-            position: 'relative',
-            boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)',
-            animation: 'fadeInUp 0.3s ease-out'
-          }}>
-            <button 
-              onClick={() => setShowComingSoon(false)}
-              style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'rgba(255,255,255,0.05)', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: '0.5rem', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-              onMouseEnter={(e) => { e.currentTarget.style.color = 'white'; e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.color = '#94a3b8'; e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; }}
-            >
-              <X size={20} />
-            </button>
-            <div style={{ 
-              width: '80px', height: '80px', borderRadius: '50%', background: 'rgba(168, 85, 247, 0.1)', border: '2px solid rgba(168, 85, 247, 0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem', color: '#c084fc'
-            }}>
-              <Database size={40} />
-            </div>
-            <h3 style={{ fontSize: '1.75rem', fontWeight: '700', color: 'white', marginBottom: '1rem' }}>Segera Hadir</h3>
-            <p style={{ color: '#94a3b8', fontSize: '1.05rem', lineHeight: '1.6', marginBottom: '2rem' }}>
-              Modul <strong>Data Pendidikan (Sekolah, Guru, Siswa)</strong> sedang dalam tahap pengembangan dan akan segera bisa Anda akses dalam waktu dekat.
-            </p>
-            <button 
-              onClick={() => setShowComingSoon(false)}
-              style={{
-                background: 'linear-gradient(135deg, #a855f7 0%, #7e22ce 100%)',
-                color: 'white',
-                border: 'none',
-                padding: '0.8rem 2rem',
-                borderRadius: '8px',
-                fontSize: '1rem',
-                fontWeight: '600',
-                cursor: 'pointer',
-                boxShadow: '0 4px 15px rgba(168,85,247,0.4)',
-                transition: 'all 0.2s'
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
-              onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-            >
-              Kembali
-            </button>
-          </div>
-        </div>
-      )}
+      {/* Modal dihapus karena sudah diarahkan ke halaman sebenarnya */}
 
       <style jsx global>{`
         @keyframes fadeInUp {
