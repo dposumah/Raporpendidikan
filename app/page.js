@@ -12,7 +12,10 @@ import {
   LineChart,
   Line
 } from 'recharts';
-import { Info, BarChart3, TrendingUp, Download, X } from 'lucide-react';
+import { Info, BarChart3, TrendingUp, Download, X, Printer } from 'lucide-react';
+import * as XLSX from 'xlsx';
+import html2canvas from 'html2canvas';
+import { jsPDF } from 'jspdf';
 
 export default function DashboardPage() {
   const [data, setData] = useState([]);
@@ -28,6 +31,7 @@ export default function DashboardPage() {
   const [exportStartYear, setExportStartYear] = useState('');
   const [exportEndYear, setExportEndYear] = useState('');
   const [exportSelectedIndicators, setExportSelectedIndicators] = useState([]);
+  const [isExportingPDF, setIsExportingPDF] = useState(false);
 
   useEffect(() => {
     fetch('/api/data', { cache: 'no-store' })
@@ -174,14 +178,20 @@ export default function DashboardPage() {
       return;
     }
 
-    let csvContent = "Tahun,Jenis Satuan Pendidikan,Indikator,Nilai Capaian,Label Capaian\n";
     const start = parseInt(exportStartYear);
     const end = parseInt(exportEndYear);
+    const excelData = [];
 
     if (exportSelectedIndicators.includes('SPM')) {
       const spmFiltered = spmData.filter(d => parseInt(d.tahun) >= start && parseInt(d.tahun) <= end);
       spmFiltered.forEach(d => {
-        csvContent += `"${d.tahun}","Semua","${d.indeks_spm}",${d.nilai_capaian},"${d.label_capaian || ''}"\n`;
+        excelData.push({
+          "Tahun": d.tahun,
+          "Jenis Satuan Pendidikan": "Semua",
+          "Indikator": d.indeks_spm,
+          "Nilai Capaian": d.nilai_capaian,
+          "Label Capaian": d.label_capaian || ''
+        });
       });
     }
 
@@ -189,19 +199,49 @@ export default function DashboardPage() {
     if (regularSelected.length > 0) {
       const regFiltered = data.filter(d => parseInt(d.tahun) >= start && parseInt(d.tahun) <= end && regularSelected.includes(d.kode_indikator));
       regFiltered.forEach(d => {
-        csvContent += `"${d.tahun}","${d.jenis_satuan_pendidikan}","${d.nama_indikator}",${d.nilai_capaian},"${d.label_capaian || ''}"\n`;
+        excelData.push({
+          "Tahun": d.tahun,
+          "Jenis Satuan Pendidikan": d.jenis_satuan_pendidikan,
+          "Indikator": d.nama_indikator,
+          "Nilai Capaian": d.nilai_capaian,
+          "Label Capaian": d.label_capaian || ''
+        });
       });
     }
 
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', `Export_Capaian_${start}-${end}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    const ws = XLSX.utils.json_to_sheet(excelData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Data Capaian");
+    XLSX.writeFile(wb, `Export_Capaian_${start}-${end}.xlsx`);
+    
     setShowExportModal(false);
+  };
+
+  const handleDownloadPDF = async () => {
+    const element = document.getElementById('pdf-content');
+    if (!element) return;
+    
+    setIsExportingPDF(true);
+    try {
+      const canvas = await html2canvas(element, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
+      const imgData = canvas.toDataURL('image/png');
+      
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+      
+      const title = selectedIndikator === 'SPM' ? 'Indeks Pencapaian SPM' : selectedIndikatorInfo?.nama || 'Laporan Capaian';
+      pdf.setFontSize(14);
+      pdf.text("Laporan Rapor Pendidikan - " + title, 10, 10);
+      
+      pdf.addImage(imgData, 'PNG', 0, 15, pdfWidth, pdfHeight);
+      pdf.save(`Laporan_Rapor_${selectedIndikator}.pdf`);
+    } catch (err) {
+      console.error("Error generating PDF:", err);
+      alert("Gagal menghasilkan PDF.");
+    } finally {
+      setIsExportingPDF(false);
+    }
   };
 
   const selectedData = useMemo(() => {
@@ -260,13 +300,23 @@ export default function DashboardPage() {
     <main className="container">
       <div className="header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
         <h1 className="title" style={{ margin: 0 }}>Analisis Detail Capaian</h1>
-        <button 
-          onClick={() => setShowExportModal(true)}
-          style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', backgroundColor: 'var(--primary-color)', color: 'white', padding: '0.5rem 1rem', borderRadius: '8px', border: 'none', cursor: 'pointer', fontWeight: '600', boxShadow: '0 2px 4px rgba(37,99,235,0.2)' }}
-        >
-          <Download size={18} />
-          Export Data
-        </button>
+        <div style={{ display: 'flex', gap: '0.75rem' }}>
+          <button 
+            onClick={handleDownloadPDF}
+            disabled={isExportingPDF}
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', backgroundColor: 'white', color: 'var(--primary-color)', padding: '0.5rem 1rem', borderRadius: '8px', border: '1px solid var(--primary-color)', cursor: isExportingPDF ? 'wait' : 'pointer', fontWeight: '600', boxShadow: '0 2px 4px rgba(37,99,235,0.1)' }}
+          >
+            <Printer size={18} />
+            {isExportingPDF ? 'Memproses...' : 'Download PDF Laporan'}
+          </button>
+          <button 
+            onClick={() => setShowExportModal(true)}
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', backgroundColor: 'var(--primary-color)', color: 'white', padding: '0.5rem 1rem', borderRadius: '8px', border: 'none', cursor: 'pointer', fontWeight: '600', boxShadow: '0 2px 4px rgba(37,99,235,0.2)' }}
+          >
+            <Download size={18} />
+            Export Data Excel
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-2" style={{ gridTemplateColumns: '300px 1fr', alignItems: 'start' }}>
@@ -359,7 +409,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Panel Kanan: Grafik atau SPM */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+        <div id="pdf-content" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', padding: '1rem', backgroundColor: 'white' }}>
           {selectedIndikator === 'SPM' ? (
             <div className="card" style={{ borderTop: '4px solid var(--primary-color)' }}>
               <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', margin: 0, marginBottom: '2rem', color: 'var(--primary-color)', fontSize: '1.4rem' }}>
@@ -745,7 +795,7 @@ export default function DashboardPage() {
               onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
             >
               <Download size={20} />
-              Download CSV
+              Download Format Excel
             </button>
           </div>
         </div>
