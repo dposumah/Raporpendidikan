@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import autoTable from 'jspdf-autotable';
 
 export default function DataPendidikanPage() {
   const [allData, setAllData] = useState([]);
@@ -411,7 +411,7 @@ export default function DataPendidikanPage() {
   const exportToPDF = (headers, dataMatrix, title, filename) => {
     const doc = new jsPDF();
     doc.text(title, 14, 15);
-    doc.autoTable({
+    autoTable(doc, {
       head: [headers],
       body: dataMatrix,
       startY: 25,
@@ -857,10 +857,42 @@ export default function DataPendidikanPage() {
             {/* DOMISILI SUB-TAB */}
             {rekapTab === 'domisili' && (
               <div style={{ background: 'white', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
-                <div style={{ padding: '1.5rem', borderBottom: '1px solid #e2e8f0', background: '#f8fafc', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ padding: '1.5rem', borderBottom: '1px solid #e2e8f0', background: '#f8fafc', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
                   <div>
                     <h3 style={{ margin: 0, color: '#0f172a', fontSize: '1.1rem', fontWeight: '600' }}>Tabel Rekapitulasi Berdasarkan Wilayah Domisili</h3>
                     <p style={{ margin: '0.5rem 0 0 0', color: '#64748b', fontSize: '0.9rem' }}>Dikelompokkan menjadi Kota Tomohon (Kecamatan → Kelurahan) dan Luar Kota Tomohon (Kabupaten → Kecamatan).</p>
+                  </div>
+                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <button 
+                      onClick={() => {
+                        const flatData = [];
+                        Object.entries(domisiliRekapData).forEach(([wil, d]) => {
+                          flatData.push({ Kategori: wil, Total: d.count, 'Laki-Laki': d.l, Perempuan: d.p });
+                          if (d.children) {
+                            Object.entries(d.children).forEach(([kec, kecD]) => {
+                              flatData.push({ Kategori: `  - ${kec}`, Total: kecD.count, 'Laki-Laki': kecD.l, Perempuan: kecD.p });
+                            });
+                          }
+                        });
+                        exportToExcel(flatData, 'Rekap_Domisili');
+                      }}
+                      style={{ background: '#10b981', color: 'white', border: 'none', padding: '0.5rem 1rem', borderRadius: '6px', fontSize: '0.85rem', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+                    ><Download size={16} /> Export Excel</button>
+                    <button 
+                      onClick={() => {
+                        const flatMatrix = [];
+                        Object.entries(domisiliRekapData).forEach(([wil, d]) => {
+                          flatMatrix.push([wil, d.count, d.l, d.p]);
+                          if (d.children) {
+                            Object.entries(d.children).forEach(([kec, kecD]) => {
+                              flatMatrix.push([`  - ${kec}`, kecD.count, kecD.l, kecD.p]);
+                            });
+                          }
+                        });
+                        exportToPDF(['Status & Wilayah', 'Total', 'Laki-Laki', 'Perempuan'], flatMatrix, 'Rekapitulasi Berdasarkan Domisili', 'Rekap_Domisili');
+                      }}
+                      style={{ background: '#ef4444', color: 'white', border: 'none', padding: '0.5rem 1rem', borderRadius: '6px', fontSize: '0.85rem', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+                    ><Download size={16} /> Export PDF</button>
                   </div>
                 </div>
                 
