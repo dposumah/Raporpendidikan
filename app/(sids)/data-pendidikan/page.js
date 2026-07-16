@@ -401,6 +401,73 @@ export default function DataPendidikanPage() {
     return agg;
   }, [filteredData]);
 
+  // Rekapitulasi Per Sekolah
+  const rekapSekolahData = useMemo(() => {
+    const data = {};
+    const today = new Date();
+    
+    const parseDate = (d) => {
+      if (!d) return null;
+      if (!isNaN(d) && Number(d) > 20000) return new Date((d - 25569) * 86400 * 1000);
+      const parts = String(d).split(/[-\/]/);
+      if (parts.length === 3) {
+        if (parts[0].length === 4) return new Date(parts[0], parts[1]-1, parts[2]);
+        else return new Date(parts[2], parts[1]-1, parts[0]);
+      }
+      return new Date(d);
+    };
+
+    filteredData.forEach(s => {
+      const sek = s.nama_sekolah || 'Tanpa Sekolah';
+      if (!data[sek]) {
+        data[sek] = { total: 0, l: 0, p: 0, tomohon: 0, luar: 0, agama: {}, umur: {}, kelas: {} };
+      }
+      
+      const node = data[sek];
+      node.total++;
+      
+      // JK
+      const jk = (s.jenis_kelamin || '').toLowerCase();
+      if (jk === 'l' || jk === 'laki-laki') node.l++;
+      else if (jk === 'p' || jk === 'perempuan') node.p++;
+      
+      // Domisili
+      const kabRaw = (s.kabupaten_siswa || '').toLowerCase().trim();
+      const kecRaw = (s.kecamatan_siswa || '').toLowerCase().replace(/^kecamatan\s+/i, '').replace(/^kec\.\s+/i, '').trim();
+      let isTomohon = false;
+      if (kecRaw === 'tomohon tengah' || (kabRaw.includes('tomohon') && kecRaw === 'tengah')) isTomohon = true;
+      else if (kecRaw === 'tomohon timur' || (kabRaw.includes('tomohon') && kecRaw === 'timur')) isTomohon = true;
+      else if (kecRaw === 'tomohon barat' || (kabRaw.includes('tomohon') && kecRaw === 'barat')) isTomohon = true;
+      else if (kecRaw === 'tomohon selatan' || (kabRaw.includes('tomohon') && kecRaw === 'selatan')) isTomohon = true;
+      else if (kecRaw === 'tomohon utara' || (kabRaw.includes('tomohon') && kecRaw === 'utara')) isTomohon = true;
+      
+      if (isTomohon) node.tomohon++;
+      else node.luar++;
+      
+      // Agama
+      const agama = s.agama || 'T/D';
+      node.agama[agama] = (node.agama[agama] || 0) + 1;
+      
+      // Umur
+      let umurLabel = 'Lainnya';
+      const tgl = parseDate(s.tanggal_lahir);
+      if (tgl && !isNaN(tgl.getTime())) {
+        let age = today.getFullYear() - tgl.getFullYear();
+        const m = today.getMonth() - tgl.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < tgl.getDate())) age--;
+        if (age >= 0 && age <= 30) umurLabel = `${age}`;
+      }
+      node.umur[umurLabel] = (node.umur[umurLabel] || 0) + 1;
+      
+      // Kelas
+      const kls = s.kelas || 'T/D';
+      node.kelas[kls] = (node.kelas[kls] || 0) + 1;
+    });
+    
+    // Sort Object entries by School name
+    return Object.entries(data).sort((a,b) => a[0].localeCompare(b[0]));
+  }, [filteredData]);
+
   // Export functions
   const exportToExcel = (dataArray, filename) => {
     const ws = XLSX.utils.json_to_sheet(dataArray);
@@ -832,6 +899,7 @@ export default function DataPendidikanPage() {
                 { id: 'domisili', label: 'Domisili' },
                 { id: 'jk', label: 'Jenis Kelamin' },
                 { id: 'agama_umur', label: 'Agama & Umur' },
+                { id: 'sekolah', label: 'Per Sekolah' },
                 { id: 'grafik', label: 'Grafik Demografi' }
               ].map(tab => (
                 <button
@@ -1126,6 +1194,89 @@ export default function DataPendidikanPage() {
                   </div>
                 </div>
 
+              </div>
+            )}
+
+            {/* SEKOLAH SUB-TAB */}
+            {rekapTab === 'sekolah' && (
+              <div style={{ background: 'white', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
+                <div style={{ padding: '1.5rem', borderBottom: '1px solid #e2e8f0', background: '#f8fafc', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+                  <div>
+                    <h3 style={{ margin: 0, color: '#0f172a', fontSize: '1.1rem', fontWeight: '600' }}>Rekapitulasi Per Sekolah</h3>
+                    <p style={{ margin: '0.5rem 0 0 0', color: '#64748b', fontSize: '0.9rem' }}>Ringkasan metrik demografi untuk setiap sekolah.</p>
+                  </div>
+                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <button 
+                      onClick={() => {
+                        const flatData = rekapSekolahData.map(([sekolah, d]) => ({
+                          'Nama Sekolah': sekolah,
+                          'Total Siswa': d.total,
+                          'Laki-Laki': d.l,
+                          'Perempuan': d.p,
+                          'Tomohon': d.tomohon,
+                          'Luar': d.luar,
+                          'Agama': Object.entries(d.agama).map(([k,v]) => `${k}:${v}`).join(', '),
+                          'Umur': Object.entries(d.umur).map(([k,v]) => `${k}:${v}`).join(', '),
+                          'Kelas': Object.entries(d.kelas).map(([k,v]) => `${k}:${v}`).join(', ')
+                        }));
+                        exportToExcel(flatData, 'Rekap_Per_Sekolah');
+                      }}
+                      style={{ background: '#10b981', color: 'white', border: 'none', padding: '0.5rem 1rem', borderRadius: '6px', fontSize: '0.85rem', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+                    >
+                      <Download size={16} /> Export Excel
+                    </button>
+                    <button 
+                      onClick={() => {
+                        const flatMatrix = rekapSekolahData.map(([sekolah, d]) => [
+                          sekolah,
+                          d.total,
+                          `${d.l} L / ${d.p} P`,
+                          `${d.tomohon} T / ${d.luar} L`,
+                          Object.entries(d.agama).map(([k,v]) => `${k}:${v}`).join(', '),
+                          Object.entries(d.umur).map(([k,v]) => `${k}:${v}`).join(', '),
+                          Object.entries(d.kelas).map(([k,v]) => `${k}:${v}`).join(', ')
+                        ]);
+                        exportToPDF(['Sekolah', 'Total', 'L/P', 'Domisili', 'Agama', 'Umur', 'Kelas'], flatMatrix, 'Rekapitulasi Per Sekolah', 'Rekap_Sekolah');
+                      }}
+                      style={{ background: '#ef4444', color: 'white', border: 'none', padding: '0.5rem 1rem', borderRadius: '6px', fontSize: '0.85rem', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+                    >
+                      <Download size={16} /> Export PDF
+                    </button>
+                  </div>
+                </div>
+                
+                <div style={{ width: '100%', overflowX: 'auto', maxHeight: '600px' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '1000px' }}>
+                    <thead style={{ position: 'sticky', top: 0, zIndex: 10 }}>
+                      <tr style={{ background: '#f1f5f9', color: '#475569' }}>
+                        <th style={{ padding: '1rem', borderBottom: '2px solid #e2e8f0', fontWeight: '600' }}>Sekolah</th>
+                        <th style={{ padding: '1rem', borderBottom: '2px solid #e2e8f0', fontWeight: '600' }}>Total</th>
+                        <th style={{ padding: '1rem', borderBottom: '2px solid #e2e8f0', fontWeight: '600' }}>L/P</th>
+                        <th style={{ padding: '1rem', borderBottom: '2px solid #e2e8f0', fontWeight: '600' }}>Domisili (T/L)</th>
+                        <th style={{ padding: '1rem', borderBottom: '2px solid #e2e8f0', fontWeight: '600' }}>Agama</th>
+                        <th style={{ padding: '1rem', borderBottom: '2px solid #e2e8f0', fontWeight: '600' }}>Umur</th>
+                        <th style={{ padding: '1rem', borderBottom: '2px solid #e2e8f0', fontWeight: '600' }}>Kelas</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {rekapSekolahData.length > 0 ? rekapSekolahData.map(([sekolah, d], idx) => (
+                        <tr key={idx} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                          <td style={{ padding: '1rem', fontWeight: '600', color: '#0f172a' }}>{sekolah}</td>
+                          <td style={{ padding: '1rem', color: '#0369a1', fontWeight: '600' }}>{d.total.toLocaleString('id-ID')}</td>
+                          <td style={{ padding: '1rem', color: '#334155', fontSize: '0.9rem' }}>{d.l} L / {d.p} P</td>
+                          <td style={{ padding: '1rem', color: '#334155', fontSize: '0.9rem' }}>{d.tomohon} T / {d.luar} L</td>
+                          <td style={{ padding: '1rem', color: '#64748b', fontSize: '0.85rem', maxWidth: '200px' }}>{Object.entries(d.agama).map(([k,v]) => `${k}:${v}`).join(', ')}</td>
+                          <td style={{ padding: '1rem', color: '#64748b', fontSize: '0.85rem', maxWidth: '200px' }}>{Object.entries(d.umur).map(([k,v]) => `${k}:${v}`).join(', ')}</td>
+                          <td style={{ padding: '1rem', color: '#64748b', fontSize: '0.85rem', maxWidth: '150px' }}>{Object.entries(d.kelas).map(([k,v]) => `${k}:${v}`).join(', ')}</td>
+                        </tr>
+                      )) : (
+                        <tr>
+                          <td colSpan="7" style={{ padding: '3rem', textAlign: 'center', color: '#64748b' }}>Pilih filter untuk melihat data sekolah</td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             )}
           </div>
