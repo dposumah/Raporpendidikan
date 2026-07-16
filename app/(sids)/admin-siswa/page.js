@@ -91,8 +91,8 @@ export default function AdminSiswaPage() {
               alamat_siswa: getVal(['Alamat', 'Alamat Siswa']),
               dusun_siswa: getVal(['Nama Dusun', 'Dusun Siswa', 'Dusun']),
               kelurahan_siswa: getVal(['Desa Kelurahan', 'Kelurahan Siswa', 'Kelurahan', 'Desa']),
-              kecamatan_siswa: getVal(['Kecamatan', 'Kecamatan Siswa']),
-              kabupaten_siswa: getVal(['Kabupaten', 'Kabupaten Siswa']),
+              kecamatan_siswa: getVal(['Kecamatan Tempat Tinggal', 'Kecamatan Domisili', 'Kec. Tempat Tinggal', 'Kecamatan Siswa', 'Kecamatan']),
+              kabupaten_siswa: getVal(['Kabupaten Tempat Tinggal', 'Kabupaten Domisili', 'Kab. Tempat Tinggal', 'Kota Tempat Tinggal', 'Kabupaten Siswa', 'Kabupaten', 'Kota']),
               provinsi_siswa: getVal(['Propinsi', 'Provinsi', 'Provinsi Siswa']),
               kode_pos_siswa: getVal(['Kode Pos', 'Kode Pos Siswa']),
               
