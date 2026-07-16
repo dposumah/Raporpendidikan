@@ -1002,15 +1002,13 @@ export default function DataPendidikanPage() {
                   <h3 style={{ margin: '0 0 1.5rem 0', color: '#0f172a', fontSize: '1.1rem', fontWeight: '600' }}>Grafik Kebutuhan Khusus</h3>
                   <div style={{ width: '100%', height: '300px' }}>
                     <ResponsiveContainer>
-                      <PieChart>
-                        <Pie data={Object.entries(rekapitulasiAggregates.kebutuhanKhusus).map(([n,v]) => ({name: n, value: v}))} cx="50%" cy="50%" innerRadius={60} outerRadius={100} paddingAngle={5} dataKey="value">
-                          {Object.keys(rekapitulasiAggregates.kebutuhanKhusus).map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={['#0284c7', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'][index % 5]} />
-                          ))}
-                        </Pie>
+                      <BarChart data={Object.entries(rekapitulasiAggregates.kebutuhanKhusus).map(([n,v]) => ({name: n, Total: v}))} layout="vertical" margin={{ left: 50 }}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis type="number" />
+                        <YAxis dataKey="name" type="category" width={80} fontSize={12} />
                         <Tooltip />
-                        <Legend />
-                      </PieChart>
+                        <Bar dataKey="Total" fill="#0284c7" radius={[0, 4, 4, 0]} />
+                      </BarChart>
                     </ResponsiveContainer>
                   </div>
                 </div>
