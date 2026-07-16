@@ -476,14 +476,14 @@ export default function DataPendidikanPage() {
     XLSX.writeFile(wb, `${filename}.xlsx`);
   };
 
-  const exportToPDF = (headers, dataMatrix, title, filename) => {
-    const doc = new jsPDF();
+  const exportToPDF = (headers, dataMatrix, title, filename, orientation = 'portrait') => {
+    const doc = new jsPDF({ orientation });
     doc.text(title, 14, 15);
     autoTable(doc, {
       head: [headers],
       body: dataMatrix,
       startY: 25,
-      styles: { fontSize: 9 }
+      styles: { fontSize: orientation === 'landscape' ? 7 : 9, cellPadding: orientation === 'landscape' ? 1.5 : 3 }
     });
     doc.save(`${filename}.pdf`);
   };
@@ -1208,17 +1208,24 @@ export default function DataPendidikanPage() {
                   <div style={{ display: 'flex', gap: '0.5rem' }}>
                     <button 
                       onClick={() => {
-                        const flatData = rekapSekolahData.map(([sekolah, d]) => ({
-                          'Nama Sekolah': sekolah,
-                          'Total Siswa': d.total,
-                          'Laki-Laki': d.l,
-                          'Perempuan': d.p,
-                          'Tomohon': d.tomohon,
-                          'Luar': d.luar,
-                          'Agama': Object.entries(d.agama).map(([k,v]) => `${k}:${v}`).join(', '),
-                          'Umur': Object.entries(d.umur).map(([k,v]) => `${k}:${v}`).join(', '),
-                          'Kelas': Object.entries(d.kelas).map(([k,v]) => `${k}:${v}`).join(', ')
-                        }));
+                        const allAgama = Array.from(new Set(rekapSekolahData.flatMap(([_, d]) => Object.keys(d.agama)))).sort();
+                        const allUmur = Array.from(new Set(rekapSekolahData.flatMap(([_, d]) => Object.keys(d.umur)))).sort((a,b) => parseInt(a) - parseInt(b));
+                        const allKelas = Array.from(new Set(rekapSekolahData.flatMap(([_, d]) => Object.keys(d.kelas)))).sort();
+
+                        const flatData = rekapSekolahData.map(([sekolah, d]) => {
+                          const row = {
+                            'Nama Sekolah': sekolah,
+                            'Total Siswa': d.total,
+                            'Laki-Laki': d.l,
+                            'Perempuan': d.p,
+                            'Tomohon': d.tomohon,
+                            'Luar': d.luar,
+                          };
+                          allAgama.forEach(a => row[`Agama: ${a}`] = d.agama[a] || 0);
+                          allUmur.forEach(u => row[`Umur: ${u}`] = d.umur[u] || 0);
+                          allKelas.forEach(k => row[`Kelas: ${k}`] = d.kelas[k] || 0);
+                          return row;
+                        });
                         exportToExcel(flatData, 'Rekap_Per_Sekolah');
                       }}
                       style={{ background: '#10b981', color: 'white', border: 'none', padding: '0.5rem 1rem', borderRadius: '6px', fontSize: '0.85rem', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
@@ -1227,16 +1234,24 @@ export default function DataPendidikanPage() {
                     </button>
                     <button 
                       onClick={() => {
+                        const allAgama = Array.from(new Set(rekapSekolahData.flatMap(([_, d]) => Object.keys(d.agama)))).sort();
+                        const allUmur = Array.from(new Set(rekapSekolahData.flatMap(([_, d]) => Object.keys(d.umur)))).sort((a,b) => parseInt(a) - parseInt(b));
+                        const allKelas = Array.from(new Set(rekapSekolahData.flatMap(([_, d]) => Object.keys(d.kelas)))).sort();
+
+                        const headers = ['Sekolah', 'Total', 'L', 'P', 'T', 'L', ...allAgama, ...allUmur, ...allKelas.map(k => `Kls ${k}`)];
+                        
                         const flatMatrix = rekapSekolahData.map(([sekolah, d]) => [
                           sekolah,
                           d.total,
-                          `${d.l} L / ${d.p} P`,
-                          `${d.tomohon} T / ${d.luar} L`,
-                          Object.entries(d.agama).map(([k,v]) => `${k}:${v}`).join(', '),
-                          Object.entries(d.umur).map(([k,v]) => `${k}:${v}`).join(', '),
-                          Object.entries(d.kelas).map(([k,v]) => `${k}:${v}`).join(', ')
+                          d.l,
+                          d.p,
+                          d.tomohon,
+                          d.luar,
+                          ...allAgama.map(a => d.agama[a] || 0),
+                          ...allUmur.map(u => d.umur[u] || 0),
+                          ...allKelas.map(k => d.kelas[k] || 0)
                         ]);
-                        exportToPDF(['Sekolah', 'Total', 'L/P', 'Domisili', 'Agama', 'Umur', 'Kelas'], flatMatrix, 'Rekapitulasi Per Sekolah', 'Rekap_Sekolah');
+                        exportToPDF(headers, flatMatrix, 'Rekapitulasi Per Sekolah', 'Rekap_Sekolah', 'landscape');
                       }}
                       style={{ background: '#ef4444', color: 'white', border: 'none', padding: '0.5rem 1rem', borderRadius: '6px', fontSize: '0.85rem', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
                     >
