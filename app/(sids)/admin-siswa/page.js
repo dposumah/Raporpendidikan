@@ -8,6 +8,7 @@ import Link from 'next/link';
 
 export default function AdminSiswaPage() {
   const [file, setFile] = useState(null);
+  const [periode, setPeriode] = useState('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState(null);
   const [error, setError] = useState(null);
@@ -23,7 +24,14 @@ export default function AdminSiswaPage() {
   };
 
   const handleUpload = async () => {
-    if (!file) return;
+    if (!file) {
+      setError('Silakan pilih file Excel terlebih dahulu.');
+      return;
+    }
+    if (!periode.trim()) {
+      setError('Silakan isi Periode (Tahun Ajaran & Semester) terlebih dahulu.');
+      return;
+    }
     setLoading(true);
     setMessage(null);
     setError(null);
@@ -58,27 +66,26 @@ export default function AdminSiswaPage() {
             const getVal = (possibleKeys) => {
               const rowKeys = Object.keys(row);
               for (const pk of possibleKeys) {
-                const found = rowKeys.find(k => k.toLowerCase().trim() === pk.toLowerCase());
-                if (found) return toStringOrEmpty(row[found]);
+                const foundKey = rowKeys.find(k => k.toLowerCase().trim() === pk.toLowerCase().trim());
+                if (foundKey) return toStringOrEmpty(row[foundKey]);
               }
               return '';
             };
 
             return {
-              semester: getVal(['semester']),
+              periode: periode.trim(),
+              nama_peserta_didik: getVal(['nama peserta didik', 'nama', 'nama siswa']),
               nama_sekolah: getVal(['nama sekolah', 'sekolah']),
               npsn: getVal(['npsn']),
               jenjang: getVal(['jenjang']),
               alamat_sekolah: getVal(['alamat sekolah']),
-              sekolah_kabupaten: getVal(['kabupaten sekolah', 'kabupaten']), // careful with overlaps if they didn't prefix
+              sekolah_kabupaten: getVal(['kabupaten sekolah', 'kabupaten']),
               sekolah_kecamatan: getVal(['kecamatan sekolah', 'kecamatan']),
               sekolah_desa_kelurahan: getVal(['desa_kelurahan sekolah', 'desa kelurahan sekolah', 'desa_kelurahan']),
               sekolah_dusun: getVal(['nama_dusun sekolah', 'dusun sekolah', 'nama_dusun']),
               sekolah_provinsi: getVal(['provinsi sekolah', 'provinsi']),
               sekolah_kode_pos: getVal(['kode_pos sekolah', 'kode pos sekolah', 'kode pos', 'kode_pos']),
               
-              // We grab the specific names provided by user
-              nama_peserta_didik: getVal(['Nama Peserta Didik', 'nama', 'nama siswa']),
               jenis_kelamin: getVal(['Jenis Kelamin siswa', 'Jenis Kelamin', 'jk', 'l/p']),
               nisn: getVal(['NISN', 'nisn']),
               nik: getVal(['NIK', 'nik']),
@@ -144,45 +151,25 @@ export default function AdminSiswaPage() {
             throw new Error("Tidak ada data valid yang ditemukan (Pastikan ada kolom NISN dan NIK).");
           }
 
-          // Deduplicate the data based on NISN and NIK before sending to database.
-          // This prevents the PostgreSQL error for both constraints.
-          const uniqueNisnMap = new Map();
-          formattedData.forEach(row => {
-            uniqueNisnMap.set(row.nisn, row);
-          });
-          
-          let deduplicatedData = Array.from(uniqueNisnMap.values());
-          
-          const uniqueNikMap = new Map();
-          deduplicatedData.forEach(row => {
-            uniqueNikMap.set(row.nik, row);
-          });
-          
-          deduplicatedData = Array.from(uniqueNikMap.values());
-
-          // Chunking array for massive uploads (e.g. 21,000+ rows)
           const CHUNK_SIZE = 1000;
           let successCount = 0;
           
-          for (let i = 0; i < deduplicatedData.length; i += CHUNK_SIZE) {
-            const chunk = deduplicatedData.slice(i, i + CHUNK_SIZE);
-            
-            // Provide progress update to the UI
-            setMessage(`Memproses data unik: ${Math.min(i + CHUNK_SIZE, deduplicatedData.length)} dari ${deduplicatedData.length} baris... (Harap tunggu, proses ini butuh waktu)`);
+          for (let i = 0; i < formattedData.length; i += CHUNK_SIZE) {
+            const chunk = formattedData.slice(i, i + CHUNK_SIZE);
+            setMessage(`Memproses data: ${Math.min(i + CHUNK_SIZE, formattedData.length)} dari ${formattedData.length} baris...`);
             
             const { error: dbError } = await supabase
               .from('siswa')
-              .upsert(chunk, { onConflict: 'nisn', ignoreDuplicates: false });
+              .upsert(chunk, { onConflict: 'nisn, periode' });
 
             if (dbError) {
               console.error('Database Error on Chunk:', dbError);
               throw new Error(`Gagal menyimpan baris ${i+1} sampai ${i+chunk.length}. Pesan Error: ${dbError.message}`);
             }
-            
             successCount += chunk.length;
           }
 
-          setMessage(`✅ Berhasil menyimpan total ${successCount} data siswa secara bertahap ke database!`);
+          setMessage(`✅ Berhasil menyimpan total ${successCount} data siswa untuk periode ${periode}!`);
         } catch (err) {
           setError(err.message || 'Gagal memproses file Excel.');
         } finally {
@@ -223,6 +210,38 @@ export default function AdminSiswaPage() {
             </div>
           )}
 
+          {/* PANDUAN KOLOM */}
+          <div style={{ background: '#f8fafc', padding: '1rem', borderRadius: '8px', marginBottom: '1.5rem', border: '1px solid #e2e8f0' }}>
+            <h4 style={{ margin: '0 0 0.5rem 0', fontSize: '0.9rem', color: '#334155', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <AlertCircle size={16} color="#3b82f6"/> Panduan Struktur Excel
+            </h4>
+            <p style={{ margin: 0, fontSize: '0.85rem', color: '#64748b', lineHeight: '1.5' }}>
+              Pastikan baris pertama (header) pada file Excel Anda memiliki judul kolom berikut (tidak harus berurutan, namun <strong>NISN</strong> dan <strong>NIK</strong> wajib ada):<br/>
+              <em>Nama Peserta Didik, NISN, NIK, No KK, Tempat Lahir, Tanggal Lahir, Jenis Kelamin, Agama, Kebutuhan Khusus, Alamat Jalan, RT, RW, Nama Dusun, Nama Kelurahan/Desa, Kecamatan, Kode Pos, Jenis Tinggal, Alat Transportasi, Layak PIP, Alasan Layak PIP, Penerima KIP, No KIP, Anak Ke-, dsb.</em>
+            </p>
+          </div>
+
+          <div style={{ marginBottom: '1.5rem' }}>
+            <label style={{ display: 'block', fontWeight: '500', color: '#334155', marginBottom: '0.5rem' }}>Periode (Tahun Ajaran & Semester) <span style={{color: 'red'}}>*</span></label>
+            <input 
+              type="text" 
+              placeholder="Contoh: Genap 2025/2026"
+              value={periode}
+              onChange={e => setPeriode(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '0.75rem',
+                border: '1px solid #cbd5e1',
+                borderRadius: '8px',
+                fontSize: '0.95rem'
+              }}
+            />
+            <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.8rem', color: '#64748b' }}>
+              Setiap kali mengunggah data untuk periode baru, pastikan untuk menggunakan penamaan periode yang konsisten (Misal: Ganjil 2025/2026, Genap 2025/2026).
+            </p>
+          </div>
+
+          {/* INPUT FILE */}
           <div 
             style={{ 
               border: '2px dashed #cbd5e1', 
@@ -269,31 +288,18 @@ export default function AdminSiswaPage() {
             </Link>
             <button 
               onClick={handleUpload}
-              disabled={!file || loading}
+              disabled={!file || !periode || loading}
               style={{
                 background: '#0284c7', color: 'white', border: 'none', 
                 padding: '0.75rem 2rem', borderRadius: '8px', fontWeight: '600', 
-                cursor: (!file || loading) ? 'not-allowed' : 'pointer',
-                opacity: (!file || loading) ? 0.6 : 1,
+                cursor: (!file || !periode || loading) ? 'not-allowed' : 'pointer',
+                opacity: (!file || !periode || loading) ? 0.6 : 1,
                 display: 'flex', alignItems: 'center', gap: '0.5rem'
               }}
             >
               {loading ? <Loader2 size={18} className="animate-spin" /> : <UploadCloud size={18} />}
               Mulai Unggah
             </button>
-          </div>
-          
-          <div style={{ marginTop: '2rem', padding: '1.5rem', background: '#f1f5f9', borderRadius: '8px' }}>
-            <h4 style={{ fontSize: '0.95rem', color: '#334155', fontWeight: '600', marginBottom: '0.75rem' }}>Panduan Kolom Excel yang Diwajibkan:</h4>
-            <ul style={{ color: '#64748b', fontSize: '0.85rem', paddingLeft: '1.25rem', margin: 0, lineHeight: '1.6' }}>
-              <li><strong>Nama Peserta Didik</strong> (wajib)</li>
-              <li><strong>NISN</strong> (wajib, unik)</li>
-              <li><strong>NIK</strong> (wajib, unik)</li>
-              <li><strong>No KK</strong> (wajib)</li>
-              <li><strong>Sekolah</strong> & <strong>Jenjang</strong></li>
-              <li><strong>Kelas</strong> & <strong>Rombel</strong></li>
-              <li><strong>Layak PIP</strong> (Ya/Tidak)</li>
-            </ul>
           </div>
         </div>
 

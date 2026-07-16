@@ -11,6 +11,8 @@ import autoTable from 'jspdf-autotable';
 
 export default function DataPendidikanPage() {
   const [allData, setAllData] = useState([]);
+  const [periodeOptions, setPeriodeOptions] = useState([]);
+  const [selectedPeriode, setSelectedPeriode] = useState("");
   const [loading, setLoading] = useState(true);
   
   // Real-time Search & Filters
@@ -38,10 +40,23 @@ export default function DataPendidikanPage() {
 
   const supabase = createClient();
 
-  // 1. FETCH ALL DATA ONCE
+  // 1. FETCH PERIODE & DATA
   useEffect(() => {
-    fetchData();
-  }, []); // Only run once on mount!
+    fetch('/api/periode')
+      .then(res => res.json())
+      .then(data => {
+        setPeriodeOptions(data);
+        if (data && data.length > 0) {
+          setSelectedPeriode(data[0]);
+        }
+      });
+  }, []);
+
+  useEffect(() => {
+    if (selectedPeriode) {
+      fetchData();
+    }
+  }, [selectedPeriode]);
 
   const fetchData = async () => {
     setLoading(true);
@@ -51,7 +66,7 @@ export default function DataPendidikanPage() {
     let hasMore = true;
 
     while (hasMore) {
-      let query = supabase.from('siswa').select('*').range(from, from + limit - 1);
+      let query = supabase.from('siswa').select('*').eq('periode', selectedPeriode).range(from, from + limit - 1);
       const { data: result, error } = await query;
       
       if (error) {
@@ -156,6 +171,15 @@ export default function DataPendidikanPage() {
     )).sort();
   }, [allData, jenjang, kecamatanFilter, kelurahanFilter]);
 
+  const kelasOptions = useMemo(() => {
+    return Array.from(new Set(allData
+      .filter(s => !jenjang || s.jenjang === jenjang)
+      .filter(s => !sekolah || s.nama_sekolah === sekolah)
+      .map(s => String(s.kelas))
+      .filter(k => k && k !== 'undefined' && k !== 'null')
+    )).sort();
+  }, [allData, jenjang, sekolah]);
+
   // 3. DERIVED STATS FROM FILTERED DATA
   const stats = useMemo(() => {
     const total = filteredData.length;
@@ -163,6 +187,26 @@ export default function DataPendidikanPage() {
     let p = 0;
     let tomohon = 0;
     let luarTomohon = 0;
+    const agamaCount = { Islam: 0, Kristen: 0, Katolik: 0, Hindu: 0, Buddha: 0, Konghucu: 0, Lainnya: 0 };
+    const umurCount = { 
+      '<4': 0, '5': 0, '6': 0, 
+      '7': 0, '8': 0, '9': 0, '10': 0, '11': 0, '12': 0,
+      '13': 0, '14': 0, '15': 0,
+      '16': 0, '17': 0, '18': 0, '>19': 0 
+    };
+    
+    const parseDate = (d) => {
+      if (!d) return null;
+      if (!isNaN(d) && Number(d) > 20000) return new Date((d - 25569) * 86400 * 1000);
+      const parts = String(d).split(/[-\/]/);
+      if (parts.length === 3) {
+        if (parts[0].length === 4) return new Date(parts[0], parts[1]-1, parts[2]);
+        return new Date(parts[2], parts[1]-1, parts[0]);
+      }
+      return new Date(d);
+    };
+
+    const today = new Date(2026, 6, 1); // 1 Juli 2026
     
     filteredData.forEach(s => {
       if (s.jenis_kelamin?.toLowerCase() === 'l') l++;
@@ -183,6 +227,28 @@ export default function DataPendidikanPage() {
       
       if (isTomohon) tomohon++;
       else luarTomohon++;
+
+      // Agama
+      const agm = (s.agama || '').trim();
+      if (agm.match(/islam/i)) agamaCount.Islam++;
+      else if (agm.match(/kristen/i)) agamaCount.Kristen++;
+      else if (agm.match(/kat[h]?olik/i)) agamaCount.Katolik++;
+      else if (agm.match(/hindu/i)) agamaCount.Hindu++;
+      else if (agm.match(/bud[d]?ha/i)) agamaCount.Buddha++;
+      else if (agm.match(/k[h]?onghucu/i)) agamaCount.Konghucu++;
+      else if (agm) agamaCount.Lainnya++;
+
+      // Umur
+      const birthDate = parseDate(s.tanggal_lahir);
+      if (birthDate && !isNaN(birthDate.getTime())) {
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const m = today.getMonth() - birthDate.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--;
+
+        if (age < 4) umurCount['<4']++;
+        else if (age >= 19) umurCount['>19']++;
+        else if (umurCount[age.toString()] !== undefined) umurCount[age.toString()]++;
+      }
     });
     
     const uniqueSekolah = new Set(filteredData.map(s => s.nama_sekolah).filter(Boolean)).size;
@@ -192,7 +258,9 @@ export default function DataPendidikanPage() {
       totalPerempuan: p,
       totalSekolah: uniqueSekolah,
       domisiliTomohon: tomohon,
-      domisiliLuar: luarTomohon
+      domisiliLuar: luarTomohon,
+      agamaCount,
+      umurCount
     };
   }, [filteredData]);
 
@@ -361,7 +429,7 @@ export default function DataPendidikanPage() {
       return new Date(d);
     };
 
-    const today = new Date();
+    const today = new Date(2026, 6, 1); // 1 Juli 2026
 
     filteredData.forEach(s => {
       const jk = (s.jenis_kelamin || '').toLowerCase();
@@ -404,7 +472,7 @@ export default function DataPendidikanPage() {
   // Rekapitulasi Per Sekolah
   const rekapSekolahData = useMemo(() => {
     const data = {};
-    const today = new Date();
+    const today = new Date(2026, 6, 1); // 1 Juli 2026
     
     const parseDate = (d) => {
       if (!d) return null;
@@ -594,306 +662,69 @@ export default function DataPendidikanPage() {
 
   return (
     <div style={{ backgroundColor: '#f8fafc', minHeight: 'calc(100vh - 75px)', padding: '2rem' }}>
-      <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
+      <div style={{ maxWidth: '1400px', margin: '0 auto', display: 'flex', gap: '2rem', alignItems: 'flex-start' }}>
         
-        {/* Header */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-          <div>
-            <h1 style={{ fontSize: '1.8rem', fontWeight: '700', color: '#0f172a', margin: 0 }}>Sistem Informasi Data Siswa (SIDS)</h1>
-            <p style={{ color: '#64748b', fontSize: '0.95rem', marginTop: '0.25rem' }}>SANGAT RAHASIA - Internal Dinas Pendidikan Kota Tomohon</p>
+        {/* SIDEBAR FILTER */}
+        <div style={{ width: '300px', flexShrink: 0, background: 'white', padding: '1.5rem', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', position: 'sticky', top: '2rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '1rem' }}>
+            <div style={{ background: '#f1f5f9', padding: '0.5rem', borderRadius: '8px', color: '#64748b' }}><Filter size={20} /></div>
+            <h3 style={{ margin: 0, fontSize: '1.1rem', color: '#0f172a' }}>Menu Filter</h3>
           </div>
-          <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-            <Link href="/admin-siswa" style={{ textDecoration: 'none', background: 'white', color: '#0f172a', border: '1px solid #cbd5e1', padding: '0.5rem 1rem', borderRadius: '8px', fontSize: '0.85rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '0.5rem', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
-              Unggah Data Excel
-            </Link>
-            <div style={{ background: '#fef3c7', color: '#d97706', padding: '0.5rem 1rem', borderRadius: '8px', fontSize: '0.85rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <AlertCircle size={16} /> Restricted Access
+          
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+            <div>
+              <label style={{ display: 'block', fontSize: '0.85rem', color: '#64748b', marginBottom: '0.5rem', fontWeight: '500' }}>Jenjang</label>
+              <select value={jenjang} onChange={e => setJenjang(e.target.value)} style={{ width: '100%', padding: '0.6rem', borderRadius: '8px', border: '1px solid #cbd5e1', color: '#334155', outline: 'none', fontSize: '0.9rem' }}>
+                <option value="">Semua Jenjang</option>
+                {jenjangOptions.map(j => (
+                  <option key={j} value={j}>{j}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <SearchableSelect label="Kecamatan" options={kecamatanOptions} value={kecamatanFilter} onChange={setKecamatanFilter} placeholder="Semua Kecamatan" />
+            </div>
+            <div>
+              <SearchableSelect label="Kelurahan" options={kelurahanOptions} value={kelurahanFilter} onChange={setKelurahanFilter} placeholder="Semua Kelurahan" />
+            </div>
+            <div>
+              <SearchableSelect label="Sekolah" options={sekolahOptions} value={sekolah} onChange={setSekolah} placeholder="Semua Sekolah" />
+            </div>
+            <div>
+              <label style={{ display: 'block', fontSize: '0.85rem', color: '#64748b', marginBottom: '0.5rem', fontWeight: '500' }}>Kelas</label>
+              <select value={kelas} onChange={e => setKelas(e.target.value)} style={{ width: '100%', padding: '0.6rem', borderRadius: '8px', border: '1px solid #cbd5e1', color: '#334155', outline: 'none', fontSize: '0.9rem' }}>
+                <option value="">Semua Kelas</option>
+                {kelasOptions.map(k => (
+                  <option key={k} value={k}>{k}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label style={{ display: 'block', fontSize: '0.85rem', color: '#64748b', marginBottom: '0.5rem', fontWeight: '500' }}>Status PIP</label>
+              <select value={statusPIP} onChange={e => setStatusPIP(e.target.value)} style={{ width: '100%', padding: '0.6rem', borderRadius: '8px', border: '1px solid #cbd5e1', color: '#334155', outline: 'none', fontSize: '0.9rem' }}>
+                <option value="">Semua Status</option>
+                <option value="layak">Layak PIP</option>
+                <option value="tidak_layak">Tidak Layak</option>
+              </select>
             </div>
           </div>
         </div>
 
-        {/* Custom Tabs */}
-        <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', borderBottom: '2px solid #e2e8f0', paddingBottom: '0.5rem' }}>
-          <button 
-            onClick={() => setActiveTab('data')}
-            style={{ background: 'none', border: 'none', padding: '0.5rem 1rem', fontSize: '1rem', fontWeight: '600', color: activeTab === 'data' ? '#0284c7' : '#64748b', borderBottom: activeTab === 'data' ? '3px solid #0284c7' : '3px solid transparent', marginBottom: '-9px', cursor: 'pointer', transition: 'all 0.2s' }}
-          >
-            Pangkalan Data Siswa
-          </button>
-          <button 
-            onClick={() => setActiveTab('rekap')}
-            style={{ background: 'none', border: 'none', padding: '0.5rem 1rem', fontSize: '1rem', fontWeight: '600', color: activeTab === 'rekap' ? '#0284c7' : '#64748b', borderBottom: activeTab === 'rekap' ? '3px solid #0284c7' : '3px solid transparent', marginBottom: '-9px', cursor: 'pointer', transition: 'all 0.2s' }}
-          >
-            Analisis & Rekap Sekolah
-          </button>
-          <button 
-            onClick={() => setActiveTab('domisili')}
-            style={{ background: 'none', border: 'none', padding: '0.5rem 1rem', fontSize: '1rem', fontWeight: '600', color: activeTab === 'domisili' ? '#0284c7' : '#64748b', borderBottom: activeTab === 'domisili' ? '3px solid #0284c7' : '3px solid transparent', marginBottom: '-9px', cursor: 'pointer', transition: 'all 0.2s' }}
-          >
-            Rekapitulasi
-          </button>
-        </div>
-
-        {activeTab === 'data' && (
-          <div className="tab-content" style={{ animation: 'fadeIn 0.4s ease' }}>
-            {/* KPI Cards */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
-            <div style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', border: '1px solid #e2e8f0' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                <div style={{ background: '#eff6ff', padding: '1rem', borderRadius: '12px' }}>
-                  <Users size={24} color="#3b82f6" />
-                </div>
-                <div>
-                  <p style={{ margin: 0, color: '#64748b', fontSize: '0.9rem', fontWeight: '500' }}>Total Siswa Terdata</p>
-                  <h2 style={{ margin: 0, fontSize: '1.8rem', color: '#0f172a', fontWeight: '700' }}>{stats.totalSiswa.toLocaleString('id-ID')}</h2>
-                </div>
-              </div>
-            </div>
-            
-            <div style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', border: '1px solid #e2e8f0' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                <div style={{ background: '#f0fdfa', padding: '1rem', borderRadius: '12px' }}>
-                  <School size={24} color="#0d9488" />
-                </div>
-                <div>
-                  <p style={{ margin: 0, color: '#64748b', fontSize: '0.9rem', fontWeight: '500' }}>Total Sekolah</p>
-                  <h2 style={{ margin: 0, fontSize: '1.8rem', color: '#0f172a', fontWeight: '700' }}>{stats.totalSekolah.toLocaleString('id-ID')}</h2>
-                </div>
-              </div>
-            </div>
-            
-            <div style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', border: '1px solid #e2e8f0' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                <div style={{ background: '#eff6ff', padding: '1rem', borderRadius: '12px' }}>
-                  <Users size={24} color="#0284c7" />
-                </div>
-                <div>
-                  <p style={{ margin: 0, color: '#64748b', fontSize: '0.9rem', fontWeight: '500' }}>Siswa Laki-laki</p>
-                  <h2 style={{ margin: 0, fontSize: '1.8rem', color: '#0f172a', fontWeight: '700' }}>{stats.totalLaki.toLocaleString('id-ID')}</h2>
-                </div>
-              </div>
-            </div>
-
-            <div style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', border: '1px solid #e2e8f0' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                <div style={{ background: '#fdf4ff', padding: '1rem', borderRadius: '12px' }}>
-                  <Users size={24} color="#d946ef" />
-                </div>
-                <div>
-                  <p style={{ margin: 0, color: '#64748b', fontSize: '0.9rem', fontWeight: '500' }}>Siswa Perempuan</p>
-                  <h2 style={{ margin: 0, fontSize: '1.8rem', color: '#0f172a', fontWeight: '700' }}>{stats.totalPerempuan.toLocaleString('id-ID')}</h2>
-                </div>
-              </div>
-            </div>
-
-            <div style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', border: '1px solid #e2e8f0' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                <div style={{ background: '#ecfdf5', padding: '1rem', borderRadius: '12px' }}>
-                  <MapPin size={24} color="#10b981" />
-                </div>
-                <div>
-                  <p style={{ margin: 0, color: '#64748b', fontSize: '0.9rem', fontWeight: '500' }}>Domisili Tomohon</p>
-                  <h2 style={{ margin: 0, fontSize: '1.8rem', color: '#0f172a', fontWeight: '700' }}>{stats.domisiliTomohon.toLocaleString('id-ID')}</h2>
-                </div>
-              </div>
-            </div>
-
-            <div style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', border: '1px solid #e2e8f0' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                <div style={{ background: '#fffbeb', padding: '1rem', borderRadius: '12px' }}>
-                  <MapPin size={24} color="#d97706" />
-                </div>
-                <div>
-                  <p style={{ margin: 0, color: '#64748b', fontSize: '0.9rem', fontWeight: '500' }}>Luar Tomohon</p>
-                  <h2 style={{ margin: 0, fontSize: '1.8rem', color: '#0f172a', fontWeight: '700' }}>{stats.domisiliLuar.toLocaleString('id-ID')}</h2>
-                </div>
-              </div>
+        {/* MAIN CONTENT */}
+        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+          
+          {/* Header Dashboard */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'white', padding: '1.5rem', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
+            <div>
+              <h1 style={{ fontSize: '1.8rem', fontWeight: '700', color: '#0f172a', margin: 0 }}>Analisis & Rekapitulasi</h1>
+              <p style={{ color: '#64748b', fontSize: '0.95rem', marginTop: '0.25rem', marginBottom: 0 }}>Sistem Informasi Data Siswa (SIDS) - Tomohon</p>
             </div>
           </div>
 
-            {/* Filters and Search */}
-            <div style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', marginBottom: '2rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '1.5rem' }}>
-                <div style={{ background: '#f1f5f9', padding: '0.5rem', borderRadius: '8px', color: '#64748b' }}><Filter size={20} /></div>
-                <h3 style={{ margin: 0, fontSize: '1.1rem', color: '#0f172a' }}>Pencarian Cepat & Filter</h3>
-              </div>
-              
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem', marginBottom: '1.5rem' }}>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.85rem', color: '#64748b', marginBottom: '0.5rem', fontWeight: '500' }}>Jenjang</label>
-                  <select value={jenjang} onChange={e => setJenjang(e.target.value)} style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #cbd5e1', color: '#334155', outline: 'none' }}>
-                    <option value="">Semua Jenjang</option>
-                    {jenjangOptions.map(j => (
-                      <option key={j} value={j}>{j}</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.85rem', color: '#64748b', marginBottom: '0.5rem', fontWeight: '500' }}>Kecamatan</label>
-                  <select value={kecamatanFilter} onChange={e => setKecamatanFilter(e.target.value)} style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #cbd5e1', color: '#334155', outline: 'none' }}>
-                    <option value="">Semua Kecamatan</option>
-                    {kecamatanOptions.map(k => (
-                      <option key={k} value={k}>{k}</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <SearchableSelect 
-                    label="Kelurahan / Desa"
-                    placeholder="Pilih Kelurahan"
-                    value={kelurahanFilter}
-                    onChange={setKelurahanFilter}
-                    options={kelurahanOptions}
-                  />
-                </div>
-                <div>
-                  <SearchableSelect 
-                    label="Sekolah"
-                    placeholder="Pilih Sekolah"
-                    value={sekolah}
-                    onChange={setSekolah}
-                    options={sekolahOptions}
-                  />
-                </div>
-              </div>
-
-              <form onSubmit={handleSearch} style={{ display: 'flex', gap: '1rem' }}>
-                <div style={{ flex: 1, position: 'relative' }}>
-                  <Search size={18} color="#94a3b8" style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)' }} />
-                  <input 
-                    type="text" 
-                    placeholder="Pencarian cerdas berdasarkan Nama, NISN, atau NIK..." 
-                    value={searchQuery}
-                    onChange={e => setSearchQuery(e.target.value)}
-                    style={{ width: '100%', padding: '0.875rem 1rem 0.875rem 2.75rem', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.95rem', outline: 'none', transition: 'border-color 0.2s' }}
-                    onFocus={(e) => e.target.style.borderColor = '#0284c7'}
-                    onBlur={(e) => e.target.style.borderColor = '#cbd5e1'}
-                  />
-                </div>
-                <button type="submit" style={{ background: '#0284c7', color: 'white', border: 'none', borderRadius: '8px', padding: '0 1.5rem', fontWeight: '600', cursor: 'pointer', transition: 'background 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.background = '#0369a1'} onMouseLeave={(e) => e.currentTarget.style.background = '#0284c7'}>
-                  Cari Data
-                </button>
-              </form>
-            </div>
-
-            {/* Data Table */}
-            <div style={{ background: 'white', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', overflow: 'hidden' }}>
-              <div style={{ overflowX: 'auto' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '800px' }}>
-                  <thead>
-                    <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
-                      <th style={{ padding: '1rem 1.5rem', color: '#475569', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase' }}>Nama Siswa</th>
-                      <th style={{ padding: '1rem 1.5rem', color: '#475569', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase' }}>NISN</th>
-                      <th style={{ padding: '1rem 1.5rem', color: '#475569', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase' }}>Sekolah</th>
-                      <th style={{ padding: '1rem 1.5rem', color: '#475569', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase' }}>Kelas</th>
-                      <th style={{ padding: '1rem 1.5rem', color: '#475569', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase' }}>Aksi</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {loading ? (
-                      <tr><td colSpan="6" style={{ padding: '2rem', textAlign: 'center', color: '#64748b' }}>Memuat data...</td></tr>
-                    ) : filteredData.length === 0 ? (
-                      <tr><td colSpan="6" style={{ padding: '2rem', textAlign: 'center', color: '#64748b' }}>Tidak ada data yang ditemukan.</td></tr>
-                    ) : (
-                      filteredData.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage).map((row) => {
-                        return (
-                          <tr key={row.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                            <td style={{ padding: '1rem 1.5rem' }}>
-                              <div style={{ fontWeight: '600', color: '#0f172a' }}>{row.nama_peserta_didik}</div>
-                            </td>
-                            <td style={{ padding: '1rem 1.5rem', color: '#334155' }}>{row.nisn || '-'}</td>
-                            <td style={{ padding: '1rem 1.5rem', color: '#334155' }}>{row.nama_sekolah || '-'}</td>
-                            <td style={{ padding: '1rem 1.5rem', color: '#334155' }}>{row.kelas} {row.nama_rombel ? `- ${row.nama_rombel}` : ''}</td>
-                            <td style={{ padding: '1rem 1.5rem' }}>
-                              <button 
-                                onClick={() => setSelectedSiswa(row)}
-                                style={{ background: '#f8fafc', border: '1px solid #cbd5e1', padding: '0.5rem 1rem', borderRadius: '6px', fontSize: '0.85rem', fontWeight: '600', color: '#0284c7', cursor: 'pointer', transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: '0.25rem' }}
-                                onMouseEnter={e => { e.currentTarget.style.background = '#0284c7'; e.currentTarget.style.color = 'white'; e.currentTarget.style.borderColor = '#0284c7'; }}
-                                onMouseLeave={e => { e.currentTarget.style.background = '#f8fafc'; e.currentTarget.style.color = '#0284c7'; e.currentTarget.style.borderColor = '#cbd5e1'; }}
-                              >
-                                Lihat Detail
-                              </button>
-                            </td>
-                          </tr>
-                        );
-                      })
-                    )}
-                  </tbody>
-                </table>
-              </div>
-              
-              {/* Pagination Controls */}
-              {filteredData.length > 0 && (
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 1.5rem', background: '#f8fafc', borderTop: '1px solid #e2e8f0' }}>
-                  <div style={{ color: '#64748b', fontSize: '0.9rem' }}>
-                    Menampilkan <strong style={{ color: '#0f172a' }}>{((currentPage - 1) * rowsPerPage) + 1}</strong> hingga <strong style={{ color: '#0f172a' }}>{Math.min(currentPage * rowsPerPage, filteredData.length)}</strong> dari <strong style={{ color: '#0f172a' }}>{filteredData.length.toLocaleString('id-ID')}</strong> data
-                  </div>
-                  <div style={{ display: 'flex', gap: '0.5rem' }}>
-                    <button 
-                      onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                      disabled={currentPage === 1}
-                      style={{ background: 'white', border: '1px solid #cbd5e1', padding: '0.5rem 1rem', borderRadius: '6px', color: currentPage === 1 ? '#94a3b8' : '#334155', cursor: currentPage === 1 ? 'not-allowed' : 'pointer', fontWeight: '500' }}
-                    >
-                      Sebelumnya
-                    </button>
-                    <button 
-                      onClick={() => setCurrentPage(p => Math.min(Math.ceil(filteredData.length / rowsPerPage), p + 1))}
-                      disabled={currentPage >= Math.ceil(filteredData.length / rowsPerPage)}
-                      style={{ background: 'white', border: '1px solid #cbd5e1', padding: '0.5rem 1rem', borderRadius: '6px', color: currentPage >= Math.ceil(filteredData.length / rowsPerPage) ? '#94a3b8' : '#334155', cursor: currentPage >= Math.ceil(filteredData.length / rowsPerPage) ? 'not-allowed' : 'pointer', fontWeight: '500' }}
-                    >
-                      Berikutnya
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {activeTab === 'rekap' && (
-          <div className="tab-content" style={{ animation: 'fadeIn 0.4s ease' }}>
-            <div style={{ background: 'white', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
-              <div style={{ padding: '1.5rem', borderBottom: '1px solid #e2e8f0', background: '#f8fafc' }}>
-                <h3 style={{ margin: 0, color: '#0f172a', fontSize: '1.1rem', fontWeight: '600' }}>
-                  Tabel Analisis & Agregasi Multi-Level
-                </h3>
-                <p style={{ margin: '0.5rem 0 0 0', color: '#64748b', fontSize: '0.9rem' }}>
-                  Klik pada baris Jenjang, Kecamatan, atau Kelurahan untuk melihat rincian datanya hingga tingkat Sekolah.
-                </p>
-              </div>
-              
-              <div style={{ width: '100%', overflowX: 'auto' }}>
-                <div style={{ minWidth: '800px' }}>
-                  {/* Table Header */}
-                  <div style={{ display: 'grid', gridTemplateColumns: 'minmax(250px, 2fr) 1fr 1fr 1fr', gap: '1rem', padding: '1rem', background: '#f1f5f9', borderBottom: '2px solid #e2e8f0', color: '#475569', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase' }}>
-                    <div>Klasifikasi Wilayah & Sekolah</div>
-                    <div style={{ textAlign: 'center' }}>Total Siswa</div>
-                    <div style={{ textAlign: 'center' }}>Laki-Laki</div>
-                    <div style={{ textAlign: 'center' }}>Perempuan</div>
-                  </div>
-                  
-                  {/* Table Body (Accordions) */}
-                  <div style={{ padding: '0' }}>
-                    {Object.entries(rekapData).length > 0 ? (
-                      Object.entries(rekapData).map(([jenjangLabel, data]) => (
-                        <RekapNode key={jenjangLabel} label={jenjangLabel} dataObj={data} depth={0} />
-                      ))
-                    ) : (
-                      <div style={{ padding: '3rem', textAlign: 'center', color: '#64748b' }}>
-                        Pilih filter untuk melihat rekapitulasi data
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {activeTab === 'domisili' && (
-          <div className="tab-content" style={{ animation: 'fadeIn 0.4s ease' }}>
+          {/* TABEL REKAPITULASI (EXISTING) */}
+          <div style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', border: '1px solid #e2e8f0' }}>
+            <h3 style={{ margin: '0 0 1.5rem 0', color: '#0f172a', fontSize: '1.25rem', fontWeight: '600' }}>Tabel Analisis & Rekapitulasi</h3>
             
-            {/* Sub-Tab Navigation */}
             <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '2rem', flexWrap: 'wrap' }}>
               {[
                 { id: 'domisili', label: 'Domisili' },
@@ -906,7 +737,7 @@ export default function DataPendidikanPage() {
                   key={tab.id}
                   onClick={() => setRekapTab(tab.id)}
                   style={{
-                    padding: '0.75rem 1.25rem',
+                    padding: '0.6rem 1.25rem',
                     borderRadius: '8px',
                     fontWeight: '600',
                     fontSize: '0.9rem',
@@ -923,7 +754,8 @@ export default function DataPendidikanPage() {
               ))}
             </div>
 
-            {/* DOMISILI SUB-TAB */}
+            {/* We will inject the existing sub-tab content here by using the old lines */}
+                        {/* DOMISILI SUB-TAB */}
             {rekapTab === 'domisili' && (
               <div style={{ background: 'white', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
                 <div style={{ padding: '1.5rem', borderBottom: '1px solid #e2e8f0', background: '#f8fafc', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
@@ -1294,259 +1126,10 @@ export default function DataPendidikanPage() {
                 </div>
               </div>
             )}
+
           </div>
-        )}
-
-        {/* Modal List Siswa per Sekolah */}
-        {selectedSekolah && (
-          <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.7)', backdropFilter: 'blur(4px)', zIndex: 999, display: 'flex', justifyContent: 'center', alignItems: 'center', animation: 'fadeIn 0.3s ease' }}>
-            <div style={{ width: '90%', maxWidth: '1000px', background: '#f8fafc', height: '90%', borderRadius: '12px', overflow: 'hidden', display: 'flex', flexDirection: 'column', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)', position: 'relative', animation: 'slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1)' }}>
-              
-              <div style={{ padding: '1.5rem 2rem', borderBottom: '1px solid #e2e8f0', background: 'white', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                  <div style={{ background: '#f0fdfa', width: '50px', height: '50px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#0d9488' }}>
-                    <School size={24} />
-                  </div>
-                  <div>
-                    <h2 style={{ margin: 0, fontSize: '1.5rem', color: '#0f172a' }}>{selectedSekolah}</h2>
-                    <div style={{ color: '#64748b', fontSize: '0.9rem', marginTop: '0.25rem' }}>
-                      Daftar Siswa ({(allData.filter(s => s.nama_sekolah === selectedSekolah).length).toLocaleString('id-ID')} Siswa)
-                    </div>
-                  </div>
-                </div>
-                <button onClick={() => setSelectedSekolah(null)} style={{ background: '#f1f5f9', border: 'none', width: '40px', height: '40px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#64748b' }}>
-                  <X size={20} />
-                </button>
-              </div>
-
-              <div style={{ flex: 1, overflowY: 'auto', padding: '1.5rem' }}>
-                <div style={{ background: 'white', borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', overflow: 'hidden', border: '1px solid #e2e8f0' }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                    <thead>
-                      <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
-                        <th style={{ padding: '1rem', color: '#475569', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase' }}>No</th>
-                        <th style={{ padding: '1rem', color: '#475569', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase' }}>Nama Siswa</th>
-                        <th style={{ padding: '1rem', color: '#475569', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase' }}>NISN / NIK</th>
-                        <th style={{ padding: '1rem', color: '#475569', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase' }}>L/P</th>
-                        <th style={{ padding: '1rem', color: '#475569', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase' }}>Kelas</th>
-                        <th style={{ padding: '1rem', color: '#475569', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase', textAlign: 'center' }}>Aksi</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {allData.filter(s => s.nama_sekolah === selectedSekolah).map((s, idx) => (
-                        <tr key={idx} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                          <td style={{ padding: '1rem', color: '#64748b' }}>{idx + 1}</td>
-                          <td style={{ padding: '1rem', fontWeight: '600', color: '#0f172a' }}>{s.nama_peserta_didik}</td>
-                          <td style={{ padding: '1rem', color: '#64748b' }}>{s.nisn || '-'} / {s.nik || '-'}</td>
-                          <td style={{ padding: '1rem', color: '#334155' }}>{s.jenis_kelamin}</td>
-                          <td style={{ padding: '1rem', color: '#334155' }}>{s.kelas}</td>
-                          <td style={{ padding: '1rem', textAlign: 'center' }}>
-                            <button 
-                              onClick={() => { setSelectedSekolah(null); setSelectedSiswa(s); }}
-                              style={{ background: '#e0f2fe', color: '#0284c7', border: 'none', padding: '0.4rem 0.8rem', borderRadius: '6px', fontSize: '0.8rem', fontWeight: '600', cursor: 'pointer' }}
-                            >Detail</button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Modal Full Detail Siswa (60+ Columns) */}
-        {selectedSiswa && (
-          <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.7)', backdropFilter: 'blur(4px)', zIndex: 1000, display: 'flex', justifyContent: 'flex-end', animation: 'fadeIn 0.3s ease' }}>
-            <div style={{ width: '100%', maxWidth: '850px', background: '#f8fafc', height: '100%', overflowY: 'auto', boxShadow: '-10px 0 25px rgba(0,0,0,0.2)', position: 'relative', animation: 'slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1)' }}>
-              
-              <div style={{ position: 'sticky', top: 0, background: 'white', padding: '1.5rem 2rem', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', zIndex: 10 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                  <div style={{ background: '#e0f2fe', width: '50px', height: '50px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#0284c7' }}>
-                    <User size={24} />
-                  </div>
-                  <div>
-                    <h2 style={{ margin: 0, fontSize: '1.5rem', color: '#0f172a' }}>{selectedSiswa.nama_peserta_didik}</h2>
-                    <div style={{ color: '#64748b', fontSize: '0.9rem', display: 'flex', gap: '1rem', marginTop: '0.25rem' }}>
-                      <span>NISN: {selectedSiswa.nisn || '-'}</span>
-                      <span>NIK: {selectedSiswa.nik || '-'}</span>
-                    </div>
-                  </div>
-                </div>
-                <button onClick={() => setSelectedSiswa(null)} style={{ background: '#f1f5f9', border: 'none', width: '40px', height: '40px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#64748b' }}>
-                  <X size={20} />
-                </button>
-              </div>
-
-              <div style={{ padding: '2rem' }}>
-                {/* Section 1: Akademik & Sekolah */}
-                <div style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', marginBottom: '1.5rem' }}>
-                  <h3 style={{ fontSize: '1.1rem', color: '#0f172a', margin: '0 0 1rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem', borderBottom: '1px solid #f1f5f9', paddingBottom: '0.75rem' }}><School size={18} color="#0284c7"/> Data Akademik & Sekolah Asal</h3>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
-                    <div><div style={{ color: '#64748b', fontSize: '0.85rem' }}>Nama Sekolah</div><div style={{ fontWeight: '600', color: '#334155' }}>{selectedSiswa.nama_sekolah || '-'}</div></div>
-                    <div><div style={{ color: '#64748b', fontSize: '0.85rem' }}>NPSN</div><div style={{ fontWeight: '600', color: '#334155' }}>{selectedSiswa.npsn || '-'}</div></div>
-                    <div><div style={{ color: '#64748b', fontSize: '0.85rem' }}>Jenjang</div><div style={{ fontWeight: '600', color: '#334155' }}>{selectedSiswa.jenjang || '-'}</div></div>
-                    <div><div style={{ color: '#64748b', fontSize: '0.85rem' }}>Kelas</div><div style={{ fontWeight: '600', color: '#334155' }}>{selectedSiswa.kelas || '-'}</div></div>
-                    <div><div style={{ color: '#64748b', fontSize: '0.85rem' }}>Jurusan</div><div style={{ fontWeight: '600', color: '#334155' }}>{selectedSiswa.nama_jurusan || '-'}</div></div>
-                    <div><div style={{ color: '#64748b', fontSize: '0.85rem' }}>Rombel</div><div style={{ fontWeight: '600', color: '#334155' }}>{selectedSiswa.nama_rombel || '-'}</div></div>
-                    <div><div style={{ color: '#64748b', fontSize: '0.85rem' }}>Semester</div><div style={{ fontWeight: '600', color: '#334155' }}>{selectedSiswa.semester || '-'}</div></div>
-                  </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginTop: '1rem' }}>
-                    <div style={{ gridColumn: '1 / -1' }}><div style={{ color: '#64748b', fontSize: '0.85rem' }}>Alamat Sekolah</div><div style={{ fontWeight: '600', color: '#334155' }}>{selectedSiswa.alamat_sekolah || '-'}</div></div>
-                    <div><div style={{ color: '#64748b', fontSize: '0.85rem' }}>Provinsi Sekolah</div><div style={{ fontWeight: '600', color: '#334155' }}>{selectedSiswa.sekolah_provinsi || '-'}</div></div>
-                    <div><div style={{ color: '#64748b', fontSize: '0.85rem' }}>Kabupaten Sekolah</div><div style={{ fontWeight: '600', color: '#334155' }}>{selectedSiswa.sekolah_kabupaten || '-'}</div></div>
-                    <div><div style={{ color: '#64748b', fontSize: '0.85rem' }}>Kecamatan Sekolah</div><div style={{ fontWeight: '600', color: '#334155' }}>{selectedSiswa.sekolah_kecamatan || '-'}</div></div>
-                    <div><div style={{ color: '#64748b', fontSize: '0.85rem' }}>Kelurahan Sekolah</div><div style={{ fontWeight: '600', color: '#334155' }}>{selectedSiswa.sekolah_desa_kelurahan || '-'}</div></div>
-                    <div><div style={{ color: '#64748b', fontSize: '0.85rem' }}>Dusun Sekolah</div><div style={{ fontWeight: '600', color: '#334155' }}>{selectedSiswa.sekolah_dusun || '-'}</div></div>
-                    <div><div style={{ color: '#64748b', fontSize: '0.85rem' }}>Kode Pos Sekolah</div><div style={{ fontWeight: '600', color: '#334155' }}>{selectedSiswa.sekolah_kode_pos || '-'}</div></div>
-                  </div>
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
-                  {/* Section 2: Profil Pribadi & Fisik */}
-                  <div style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-                    <h3 style={{ fontSize: '1.1rem', color: '#0f172a', margin: '0 0 1rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem', borderBottom: '1px solid #f1f5f9', paddingBottom: '0.75rem' }}><FileText size={18} color="#0284c7"/> Identitas & Fisik</h3>
-                    <div style={{ display: 'grid', gap: '0.75rem' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Jenis Kelamin</span> <strong style={{ color: '#334155' }}>{selectedSiswa.jenis_kelamin || '-'}</strong></div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Tempat Lahir</span> <strong style={{ color: '#334155' }}>{selectedSiswa.tempat_lahir || '-'}</strong></div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Tanggal Lahir</span> <strong style={{ color: '#334155' }}>{selectedSiswa.tanggal_lahir || '-'}</strong></div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>No. Akta Lahir</span> <strong style={{ color: '#334155' }}>{selectedSiswa.no_akta_lahir || '-'}</strong></div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Agama</span> <strong style={{ color: '#334155' }}>{selectedSiswa.agama || '-'}</strong></div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Kebutuhan Khusus</span> <strong style={{ color: '#334155' }}>{selectedSiswa.kebutuhan_khusus || '-'}</strong></div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Anak Ke-</span> <strong style={{ color: '#334155' }}>{selectedSiswa.anak_ke || '-'}</strong></div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Jml Saudara Kandung</span> <strong style={{ color: '#334155' }}>{selectedSiswa.jumlah_saudara_kandung || '-'}</strong></div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Tinggi Badan</span> <strong style={{ color: '#334155' }}>{selectedSiswa.tinggi_badan ? `${selectedSiswa.tinggi_badan} cm` : '-'}</strong></div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Berat Badan</span> <strong style={{ color: '#334155' }}>{selectedSiswa.berat_badan ? `${selectedSiswa.berat_badan} kg` : '-'}</strong></div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Lingkar Kepala</span> <strong style={{ color: '#334155' }}>{selectedSiswa.lingkar_kepala ? `${selectedSiswa.lingkar_kepala} cm` : '-'}</strong></div>
-                    </div>
-                  </div>
-
-                  {/* Section 3: Kontak & Transportasi */}
-                  <div style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-                    <h3 style={{ fontSize: '1.1rem', color: '#0f172a', margin: '0 0 1rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem', borderBottom: '1px solid #f1f5f9', paddingBottom: '0.75rem' }}><MapPin size={18} color="#0284c7"/> Kontak & Domisili</h3>
-                    <div style={{ display: 'grid', gap: '0.75rem' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>No. HP / Telepon</span> <strong style={{ color: '#334155' }}>{selectedSiswa.nomor_telp || '-'}</strong></div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Email</span> <strong style={{ color: '#334155', wordBreak: 'break-all', marginLeft: '1rem', textAlign: 'right' }}>{selectedSiswa.email || '-'}</strong></div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Alamat Jalan</span> <strong style={{ color: '#334155', textAlign: 'right', marginLeft: '1rem' }}>{selectedSiswa.alamat_siswa || '-'}</strong></div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Dusun</span> <strong style={{ color: '#334155' }}>{selectedSiswa.dusun_siswa || '-'}</strong></div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Kelurahan / Desa</span> <strong style={{ color: '#334155' }}>{selectedSiswa.kelurahan_siswa || '-'}</strong></div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Kecamatan</span> <strong style={{ color: '#334155' }}>{selectedSiswa.kecamatan_siswa || '-'}</strong></div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Kabupaten / Kota</span> <strong style={{ color: '#334155' }}>{selectedSiswa.kabupaten_siswa || '-'}</strong></div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Provinsi</span> <strong style={{ color: '#334155' }}>{selectedSiswa.provinsi_siswa || '-'}</strong></div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Kode Pos</span> <strong style={{ color: '#334155' }}>{selectedSiswa.kode_pos_siswa || '-'}</strong></div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Jenis Tinggal</span> <strong style={{ color: '#334155' }}>{selectedSiswa.jenis_tinggal || '-'}</strong></div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Alat Transportasi</span> <strong style={{ color: '#334155' }}>{selectedSiswa.alat_transportasi || '-'}</strong></div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Section 4: Data Keluarga (Ortu & Wali) */}
-                <div style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', marginBottom: '1.5rem' }}>
-                  <h3 style={{ fontSize: '1.1rem', color: '#0f172a', margin: '0 0 1rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem', borderBottom: '1px solid #f1f5f9', paddingBottom: '0.75rem' }}><FamilyIcon size={18} color="#0284c7"/> Informasi Keluarga & Orang Tua</h3>
-                  <div style={{ marginBottom: '1rem' }}>
-                    <div style={{ display: 'flex', gap: '2rem' }}>
-                      <span style={{ color: '#64748b' }}>Nomor Kartu Keluarga (KK):</span>
-                      <strong style={{ color: '#334155' }}>{selectedSiswa.no_kk || '-'}</strong>
-                    </div>
-                  </div>
-                  
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1.5rem' }}>
-                    {/* Ayah */}
-                    <div style={{ background: '#f8fafc', padding: '1rem', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                      <h4 style={{ margin: '0 0 0.75rem 0', color: '#0f172a', fontSize: '0.95rem', borderBottom: '1px solid #cbd5e1', paddingBottom: '0.5rem' }}>Data Ayah</h4>
-                      <div style={{ display: 'grid', gap: '0.5rem', fontSize: '0.9rem' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Nama</span> <strong>{selectedSiswa.nama_ayah || '-'}</strong></div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>NIK</span> <strong>{selectedSiswa.nik_ayah || '-'}</strong></div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Pendidikan</span> <strong>{selectedSiswa.pendidikan_ayah || '-'}</strong></div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Pekerjaan</span> <strong>{selectedSiswa.pekerjaan_ayah || '-'}</strong></div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Penghasilan</span> <strong>{selectedSiswa.penghasilan_ayah || '-'}</strong></div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Keb. Khusus</span> <strong>{selectedSiswa.kebutuhan_khusus_ayah || '-'}</strong></div>
-                      </div>
-                    </div>
-                    {/* Ibu */}
-                    <div style={{ background: '#f8fafc', padding: '1rem', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                      <h4 style={{ margin: '0 0 0.75rem 0', color: '#0f172a', fontSize: '0.95rem', borderBottom: '1px solid #cbd5e1', paddingBottom: '0.5rem' }}>Data Ibu Kandung</h4>
-                      <div style={{ display: 'grid', gap: '0.5rem', fontSize: '0.9rem' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Nama</span> <strong>{selectedSiswa.nama_ibu_kandung || '-'}</strong></div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>NIK</span> <strong>{selectedSiswa.nik_ibu || '-'}</strong></div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Pendidikan</span> <strong>{selectedSiswa.pendidikan_ibu || '-'}</strong></div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Pekerjaan</span> <strong>{selectedSiswa.pekerjaan_ibu || '-'}</strong></div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Penghasilan</span> <strong>{selectedSiswa.penghasilan_ibu || '-'}</strong></div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Keb. Khusus</span> <strong>{selectedSiswa.kebutuhan_khusus_ibu || '-'}</strong></div>
-                      </div>
-                    </div>
-                    {/* Wali */}
-                    <div style={{ background: '#f8fafc', padding: '1rem', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                      <h4 style={{ margin: '0 0 0.75rem 0', color: '#0f172a', fontSize: '0.95rem', borderBottom: '1px solid #cbd5e1', paddingBottom: '0.5rem' }}>Data Wali</h4>
-                      <div style={{ display: 'grid', gap: '0.5rem', fontSize: '0.9rem' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Nama</span> <strong>{selectedSiswa.nama_wali || '-'}</strong></div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Pekerjaan</span> <strong>{selectedSiswa.pekerjaan_wali || '-'}</strong></div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Penghasilan</span> <strong>{selectedSiswa.penghasilan_wali || '-'}</strong></div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
-                  {/* Section 5: Kesejahteraan (PIP/KIP) */}
-                  <div style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-                    <h3 style={{ fontSize: '1.1rem', color: '#0f172a', margin: '0 0 1rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem', borderBottom: '1px solid #f1f5f9', paddingBottom: '0.75rem' }}><Briefcase size={18} color="#0284c7"/> Kesejahteraan Sosial (PIP & KIP)</h3>
-                    <div style={{ display: 'grid', gap: '0.75rem' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}><span style={{ color: '#64748b' }}>Status Layak PIP</span> 
-                        {selectedSiswa.layak_pip ? <span style={{ background: '#dcfce7', color: '#166534', padding: '0.2rem 0.6rem', borderRadius: '4px', fontSize: '0.8rem', fontWeight: '600' }}>Layak PIP</span> : <span style={{ background: '#f1f5f9', color: '#475569', padding: '0.2rem 0.6rem', borderRadius: '4px', fontSize: '0.8rem', fontWeight: '600' }}>Tidak Layak</span>}
-                      </div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Alasan Layak PIP</span> <strong style={{ color: '#334155', textAlign: 'right', maxWidth: '150px' }}>{selectedSiswa.alasan_layak_pip || '-'}</strong></div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}><span style={{ color: '#64748b' }}>Penerima KIP</span> 
-                        {selectedSiswa.penerima_kip ? <span style={{ background: '#dcfce7', color: '#166534', padding: '0.2rem 0.6rem', borderRadius: '4px', fontSize: '0.8rem', fontWeight: '600' }}>Ya (Penerima)</span> : <span style={{ background: '#f1f5f9', color: '#475569', padding: '0.2rem 0.6rem', borderRadius: '4px', fontSize: '0.8rem', fontWeight: '600' }}>Bukan Penerima</span>}
-                      </div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>No. KIP</span> <strong style={{ color: '#334155' }}>{selectedSiswa.no_kip || '-'}</strong></div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Nama Tertera di KIP</span> <strong style={{ color: '#334155' }}>{selectedSiswa.nama_kip || '-'}</strong></div>
-                    </div>
-                  </div>
-
-                  {/* Section 6: Lokasi & Peta (Koordinat) */}
-                  <div style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-                    <h3 style={{ fontSize: '1.1rem', color: '#0f172a', margin: '0 0 1rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem', borderBottom: '1px solid #f1f5f9', paddingBottom: '0.75rem' }}><MapPin size={18} color="#0284c7"/> Peta Koordinat Domisili</h3>
-                    
-                    <div style={{ display: 'flex', gap: '2rem', flexDirection: 'column', height: '100%' }}>
-                      <div style={{ display: 'grid', gap: '0.5rem', color: '#334155', fontSize: '0.95rem' }}>
-                        <div><strong>Lintang (Latitude):</strong> {selectedSiswa.lintang || '-'}</div>
-                        <div><strong>Bujur (Longitude):</strong> {selectedSiswa.bujur || '-'}</div>
-                      </div>
-
-                      {selectedSiswa.lintang && selectedSiswa.bujur ? (
-                        <div style={{ width: '100%', flex: 1, minHeight: '180px', borderRadius: '8px', overflow: 'hidden', border: '1px solid #e2e8f0', background: '#f1f5f9' }}>
-                          <iframe 
-                            width="100%" 
-                            height="100%" 
-                            style={{ border: 0 }}
-                            loading="lazy" 
-                            allowFullScreen
-                            referrerPolicy="no-referrer-when-downgrade"
-                            src={`https://maps.google.com/maps?q=${selectedSiswa.lintang},${selectedSiswa.bujur}&z=16&output=embed`}
-                          ></iframe>
-                        </div>
-                      ) : (
-                        <div style={{ width: '100%', flex: 1, minHeight: '180px', padding: '2rem', borderRadius: '8px', border: '1px dashed #cbd5e1', background: '#f8fafc', color: '#64748b', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
-                          <MapPin size={32} color="#cbd5e1"/>
-                          <span style={{ fontSize: '0.9rem' }}>Koordinat (Lintang/Bujur) kosong.<br/>Mini Map Google tidak dapat dirender.</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-              </div>
-            </div>
-          </div>
-        )}
-
+        </div>
       </div>
-      <style jsx global>{`
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes slideInRight { from { transform: translateX(100%); } to { transform: translateX(0); } }
-      `}</style>
     </div>
   );
 }

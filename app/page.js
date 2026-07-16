@@ -84,7 +84,7 @@ export default function PortalPage() {
         </Link>
 
         {/* Card 2: Data Pendidikan */}
-        <Link href="/data-pendidikan" style={{ textDecoration: 'none' }}>
+        <Link href="/dashboard-analitik" style={{ textDecoration: 'none' }}>
           <div 
             style={{
               background: 'rgba(255, 255, 255, 0.03)',
@@ -118,7 +118,7 @@ export default function PortalPage() {
             <div style={{ background: 'linear-gradient(135deg, #a855f7 0%, #7e22ce 100%)', padding: '1.2rem', borderRadius: '50%', marginBottom: '1.5rem', boxShadow: '0 4px 15px rgba(168,85,247,0.4)' }}>
               <Database size={40} color="white" />
             </div>
-            <h3 style={{ fontSize: '1.5rem', fontWeight: '600', color: 'white', marginBottom: '0.75rem' }}>Data Pendidikan</h3>
+              <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: '600', color: 'white', marginBottom: '0.5rem' }}>Dashboard Analitik</h3>
             <p style={{ color: '#94a3b8', fontSize: '0.95rem', lineHeight: '1.5', marginBottom: '2rem' }}>
               Akses ke berbagai pangkalan data pendidikan termasuk profil sekolah, daftar tenaga pengajar, dan siswa.
             </p>

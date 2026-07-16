@@ -28,7 +28,7 @@ export default function LoginPage() {
       setError(error.message);
       setLoading(false);
     } else {
-      router.push('/data-pendidikan');
+      router.push('/dashboard-analitik');
       router.refresh(); // Refresh to update server components and middleware state
     }
   };

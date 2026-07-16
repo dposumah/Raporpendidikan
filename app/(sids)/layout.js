@@ -37,7 +37,46 @@ export default function SidsLayout({ children }) {
           </div>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
+          <div style={{ display: 'flex', gap: '1.5rem' }}>
+            <Link href="/dashboard-analitik" style={{
+              color: 'white',
+              textDecoration: 'none',
+              fontSize: '0.95rem',
+              fontWeight: '500',
+              padding: '0.5rem',
+              borderBottom: '2px solid transparent',
+              transition: 'all 0.2s'
+            }} onMouseEnter={e => e.currentTarget.style.borderBottomColor = '#38bdf8'} onMouseLeave={e => e.currentTarget.style.borderBottomColor = 'transparent'}>
+              Dashboard Analitik
+            </Link>
+            <Link href="/pencarian-siswa" style={{
+              color: 'white',
+              textDecoration: 'none',
+              fontSize: '0.95rem',
+              fontWeight: '500',
+              padding: '0.5rem',
+              borderBottom: '2px solid transparent',
+              transition: 'all 0.2s'
+            }} onMouseEnter={e => e.currentTarget.style.borderBottomColor = '#38bdf8'} onMouseLeave={e => e.currentTarget.style.borderBottomColor = 'transparent'}>
+              Pencarian Siswa
+            </Link>
+            <Link href="/analisis-rekap" style={{
+              color: 'white',
+              textDecoration: 'none',
+              fontSize: '0.95rem',
+              fontWeight: '500',
+              padding: '0.5rem',
+              borderBottom: '2px solid transparent',
+              transition: 'all 0.2s'
+            }} onMouseEnter={e => e.currentTarget.style.borderBottomColor = '#38bdf8'} onMouseLeave={e => e.currentTarget.style.borderBottomColor = 'transparent'}>
+              Tabel Analisis & Rekapitulasi
+            </Link>
+          </div>
+
+          <div style={{ width: '1px', height: '24px', background: '#334155' }}></div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
           <Link href="/" style={{
             color: 'white',
             textDecoration: 'none',
@@ -65,6 +104,7 @@ export default function SidsLayout({ children }) {
           }} onMouseEnter={e => e.currentTarget.style.backgroundColor = '#991b1b'} onMouseLeave={e => e.currentTarget.style.backgroundColor = '#b91c1c'}>
             <LogOut size={16} /> Logout
           </button>
+        </div>
         </div>
       </nav>
       
