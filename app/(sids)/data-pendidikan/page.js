@@ -2,8 +2,12 @@
 
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { createClient } from '@/utils/supabase/client';
-import { Search, Filter, Eye, EyeOff, Users, CheckCircle, School, AlertCircle, MapPin, X, ChevronDown, ChevronRight, User, Users as FamilyIcon, FileText, Briefcase } from 'lucide-react';
+import { Search, Filter, Eye, EyeOff, Users, CheckCircle, School, AlertCircle, MapPin, X, ChevronDown, ChevronRight, User, Users as FamilyIcon, FileText, Briefcase, Download } from 'lucide-react';
 import Link from 'next/link';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import * as XLSX from 'xlsx';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 
 export default function DataPendidikanPage() {
   const [allData, setAllData] = useState([]);
@@ -20,6 +24,7 @@ export default function DataPendidikanPage() {
   
   // Tabs
   const [activeTab, setActiveTab] = useState('data');
+  const [rekapTab, setRekapTab] = useState('domisili'); // domisili, jk, agama_umur, grafik
 
   // Unmask state
   const [unmaskedRows, setUnmaskedRows] = useState(new Set());
@@ -285,6 +290,88 @@ export default function DataPendidikanPage() {
     return grouped;
   }, [filteredData]);
 
+  // General Rekapitulasi Aggregations
+  const rekapitulasiAggregates = useMemo(() => {
+    const agg = {
+      jenisKelamin: { L: 0, P: 0, TidakDiketahui: 0 },
+      agama: {},
+      umur: {},
+      kebutuhanKhusus: {},
+      jenisTinggal: {},
+      transportasi: {}
+    };
+
+    const parseDate = (d) => {
+      if (!d) return null;
+      if (!isNaN(d) && Number(d) > 20000) return new Date((d - 25569) * 86400 * 1000);
+      const parts = String(d).split(/[-\/]/);
+      if (parts.length === 3) {
+        if (parts[0].length === 4) return new Date(parts[0], parts[1]-1, parts[2]);
+        else return new Date(parts[2], parts[1]-1, parts[0]);
+      }
+      return new Date(d);
+    };
+
+    const today = new Date();
+
+    filteredData.forEach(s => {
+      const jk = (s.jenis_kelamin || '').toLowerCase();
+      if (jk === 'l' || jk === 'laki-laki') agg.jenisKelamin.L++;
+      else if (jk === 'p' || jk === 'perempuan') agg.jenisKelamin.P++;
+      else agg.jenisKelamin.TidakDiketahui++;
+
+      const agama = s.agama || 'Tidak Diketahui';
+      agg.agama[agama] = (agg.agama[agama] || 0) + 1;
+
+      let umurLabel = 'Tidak Diketahui';
+      const tgl = parseDate(s.tanggal_lahir);
+      if (tgl && !isNaN(tgl.getTime())) {
+        let age = today.getFullYear() - tgl.getFullYear();
+        const m = today.getMonth() - tgl.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < tgl.getDate())) age--;
+        if (age >= 0 && age <= 30) umurLabel = `${age} Tahun`;
+        else umurLabel = 'Lainnya';
+      }
+      agg.umur[umurLabel] = (agg.umur[umurLabel] || 0) + 1;
+
+      const kk = s.kebutuhan_khusus || 'Tidak Ada';
+      agg.kebutuhanKhusus[kk] = (agg.kebutuhanKhusus[kk] || 0) + 1;
+
+      const jt = s.jenis_tinggal || 'Tidak Diketahui';
+      agg.jenisTinggal[jt] = (agg.jenisTinggal[jt] || 0) + 1;
+
+      const trans = s.alat_transportasi || 'Tidak Diketahui';
+      agg.transportasi[trans] = (agg.transportasi[trans] || 0) + 1;
+    });
+    
+    // Sort Age Object properly
+    const sortedUmur = {};
+    Object.keys(agg.umur).sort((a,b) => parseInt(a) - parseInt(b)).forEach(k => sortedUmur[k] = agg.umur[k]);
+    agg.umur = sortedUmur;
+
+    return agg;
+  }, [filteredData]);
+
+  // Export functions
+  const exportToExcel = (dataArray, filename) => {
+    const ws = XLSX.utils.json_to_sheet(dataArray);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Data");
+    XLSX.writeFile(wb, `${filename}.xlsx`);
+  };
+
+  const exportToPDF = (headers, dataMatrix, title, filename) => {
+    const doc = new jsPDF();
+    doc.text(title, 14, 15);
+    doc.autoTable({
+      head: [headers],
+      body: dataMatrix,
+      startY: 25,
+      styles: { fontSize: 9 }
+    });
+    doc.save(`${filename}.pdf`);
+  };
+
   // Group data for Rekapitulasi: Jenjang -> Kecamatan -> Kelurahan -> Sekolah
   const rekapData = useMemo(() => {
     const grouped = {};
@@ -427,7 +514,7 @@ export default function DataPendidikanPage() {
             onClick={() => setActiveTab('domisili')}
             style={{ background: 'none', border: 'none', padding: '0.5rem 1rem', fontSize: '1rem', fontWeight: '600', color: activeTab === 'domisili' ? '#0284c7' : '#64748b', borderBottom: activeTab === 'domisili' ? '3px solid #0284c7' : '3px solid transparent', marginBottom: '-9px', cursor: 'pointer', transition: 'all 0.2s' }}
           >
-            Rekapitulasi Domisili
+            Rekapitulasi
           </button>
         </div>
 
@@ -689,39 +776,279 @@ export default function DataPendidikanPage() {
 
         {activeTab === 'domisili' && (
           <div className="tab-content" style={{ animation: 'fadeIn 0.4s ease' }}>
-            <div style={{ background: 'white', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
-              <div style={{ padding: '1.5rem', borderBottom: '1px solid #e2e8f0', background: '#f8fafc' }}>
-                <h3 style={{ margin: 0, color: '#0f172a', fontSize: '1.1rem', fontWeight: '600' }}>
-                  Tabel Rekapitulasi Berdasarkan Wilayah Domisili
-                </h3>
-                <p style={{ margin: '0.5rem 0 0 0', color: '#64748b', fontSize: '0.9rem' }}>
-                  Dikelompokkan menjadi Kota Tomohon (Kecamatan → Kelurahan) dan Luar Kota Tomohon (Kabupaten → Kecamatan).
-                </p>
-              </div>
-              
-              <div style={{ width: '100%', overflowX: 'auto' }}>
-                <div style={{ minWidth: '800px' }}>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'minmax(250px, 2fr) 1fr 1fr 1fr', gap: '1rem', padding: '1rem', background: '#f1f5f9', borderBottom: '2px solid #e2e8f0', color: '#475569', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase' }}>
-                    <div>Status & Wilayah Domisili</div>
-                    <div style={{ textAlign: 'center' }}>Total Siswa</div>
-                    <div style={{ textAlign: 'center' }}>Laki-Laki</div>
-                    <div style={{ textAlign: 'center' }}>Perempuan</div>
+            
+            {/* Sub-Tab Navigation */}
+            <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '2rem', flexWrap: 'wrap' }}>
+              {[
+                { id: 'domisili', label: 'Domisili' },
+                { id: 'jk', label: 'Jenis Kelamin' },
+                { id: 'agama_umur', label: 'Agama & Umur' },
+                { id: 'grafik', label: 'Grafik Demografi' }
+              ].map(tab => (
+                <button
+                  key={tab.id}
+                  onClick={() => setRekapTab(tab.id)}
+                  style={{
+                    padding: '0.75rem 1.25rem',
+                    borderRadius: '8px',
+                    fontWeight: '600',
+                    fontSize: '0.9rem',
+                    border: 'none',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                    background: rekapTab === tab.id ? '#0284c7' : '#f1f5f9',
+                    color: rekapTab === tab.id ? 'white' : '#64748b',
+                    boxShadow: rekapTab === tab.id ? '0 4px 6px rgba(2, 132, 199, 0.2)' : 'none'
+                  }}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+
+            {/* DOMISILI SUB-TAB */}
+            {rekapTab === 'domisili' && (
+              <div style={{ background: 'white', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
+                <div style={{ padding: '1.5rem', borderBottom: '1px solid #e2e8f0', background: '#f8fafc', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div>
+                    <h3 style={{ margin: 0, color: '#0f172a', fontSize: '1.1rem', fontWeight: '600' }}>Tabel Rekapitulasi Berdasarkan Wilayah Domisili</h3>
+                    <p style={{ margin: '0.5rem 0 0 0', color: '#64748b', fontSize: '0.9rem' }}>Dikelompokkan menjadi Kota Tomohon (Kecamatan → Kelurahan) dan Luar Kota Tomohon (Kabupaten → Kecamatan).</p>
                   </div>
-                  
-                  <div style={{ padding: '0' }}>
-                    {Object.entries(domisiliRekapData).length > 0 ? (
-                      Object.entries(domisiliRekapData).map(([wilayahLabel, data]) => (
-                        <RekapNode key={wilayahLabel} label={wilayahLabel} dataObj={data} depth={0} />
-                      ))
-                    ) : (
-                      <div style={{ padding: '3rem', textAlign: 'center', color: '#64748b' }}>
-                        Pilih filter untuk melihat rekapitulasi domisili
-                      </div>
-                    )}
+                </div>
+                
+                <div style={{ width: '100%', overflowX: 'auto' }}>
+                  <div style={{ minWidth: '800px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'minmax(250px, 2fr) 1fr 1fr 1fr', gap: '1rem', padding: '1rem', background: '#f1f5f9', borderBottom: '2px solid #e2e8f0', color: '#475569', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase' }}>
+                      <div>Status & Wilayah Domisili</div>
+                      <div style={{ textAlign: 'center' }}>Total Siswa</div>
+                      <div style={{ textAlign: 'center' }}>Laki-Laki</div>
+                      <div style={{ textAlign: 'center' }}>Perempuan</div>
+                    </div>
+                    
+                    <div style={{ padding: '0' }}>
+                      {Object.entries(domisiliRekapData).length > 0 ? (
+                        Object.entries(domisiliRekapData).map(([wilayahLabel, data]) => (
+                          <RekapNode key={wilayahLabel} label={wilayahLabel} dataObj={data} depth={0} />
+                        ))
+                      ) : (
+                        <div style={{ padding: '3rem', textAlign: 'center', color: '#64748b' }}>Pilih filter untuk melihat rekapitulasi domisili</div>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            )}
+
+            {/* JENIS KELAMIN SUB-TAB */}
+            {rekapTab === 'jk' && (
+              <div style={{ background: 'white', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
+                <div style={{ padding: '1.5rem', borderBottom: '1px solid #e2e8f0', background: '#f8fafc', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+                  <div>
+                    <h3 style={{ margin: 0, color: '#0f172a', fontSize: '1.1rem', fontWeight: '600' }}>Rekapitulasi Jenis Kelamin</h3>
+                    <p style={{ margin: '0.5rem 0 0 0', color: '#64748b', fontSize: '0.9rem' }}>Berdasarkan hasil saringan data saat ini.</p>
+                  </div>
+                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <button 
+                      onClick={() => exportToExcel([
+                        { Kategori: 'Laki-Laki', Total: rekapitulasiAggregates.jenisKelamin.L },
+                        { Kategori: 'Perempuan', Total: rekapitulasiAggregates.jenisKelamin.P },
+                        { Kategori: 'Tidak Diketahui', Total: rekapitulasiAggregates.jenisKelamin.TidakDiketahui },
+                        { Kategori: 'Total', Total: filteredData.length }
+                      ], 'Rekap_Jenis_Kelamin')}
+                      style={{ background: '#10b981', color: 'white', border: 'none', padding: '0.5rem 1rem', borderRadius: '6px', fontSize: '0.85rem', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+                    >
+                      <Download size={16} /> Export Excel
+                    </button>
+                    <button 
+                      onClick={() => exportToPDF(['Kategori', 'Total Siswa'], [
+                        ['Laki-Laki', rekapitulasiAggregates.jenisKelamin.L],
+                        ['Perempuan', rekapitulasiAggregates.jenisKelamin.P],
+                        ['Tidak Diketahui', rekapitulasiAggregates.jenisKelamin.TidakDiketahui],
+                        ['Total', filteredData.length]
+                      ], 'Rekapitulasi Jenis Kelamin Siswa', 'Rekap_Jenis_Kelamin')}
+                      style={{ background: '#ef4444', color: 'white', border: 'none', padding: '0.5rem 1rem', borderRadius: '6px', fontSize: '0.85rem', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+                    >
+                      <Download size={16} /> Export PDF
+                    </button>
+                  </div>
+                </div>
+                
+                <div style={{ padding: '1.5rem' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                    <thead>
+                      <tr style={{ background: '#f1f5f9', color: '#475569', textAlign: 'left' }}>
+                        <th style={{ padding: '1rem', borderBottom: '2px solid #e2e8f0', fontWeight: '600' }}>Kategori</th>
+                        <th style={{ padding: '1rem', borderBottom: '2px solid #e2e8f0', fontWeight: '600', textAlign: 'right' }}>Total Siswa</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td style={{ padding: '1rem', borderBottom: '1px solid #e2e8f0', fontWeight: '500' }}>Laki-Laki</td>
+                        <td style={{ padding: '1rem', borderBottom: '1px solid #e2e8f0', textAlign: 'right' }}>{rekapitulasiAggregates.jenisKelamin.L.toLocaleString('id-ID')}</td>
+                      </tr>
+                      <tr>
+                        <td style={{ padding: '1rem', borderBottom: '1px solid #e2e8f0', fontWeight: '500' }}>Perempuan</td>
+                        <td style={{ padding: '1rem', borderBottom: '1px solid #e2e8f0', textAlign: 'right' }}>{rekapitulasiAggregates.jenisKelamin.P.toLocaleString('id-ID')}</td>
+                      </tr>
+                      {rekapitulasiAggregates.jenisKelamin.TidakDiketahui > 0 && (
+                        <tr>
+                          <td style={{ padding: '1rem', borderBottom: '1px solid #e2e8f0', color: '#64748b' }}>Tidak Diketahui</td>
+                          <td style={{ padding: '1rem', borderBottom: '1px solid #e2e8f0', textAlign: 'right', color: '#64748b' }}>{rekapitulasiAggregates.jenisKelamin.TidakDiketahui.toLocaleString('id-ID')}</td>
+                        </tr>
+                      )}
+                      <tr style={{ background: '#f8fafc', fontWeight: '700' }}>
+                        <td style={{ padding: '1rem' }}>Total Keseluruhan</td>
+                        <td style={{ padding: '1rem', textAlign: 'right' }}>{filteredData.length.toLocaleString('id-ID')}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            {/* AGAMA & UMUR SUB-TAB */}
+            {rekapTab === 'agama_umur' && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+                {/* Tabel Agama */}
+                <div style={{ background: 'white', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
+                  <div style={{ padding: '1.5rem', borderBottom: '1px solid #e2e8f0', background: '#f8fafc', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+                    <div>
+                      <h3 style={{ margin: 0, color: '#0f172a', fontSize: '1.1rem', fontWeight: '600' }}>Rekapitulasi Agama</h3>
+                    </div>
+                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                      <button 
+                        onClick={() => exportToExcel(
+                          Object.entries(rekapitulasiAggregates.agama).map(([k, v]) => ({ Agama: k, Total: v })),
+                          'Rekap_Agama'
+                        )}
+                        style={{ background: '#10b981', color: 'white', border: 'none', padding: '0.4rem 0.8rem', borderRadius: '6px', fontSize: '0.8rem', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
+                      ><Download size={14} /> Excel</button>
+                      <button 
+                        onClick={() => exportToPDF(['Agama', 'Total Siswa'], Object.entries(rekapitulasiAggregates.agama), 'Rekapitulasi Agama Siswa', 'Rekap_Agama')}
+                        style={{ background: '#ef4444', color: 'white', border: 'none', padding: '0.4rem 0.8rem', borderRadius: '6px', fontSize: '0.8rem', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
+                      ><Download size={14} /> PDF</button>
+                    </div>
+                  </div>
+                  
+                  <div style={{ padding: '1.5rem' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                      <thead>
+                        <tr style={{ background: '#f1f5f9', color: '#475569', textAlign: 'left' }}>
+                          <th style={{ padding: '1rem', borderBottom: '2px solid #e2e8f0', fontWeight: '600' }}>Agama</th>
+                          <th style={{ padding: '1rem', borderBottom: '2px solid #e2e8f0', fontWeight: '600', textAlign: 'right' }}>Total Siswa</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {Object.entries(rekapitulasiAggregates.agama).sort((a,b) => b[1] - a[1]).map(([agama, total]) => (
+                          <tr key={agama}>
+                            <td style={{ padding: '1rem', borderBottom: '1px solid #e2e8f0', fontWeight: '500' }}>{agama}</td>
+                            <td style={{ padding: '1rem', borderBottom: '1px solid #e2e8f0', textAlign: 'right' }}>{total.toLocaleString('id-ID')}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* Tabel Umur */}
+                <div style={{ background: 'white', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
+                  <div style={{ padding: '1.5rem', borderBottom: '1px solid #e2e8f0', background: '#f8fafc', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+                    <div>
+                      <h3 style={{ margin: 0, color: '#0f172a', fontSize: '1.1rem', fontWeight: '600' }}>Rekapitulasi Umur</h3>
+                    </div>
+                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                      <button 
+                        onClick={() => exportToExcel(
+                          Object.entries(rekapitulasiAggregates.umur).map(([k, v]) => ({ Umur: k, Total: v })),
+                          'Rekap_Umur'
+                        )}
+                        style={{ background: '#10b981', color: 'white', border: 'none', padding: '0.4rem 0.8rem', borderRadius: '6px', fontSize: '0.8rem', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
+                      ><Download size={14} /> Excel</button>
+                      <button 
+                        onClick={() => exportToPDF(['Umur', 'Total Siswa'], Object.entries(rekapitulasiAggregates.umur), 'Rekapitulasi Umur Siswa', 'Rekap_Umur')}
+                        style={{ background: '#ef4444', color: 'white', border: 'none', padding: '0.4rem 0.8rem', borderRadius: '6px', fontSize: '0.8rem', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
+                      ><Download size={14} /> PDF</button>
+                    </div>
+                  </div>
+                  
+                  <div style={{ padding: '1.5rem' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                      <thead>
+                        <tr style={{ background: '#f1f5f9', color: '#475569', textAlign: 'left' }}>
+                          <th style={{ padding: '1rem', borderBottom: '2px solid #e2e8f0', fontWeight: '600' }}>Rentang Umur</th>
+                          <th style={{ padding: '1rem', borderBottom: '2px solid #e2e8f0', fontWeight: '600', textAlign: 'right' }}>Total Siswa</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {Object.entries(rekapitulasiAggregates.umur).map(([umur, total]) => (
+                          <tr key={umur}>
+                            <td style={{ padding: '1rem', borderBottom: '1px solid #e2e8f0', fontWeight: '500' }}>{umur}</td>
+                            <td style={{ padding: '1rem', borderBottom: '1px solid #e2e8f0', textAlign: 'right' }}>{total.toLocaleString('id-ID')}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* GRAFIK SUB-TAB */}
+            {rekapTab === 'grafik' && (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '2rem' }}>
+                
+                {/* Kebutuhan Khusus Chart */}
+                <div style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', border: '1px solid #e2e8f0' }}>
+                  <h3 style={{ margin: '0 0 1.5rem 0', color: '#0f172a', fontSize: '1.1rem', fontWeight: '600' }}>Grafik Kebutuhan Khusus</h3>
+                  <div style={{ width: '100%', height: '300px' }}>
+                    <ResponsiveContainer>
+                      <PieChart>
+                        <Pie data={Object.entries(rekapitulasiAggregates.kebutuhanKhusus).map(([n,v]) => ({name: n, value: v}))} cx="50%" cy="50%" innerRadius={60} outerRadius={100} paddingAngle={5} dataKey="value">
+                          {Object.keys(rekapitulasiAggregates.kebutuhanKhusus).map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={['#0284c7', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'][index % 5]} />
+                          ))}
+                        </Pie>
+                        <Tooltip />
+                        <Legend />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+
+                {/* Jenis Tinggal Chart */}
+                <div style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', border: '1px solid #e2e8f0' }}>
+                  <h3 style={{ margin: '0 0 1.5rem 0', color: '#0f172a', fontSize: '1.1rem', fontWeight: '600' }}>Grafik Jenis Tinggal</h3>
+                  <div style={{ width: '100%', height: '300px' }}>
+                    <ResponsiveContainer>
+                      <BarChart data={Object.entries(rekapitulasiAggregates.jenisTinggal).map(([n,v]) => ({name: n, Total: v}))} layout="vertical" margin={{ left: 50 }}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis type="number" />
+                        <YAxis dataKey="name" type="category" width={80} fontSize={12} />
+                        <Tooltip />
+                        <Bar dataKey="Total" fill="#10b981" radius={[0, 4, 4, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+
+                {/* Alat Transportasi Chart */}
+                <div style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', border: '1px solid #e2e8f0', gridColumn: '1 / -1' }}>
+                  <h3 style={{ margin: '0 0 1.5rem 0', color: '#0f172a', fontSize: '1.1rem', fontWeight: '600' }}>Grafik Alat Transportasi</h3>
+                  <div style={{ width: '100%', height: '350px' }}>
+                    <ResponsiveContainer>
+                      <BarChart data={Object.entries(rekapitulasiAggregates.transportasi).map(([n,v]) => ({name: n, Total: v}))}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="name" fontSize={11} interval={0} angle={-45} textAnchor="end" height={80} />
+                        <YAxis />
+                        <Tooltip />
+                        <Bar dataKey="Total" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+
+              </div>
+            )}
           </div>
         )}
 
