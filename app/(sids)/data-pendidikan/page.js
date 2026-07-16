@@ -115,15 +115,16 @@ export default function DataPendidikanPage() {
       else if (s.jenis_kelamin?.toLowerCase() === 'p') p++;
       
       const kabRaw = (s.kabupaten_siswa || '').toLowerCase().trim();
-      const kecRaw = (s.kecamatan_siswa || '').toLowerCase().trim();
+      const kecRaw = (s.kecamatan_siswa || '').toLowerCase().replace(/^kecamatan\s+/i, '').replace(/^kec\.\s+/i, '').trim();
+      
+      const validFull = ['tomohon tengah', 'tomohon timur', 'tomohon barat', 'tomohon selatan', 'tomohon utara'];
+      const validShort = ['tengah', 'timur', 'barat', 'selatan', 'utara'];
       
       let isTomohon = false;
-      if (kecRaw.includes('tomohon tengah') || kecRaw.includes('tomohon timur') || kecRaw.includes('tomohon barat') || kecRaw.includes('tomohon selatan') || kecRaw.includes('tomohon utara')) {
+      if (validFull.includes(kecRaw)) {
         isTomohon = true;
-      } else if (kabRaw.includes('tomohon')) {
-        if (kecRaw.includes('tengah') || kecRaw.includes('timur') || kecRaw.includes('barat') || kecRaw.includes('selatan') || kecRaw.includes('utara')) {
-          isTomohon = true;
-        }
+      } else if (kabRaw.includes('tomohon') && validShort.includes(kecRaw)) {
+        isTomohon = true;
       }
       
       if (isTomohon) tomohon++;
@@ -243,16 +244,16 @@ export default function DataPendidikanPage() {
 
     filteredData.forEach(s => {
       const kabRaw = (s.kabupaten_siswa || '').toLowerCase().trim();
-      const kecRaw = (s.kecamatan_siswa || '').toLowerCase().trim();
+      const kecRaw = (s.kecamatan_siswa || '').toLowerCase().replace(/^kecamatan\s+/i, '').replace(/^kec\.\s+/i, '').trim();
       
       let isTomohon = false;
       let matchedKec = s.kecamatan_siswa || 'Tanpa Kecamatan';
 
-      if (kecRaw.includes('tomohon tengah') || (kabRaw.includes('tomohon') && kecRaw.includes('tengah'))) { isTomohon = true; matchedKec = 'Tomohon Tengah'; }
-      else if (kecRaw.includes('tomohon timur') || (kabRaw.includes('tomohon') && kecRaw.includes('timur'))) { isTomohon = true; matchedKec = 'Tomohon Timur'; }
-      else if (kecRaw.includes('tomohon barat') || (kabRaw.includes('tomohon') && kecRaw.includes('barat'))) { isTomohon = true; matchedKec = 'Tomohon Barat'; }
-      else if (kecRaw.includes('tomohon selatan') || (kabRaw.includes('tomohon') && kecRaw.includes('selatan'))) { isTomohon = true; matchedKec = 'Tomohon Selatan'; }
-      else if (kecRaw.includes('tomohon utara') || (kabRaw.includes('tomohon') && kecRaw.includes('utara'))) { isTomohon = true; matchedKec = 'Tomohon Utara'; }
+      if (kecRaw === 'tomohon tengah' || (kabRaw.includes('tomohon') && kecRaw === 'tengah')) { isTomohon = true; matchedKec = 'Tomohon Tengah'; }
+      else if (kecRaw === 'tomohon timur' || (kabRaw.includes('tomohon') && kecRaw === 'timur')) { isTomohon = true; matchedKec = 'Tomohon Timur'; }
+      else if (kecRaw === 'tomohon barat' || (kabRaw.includes('tomohon') && kecRaw === 'barat')) { isTomohon = true; matchedKec = 'Tomohon Barat'; }
+      else if (kecRaw === 'tomohon selatan' || (kabRaw.includes('tomohon') && kecRaw === 'selatan')) { isTomohon = true; matchedKec = 'Tomohon Selatan'; }
+      else if (kecRaw === 'tomohon utara' || (kabRaw.includes('tomohon') && kecRaw === 'utara')) { isTomohon = true; matchedKec = 'Tomohon Utara'; }
       
       const kec = matchedKec;
       const kel = s.kelurahan_siswa || 'Tanpa Kelurahan';
