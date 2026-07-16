@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { createClient } from '@/utils/supabase/client';
+import { useSiswaData } from '../../../context/SiswaDataContext';
 import { Search, Filter, Eye, EyeOff, Users, CheckCircle, School, AlertCircle, MapPin, X, ChevronDown, ChevronRight, User, Users as FamilyIcon, FileText, Briefcase, Download } from 'lucide-react';
 import Link from 'next/link';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
@@ -10,10 +11,7 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
 export default function DataPendidikanPage() {
-  const [allData, setAllData] = useState([]);
-  const [periodeOptions, setPeriodeOptions] = useState([]);
-  const [selectedPeriode, setSelectedPeriode] = useState("");
-  const [loading, setLoading] = useState(true);
+  const { allData, periodeOptions, selectedPeriode, setSelectedPeriode, loading } = useSiswaData();
   
   // Real-time Search & Filters
   const [searchQuery, setSearchQuery] = useState('');
@@ -39,52 +37,7 @@ export default function DataPendidikanPage() {
 
   const supabase = createClient();
 
-  // 1. FETCH PERIODE & DATA
-  useEffect(() => {
-    fetch('/api/periode')
-      .then(res => res.json())
-      .then(data => {
-        setPeriodeOptions(data);
-        if (data && data.length > 0) {
-          setSelectedPeriode(data[0]);
-        }
-      });
-  }, []);
-
-  useEffect(() => {
-    if (selectedPeriode) {
-      fetchData();
-    }
-  }, [selectedPeriode]);
-
-  const fetchData = async () => {
-    setLoading(true);
-    let allResult = [];
-    let from = 0;
-    const limit = 1000;
-    let hasMore = true;
-
-    while (hasMore) {
-      let query = supabase.from('siswa').select('*').eq('periode', selectedPeriode).range(from, from + limit - 1);
-      const { data: result, error } = await query;
-      
-      if (error) {
-        console.error('Error fetching data:', error);
-        hasMore = false;
-      } else {
-        if (result && result.length > 0) {
-          allResult = [...allResult, ...result];
-          from += limit;
-          if (result.length < limit) hasMore = false;
-        } else {
-          hasMore = false;
-        }
-      }
-    }
-
-    setAllData(allResult);
-    setLoading(false);
-  };
+  // Data is now fetched globally from Context
 
   // 2. CLIENT-SIDE FILTERING (Blazing Fast)
   const filteredData = useMemo(() => {

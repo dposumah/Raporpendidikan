@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { LogOut } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
 import { useRouter } from 'next/navigation';
+import { SiswaDataProvider } from '../../context/SiswaDataContext';
 
 export default function SidsLayout({ children }) {
   const router = useRouter();
@@ -108,9 +109,11 @@ export default function SidsLayout({ children }) {
         </div>
       </nav>
       
-      <main style={{ flex: 1 }}>
-        {children}
-      </main>
+      <div style={{ flex: 1, overflowY: 'auto' }}>
+        <SiswaDataProvider>
+          {children}
+        </SiswaDataProvider>
+      </div>
     </div>
   );
 }
