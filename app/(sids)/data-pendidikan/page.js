@@ -31,6 +31,7 @@ export default function DataPendidikanPage() {
   
   // Detail Modal
   const [selectedSiswa, setSelectedSiswa] = useState(null);
+  const [selectedSekolah, setSelectedSekolah] = useState(null);
 
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 50;
@@ -478,14 +479,14 @@ export default function DataPendidikanPage() {
     return (
       <div style={{ borderBottom: '1px solid #f1f5f9' }}>
         <div 
-          onClick={() => !isLeaf && setOpen(!open)}
+          onClick={() => isLeaf ? setSelectedSekolah(label) : setOpen(!open)}
           style={{ 
             display: 'grid', 
             gridTemplateColumns: 'minmax(250px, 2fr) 1fr 1fr 1fr', 
             gap: '1rem', 
             padding: '1rem', 
             background: depth === 0 ? '#f8fafc' : depth === 1 ? '#ffffff' : '#fcfcfc',
-            cursor: isLeaf ? 'default' : 'pointer',
+            cursor: 'pointer',
             alignItems: 'center',
             transition: 'background 0.2s',
             fontWeight: depth === 0 ? '700' : depth === 1 ? '600' : '500',
@@ -1127,6 +1128,65 @@ export default function DataPendidikanPage() {
 
               </div>
             )}
+          </div>
+        )}
+
+        {/* Modal List Siswa per Sekolah */}
+        {selectedSekolah && (
+          <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.7)', backdropFilter: 'blur(4px)', zIndex: 999, display: 'flex', justifyContent: 'center', alignItems: 'center', animation: 'fadeIn 0.3s ease' }}>
+            <div style={{ width: '90%', maxWidth: '1000px', background: '#f8fafc', height: '90%', borderRadius: '12px', overflow: 'hidden', display: 'flex', flexDirection: 'column', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)', position: 'relative', animation: 'slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1)' }}>
+              
+              <div style={{ padding: '1.5rem 2rem', borderBottom: '1px solid #e2e8f0', background: 'white', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                  <div style={{ background: '#f0fdfa', width: '50px', height: '50px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#0d9488' }}>
+                    <School size={24} />
+                  </div>
+                  <div>
+                    <h2 style={{ margin: 0, fontSize: '1.5rem', color: '#0f172a' }}>{selectedSekolah}</h2>
+                    <div style={{ color: '#64748b', fontSize: '0.9rem', marginTop: '0.25rem' }}>
+                      Daftar Siswa ({(allData.filter(s => s.nama_sekolah === selectedSekolah).length).toLocaleString('id-ID')} Siswa)
+                    </div>
+                  </div>
+                </div>
+                <button onClick={() => setSelectedSekolah(null)} style={{ background: '#f1f5f9', border: 'none', width: '40px', height: '40px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#64748b' }}>
+                  <X size={20} />
+                </button>
+              </div>
+
+              <div style={{ flex: 1, overflowY: 'auto', padding: '1.5rem' }}>
+                <div style={{ background: 'white', borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', overflow: 'hidden', border: '1px solid #e2e8f0' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                    <thead>
+                      <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
+                        <th style={{ padding: '1rem', color: '#475569', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase' }}>No</th>
+                        <th style={{ padding: '1rem', color: '#475569', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase' }}>Nama Siswa</th>
+                        <th style={{ padding: '1rem', color: '#475569', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase' }}>NISN / NIK</th>
+                        <th style={{ padding: '1rem', color: '#475569', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase' }}>L/P</th>
+                        <th style={{ padding: '1rem', color: '#475569', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase' }}>Kelas</th>
+                        <th style={{ padding: '1rem', color: '#475569', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase', textAlign: 'center' }}>Aksi</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {allData.filter(s => s.nama_sekolah === selectedSekolah).map((s, idx) => (
+                        <tr key={idx} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                          <td style={{ padding: '1rem', color: '#64748b' }}>{idx + 1}</td>
+                          <td style={{ padding: '1rem', fontWeight: '600', color: '#0f172a' }}>{s.nama_peserta_didik}</td>
+                          <td style={{ padding: '1rem', color: '#64748b' }}>{s.nisn || '-'} / {s.nik || '-'}</td>
+                          <td style={{ padding: '1rem', color: '#334155' }}>{s.jenis_kelamin}</td>
+                          <td style={{ padding: '1rem', color: '#334155' }}>{s.kelas}</td>
+                          <td style={{ padding: '1rem', textAlign: 'center' }}>
+                            <button 
+                              onClick={() => { setSelectedSekolah(null); setSelectedSiswa(s); }}
+                              style={{ background: '#e0f2fe', color: '#0284c7', border: 'none', padding: '0.4rem 0.8rem', borderRadius: '6px', fontSize: '0.8rem', fontWeight: '600', cursor: 'pointer' }}
+                            >Detail</button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
           </div>
         )}
 
