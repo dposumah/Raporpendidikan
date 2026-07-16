@@ -105,7 +105,55 @@ export default function DataPendidikanPage() {
   // Reset page when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [jenjang, sekolah, kecamatanFilter, kelurahanFilter, kelas, statusPIP, searchQuery]);
+  }, [searchQuery, jenjang, sekolah, kecamatanFilter, kelurahanFilter, kelas, statusPIP]);
+
+  // Cascading Filter Logic (Reset downstream filters when upstream changes)
+  useEffect(() => {
+    setKecamatanFilter('');
+    setKelurahanFilter('');
+    setSekolah('');
+  }, [jenjang]);
+
+  useEffect(() => {
+    setKelurahanFilter('');
+    setSekolah('');
+  }, [kecamatanFilter]);
+
+  useEffect(() => {
+    setSekolah('');
+  }, [kelurahanFilter]);
+
+  // Dynamic Filter Options
+  const jenjangOptions = useMemo(() => {
+    return Array.from(new Set(allData.map(s => s.jenjang).filter(Boolean))).sort();
+  }, [allData]);
+
+  const kecamatanOptions = useMemo(() => {
+    return Array.from(new Set(allData
+      .filter(s => !jenjang || s.jenjang === jenjang)
+      .map(s => s.sekolah_kecamatan || s.kecamatan_siswa)
+      .filter(Boolean)
+    )).sort();
+  }, [allData, jenjang]);
+
+  const kelurahanOptions = useMemo(() => {
+    return Array.from(new Set(allData
+      .filter(s => !jenjang || s.jenjang === jenjang)
+      .filter(s => !kecamatanFilter || (s.sekolah_kecamatan || s.kecamatan_siswa) === kecamatanFilter)
+      .map(s => s.sekolah_desa_kelurahan || s.kelurahan_siswa)
+      .filter(Boolean)
+    )).sort();
+  }, [allData, jenjang, kecamatanFilter]);
+
+  const sekolahOptions = useMemo(() => {
+    return Array.from(new Set(allData
+      .filter(s => !jenjang || s.jenjang === jenjang)
+      .filter(s => !kecamatanFilter || (s.sekolah_kecamatan || s.kecamatan_siswa) === kecamatanFilter)
+      .filter(s => !kelurahanFilter || (s.sekolah_desa_kelurahan || s.kelurahan_siswa) === kelurahanFilter)
+      .map(s => s.nama_sekolah)
+      .filter(Boolean)
+    )).sort();
+  }, [allData, jenjang, kecamatanFilter, kelurahanFilter]);
 
   // 3. DERIVED STATS FROM FILTERED DATA
   const stats = useMemo(() => {
@@ -607,7 +655,7 @@ export default function DataPendidikanPage() {
                   <label style={{ display: 'block', fontSize: '0.85rem', color: '#64748b', marginBottom: '0.5rem', fontWeight: '500' }}>Jenjang</label>
                   <select value={jenjang} onChange={e => setJenjang(e.target.value)} style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #cbd5e1', color: '#334155', outline: 'none' }}>
                     <option value="">Semua Jenjang</option>
-                    {Array.from(new Set(allData.map(s => s.jenjang).filter(Boolean))).sort().map(j => (
+                    {jenjangOptions.map(j => (
                       <option key={j} value={j}>{j}</option>
                     ))}
                   </select>
@@ -616,7 +664,7 @@ export default function DataPendidikanPage() {
                   <label style={{ display: 'block', fontSize: '0.85rem', color: '#64748b', marginBottom: '0.5rem', fontWeight: '500' }}>Kecamatan</label>
                   <select value={kecamatanFilter} onChange={e => setKecamatanFilter(e.target.value)} style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #cbd5e1', color: '#334155', outline: 'none' }}>
                     <option value="">Semua Kecamatan</option>
-                    {Array.from(new Set(allData.map(s => s.sekolah_kecamatan || s.kecamatan_siswa).filter(Boolean))).sort().map(k => (
+                    {kecamatanOptions.map(k => (
                       <option key={k} value={k}>{k}</option>
                     ))}
                   </select>
@@ -627,7 +675,7 @@ export default function DataPendidikanPage() {
                     placeholder="Pilih Kelurahan"
                     value={kelurahanFilter}
                     onChange={setKelurahanFilter}
-                    options={Array.from(new Set(allData.map(s => s.sekolah_desa_kelurahan || s.kelurahan_siswa).filter(Boolean))).sort()}
+                    options={kelurahanOptions}
                   />
                 </div>
                 <div>
@@ -636,7 +684,7 @@ export default function DataPendidikanPage() {
                     placeholder="Pilih Sekolah"
                     value={sekolah}
                     onChange={setSekolah}
-                    options={Array.from(new Set(allData.map(s => s.nama_sekolah).filter(Boolean))).sort()}
+                    options={sekolahOptions}
                   />
                 </div>
               </div>
