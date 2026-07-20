@@ -12,19 +12,9 @@ export default function AdminSispPage() {
   const [preview, setPreview] = useState([]);
 
   useEffect(() => {
-    fetchPeriode();
+    // Optionally auto-fill if needed, but manual input is safer
   }, []);
 
-  const fetchPeriode = async () => {
-    try {
-      const res = await fetch('/api/periode');
-      const data = await res.json();
-      const aktif = data.find(p => p.is_active);
-      if (aktif) setPeriode(aktif.periode);
-    } catch (err) {
-      console.error('Gagal mengambil periode', err);
-    }
-  };
 
   const handleFileChange = (e) => {
     const selected = e.target.files[0];
@@ -110,7 +100,21 @@ export default function AdminSispPage() {
             <Upload size={32} />
           </div>
           <h1 style={{ margin: '0 0 0.5rem 0', fontSize: '1.8rem', color: '#0f172a' }}>Unggah Data Satuan Pendidikan (SISP)</h1>
-          <p style={{ margin: 0, color: '#64748b' }}>Unggah file Excel SISP untuk Periode: <strong>{periode || 'Memuat...'}</strong></p>
+          <p style={{ margin: 0, color: '#64748b' }}>Impor data sekolah dari file Excel.</p>
+        </div>
+
+        <div style={{ marginBottom: '1.5rem' }}>
+          <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: '600', color: '#334155' }}>
+            Periode Data <span style={{ color: '#ef4444' }}>*</span>
+          </label>
+          <input
+            type="text"
+            placeholder="Misal: 2025/2026"
+            value={periode}
+            onChange={(e) => setPeriode(e.target.value)}
+            style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none', fontSize: '0.95rem' }}
+            disabled={loading}
+          />
         </div>
 
         {/* Upload Box */}
