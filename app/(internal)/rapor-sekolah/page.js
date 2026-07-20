@@ -174,51 +174,110 @@ export default function RaporSekolahPage() {
                 </h3>
                 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                  {Object.entries(selectedSekolah.indikator).map(([groupName, fields], idx) => {
-                    const labelCapaian = fields['Label Capaian'] || fields['Label Capaian '] || fields['label_capaian'];
-                    const nilai = fields['Perubahan Nilai'] || fields['Nilai'];
-                    const tren = fields['Perubahan dari Tahun 2024'] || fields['Perubahan Nilai Capaian dari Tahun 2024'];
+                  
+                  {(() => {
+                    const grouped = {};
                     
-                    // Ekstrak kode indikator (misal "D.18" dari "D.18 Kesiapsiagaan Bencana")
-                    const kodeMatch = groupName.match(/^([A-Z]\\.\\d+(\\.\\d+)?)/);
-                    const kode = kodeMatch ? kodeMatch[1] : '';
-                    const title = kodeMatch ? groupName.substring(kode.length).trim() : groupName;
+                    Object.entries(selectedSekolah.indikator).forEach(([groupName, fields]) => {
+                      const kodeMatch = groupName.match(/^([A-Z])\.(\d+)(?:\.(\d+))?/);
+                      if (!kodeMatch) return;
+                      
+                      const letter = kodeMatch[1];
+                      const mainNum = kodeMatch[2];
+                      const subNum = kodeMatch[3];
+                      const mainKode = `${letter}.${mainNum}`;
+                      
+                      if (!grouped[mainKode]) {
+                        grouped[mainKode] = { main: null, sub: [] };
+                      }
+                      
+                      const titleStr = groupName.substring(kodeMatch[0].length).trim();
+                      
+                      if (!subNum) {
+                        grouped[mainKode].main = { groupName, fields, kode: mainKode, title: titleStr };
+                      } else {
+                        grouped[mainKode].sub.push({ groupName, fields, kode: kodeMatch[0], title: titleStr });
+                      }
+                    });
+                    
+                    const sortedMainCodes = Object.keys(grouped).sort((a, b) => {
+                      const [aL, aN] = a.split('.');
+                      const [bL, bN] = b.split('.');
+                      if (aL !== bL) return aL.localeCompare(bL);
+                      return parseInt(aN) - parseInt(bN);
+                    });
 
-                    return (
-                      <div key={idx} style={{ border: '1px solid #e2e8f0', borderRadius: '8px', overflow: 'hidden' }}>
-                        
-                        <div style={{ background: '#f8fafc', padding: '1rem', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <div style={{ flex: 1 }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.25rem' }}>
-                              {kode && <span style={{ background: '#3b82f6', color: 'white', padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 'bold' }}>{kode}</span>}
-                              <h4 style={{ margin: 0, color: '#0f172a', fontSize: '1rem' }}>{title}</h4>
-                            </div>
-                          </div>
+                    return sortedMainCodes.map((mainKode, idx) => {
+                      const group = grouped[mainKode];
+                      // Jika kebetulan header utamanya tidak ada tapi sub-nya ada, kita buatkan dummy
+                      const mainData = group.main || { fields: {}, kode: mainKode, title: 'Indikator ' + mainKode };
+                      const { fields, kode, title } = mainData;
+                      
+                      const labelCapaian = fields['Label Capaian'] || fields['Label Capaian '] || fields['label_capaian'];
+                      
+                      return (
+                        <div key={idx} style={{ border: '1px solid #e2e8f0', borderRadius: '8px', overflow: 'hidden', marginBottom: '1.5rem', background: 'white' }}>
                           
-                          {labelCapaian && (
-                            <div style={{ background: getLabelColor(labelCapaian), color: getLabelTextColor(labelCapaian), padding: '0.4rem 0.8rem', borderRadius: '20px', fontSize: '0.85rem', fontWeight: '600', whiteSpace: 'nowrap' }}>
-                              {labelCapaian}
+                          {/* MAIN INDICATOR HEADER */}
+                          <div style={{ background: '#f1f5f9', padding: '1rem', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                            <div style={{ flex: 1, paddingRight: '1rem' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
+                                <span style={{ background: '#2563eb', color: 'white', padding: '0.3rem 0.6rem', borderRadius: '6px', fontSize: '0.85rem', fontWeight: 'bold' }}>{kode}</span>
+                                <h4 style={{ margin: 0, color: '#0f172a', fontSize: '1.1rem', fontWeight: '700' }}>{title}</h4>
+                              </div>
+                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem', marginTop: '0.75rem' }}>
+                                {Object.entries(fields).filter(([k]) => !k.includes('Label Capaian')).map(([k, v], i) => (
+                                  <div key={i} style={{ display: 'flex', flexDirection: 'column' }}>
+                                    <span style={{ color: '#64748b', fontSize: '0.75rem', fontWeight: '600', textTransform: 'uppercase' }}>{k}</span>
+                                    <div style={{ color: '#1e293b', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: '500' }}>
+                                      {k.toLowerCase().includes('perubahan') && renderTrendIcon(v)}
+                                      <span>{v || '-'}</span>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                            
+                            {labelCapaian && (
+                              <div style={{ background: getLabelColor(labelCapaian), color: getLabelTextColor(labelCapaian), padding: '0.5rem 1rem', borderRadius: '20px', fontSize: '0.85rem', fontWeight: '700', whiteSpace: 'nowrap', border: `1px solid ${getLabelTextColor(labelCapaian)}30` }}>
+                                {labelCapaian}
+                              </div>
+                            )}
+                          </div>
+
+                          {/* SUB INDICATORS LIST */}
+                          {group.sub.length > 0 && (
+                            <div style={{ padding: '0.5rem 1rem' }}>
+                              {group.sub.sort((a, b) => {
+                                const aNum = parseInt(a.kode.split('.')[2] || 0);
+                                const bNum = parseInt(b.kode.split('.')[2] || 0);
+                                return aNum - bNum;
+                              }).map((sub, sIdx) => (
+                                <div key={sIdx} style={{ padding: '0.75rem 0', borderBottom: sIdx === group.sub.length - 1 ? 'none' : '1px dashed #cbd5e1' }}>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                                    <span style={{ color: '#3b82f6', fontWeight: '700', fontSize: '0.85rem' }}>{sub.kode}</span>
+                                    <h5 style={{ margin: 0, color: '#334155', fontSize: '0.9rem', fontWeight: '600' }}>{sub.title}</h5>
+                                  </div>
+                                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', paddingLeft: '2.5rem' }}>
+                                    {Object.entries(sub.fields).map(([k, v], i) => (
+                                      <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                        <span style={{ color: '#64748b', fontSize: '0.8rem' }}>{k}:</span>
+                                        <div style={{ color: '#0f172a', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.25rem', fontWeight: '500' }}>
+                                          {k.toLowerCase().includes('perubahan') && renderTrendIcon(v)}
+                                          <span>{v || '-'}</span>
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              ))}
                             </div>
                           )}
-                        </div>
 
-                        <div style={{ padding: '1rem', background: 'white' }}>
-                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
-                            {Object.entries(fields).filter(([k]) => !k.includes('Label Capaian')).map(([k, v], i) => (
-                              <div key={i} style={{ display: 'flex', flexDirection: 'column' }}>
-                                <span style={{ color: '#64748b', fontSize: '0.8rem', fontWeight: '500', marginBottom: '0.25rem' }}>{k}</span>
-                                <div style={{ color: '#1e293b', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                  {k.toLowerCase().includes('perubahan') && renderTrendIcon(v)}
-                                  <span>{v || '-'}</span>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
                         </div>
-
-                      </div>
-                    );
-                  })}
+                      );
+                    });
+                  })()}
                 </div>
               </div>
             </>
