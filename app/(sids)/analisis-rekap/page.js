@@ -32,6 +32,17 @@ export default function DataPendidikanPage() {
   // Detail Modal
   const [selectedSiswa, setSelectedSiswa] = useState(null);
   const [selectedSekolah, setSelectedSekolah] = useState(null);
+  const [modalSortConfig, setModalSortConfig] = useState({ key: 'nama_peserta_didik', direction: 'asc' });
+
+  const handleModalSort = (key) => {
+    let direction = 'asc';
+    if (modalSortConfig.key === key && modalSortConfig.direction === 'asc') {
+      direction = 'desc';
+    }
+    setModalSortConfig({ key, direction });
+  };
+
+
 
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 50;
@@ -93,6 +104,24 @@ export default function DataPendidikanPage() {
   }, [kelurahanFilter]);
 
   // Dynamic Filter Options
+  const modalData = useMemo(() => {
+    if (!selectedSekolah) return [];
+    let data = [...filteredData.filter(s => s.nama_sekolah === selectedSekolah)];
+    if (modalSortConfig.key) {
+      data.sort((a, b) => {
+        let valA = a[modalSortConfig.key] || '';
+        let valB = b[modalSortConfig.key] || '';
+        if (typeof valA === 'string') valA = valA.toLowerCase();
+        if (typeof valB === 'string') valB = valB.toLowerCase();
+        
+        if (valA < valB) return modalSortConfig.direction === 'asc' ? -1 : 1;
+        if (valA > valB) return modalSortConfig.direction === 'asc' ? 1 : -1;
+        return 0;
+      });
+    }
+    return data;
+  }, [filteredData, selectedSekolah, modalSortConfig]);
+
   const jenjangOptions = useMemo(() => {
     return Array.from(new Set(allData.map(s => s.jenjang).filter(Boolean))).sort();
   }, [allData]);
@@ -672,6 +701,34 @@ export default function DataPendidikanPage() {
               <h1 style={{ fontSize: '1.8rem', fontWeight: '700', color: '#0f172a', margin: 0 }}>Analisis & Rekapitulasi</h1>
               <p style={{ color: '#64748b', fontSize: '0.95rem', marginTop: '0.25rem', marginBottom: 0 }}>Sistem Informasi Data Siswa (SIDS) - Tomohon</p>
             </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', background: '#f8fafc', padding: '0.5rem 1rem', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+              <label style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: '600' }}>Tahun Ajaran:</label>
+              <select 
+                value={selectedPeriode} 
+                onChange={(e) => setSelectedPeriode(e.target.value)}
+                style={{ 
+                  padding: '0.4rem 2rem 0.4rem 0.5rem', 
+                  borderRadius: '6px', 
+                  border: '1px solid #cbd5e1', 
+                  color: '#0f172a', 
+                  background: 'white', 
+                  fontWeight: 'bold',
+                  fontSize: '0.9rem',
+                  cursor: 'pointer',
+                  appearance: 'none',
+                  backgroundImage: 'url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23334155%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E")',
+                  backgroundRepeat: 'no-repeat',
+                  backgroundPosition: 'right .7rem top 50%',
+                  backgroundSize: '.65rem auto',
+                }}
+              >
+                {periodeOptions.length > 0 ? periodeOptions.map(p => (
+                  <option key={p} value={p}>{p}</option>
+                )) : (
+                  <option value="">- Tidak ada data -</option>
+                )}
+              </select>
+            </div>
           </div>
 
           {/* TABEL REKAPITULASI (EXISTING) */}
@@ -1056,6 +1113,7 @@ export default function DataPendidikanPage() {
                         <th style={{ padding: '1rem', borderBottom: '2px solid #e2e8f0', fontWeight: '600' }}>Agama</th>
                         <th style={{ padding: '1rem', borderBottom: '2px solid #e2e8f0', fontWeight: '600' }}>Umur</th>
                         <th style={{ padding: '1rem', borderBottom: '2px solid #e2e8f0', fontWeight: '600' }}>Kelas</th>
+                        <th style={{ padding: '1rem', borderBottom: '2px solid #e2e8f0', fontWeight: '600' }}>Aksi</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -1068,6 +1126,9 @@ export default function DataPendidikanPage() {
                           <td style={{ padding: '1rem', color: '#64748b', fontSize: '0.85rem', maxWidth: '200px' }}>{Object.entries(d.agama).map(([k,v]) => `${k}:${v}`).join(', ')}</td>
                           <td style={{ padding: '1rem', color: '#64748b', fontSize: '0.85rem', maxWidth: '200px' }}>{Object.entries(d.umur).map(([k,v]) => `${k}:${v}`).join(', ')}</td>
                           <td style={{ padding: '1rem', color: '#64748b', fontSize: '0.85rem', maxWidth: '150px' }}>{Object.entries(d.kelas).map(([k,v]) => `${k}:${v}`).join(', ')}</td>
+                          <td style={{ padding: '1rem' }}>
+                            <button onClick={() => setSelectedSekolah(sekolah)} style={{ background: '#3b82f6', color: 'white', border: 'none', padding: '0.4rem 0.8rem', borderRadius: '6px', cursor: 'pointer', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}><Users size={14}/> Detail</button>
+                          </td>
                         </tr>
                       )) : (
                         <tr>
@@ -1083,6 +1144,63 @@ export default function DataPendidikanPage() {
           </div>
         </div>
       </div>
+
+      {/* MODAL SEKOLAH */}
+      {selectedSekolah && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
+          <div style={{ background: 'white', borderRadius: '12px', width: '100%', maxWidth: '800px', maxHeight: '90vh', display: 'flex', flexDirection: 'column', overflow: 'hidden', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)' }}>
+            
+            <div style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#f8fafc' }}>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '1.25rem', color: '#0f172a' }}>Data Siswa</h3>
+                <p style={{ margin: '0.25rem 0 0 0', color: '#64748b', fontSize: '0.9rem' }}>{selectedSekolah}</p>
+              </div>
+              <button onClick={() => setSelectedSekolah(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b', padding: '0.5rem' }}>
+                <X size={24} />
+              </button>
+            </div>
+            
+            <div style={{ padding: '1.5rem', overflowY: 'auto', flex: 1 }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                <thead style={{ position: 'sticky', top: 0, background: 'white', zIndex: 1 }}>
+                  <tr>
+                    <th style={{ padding: '0.75rem', borderBottom: '2px solid #e2e8f0', color: '#475569', fontWeight: '600' }}>No</th>
+                    <th onClick={() => handleModalSort('nisn')} style={{ padding: '0.75rem', borderBottom: '2px solid #e2e8f0', color: '#475569', fontWeight: '600', cursor: 'pointer' }}>
+                      NISN {modalSortConfig.key === 'nisn' ? (modalSortConfig.direction === 'asc' ? '↑' : '↓') : ''}
+                    </th>
+                    <th onClick={() => handleModalSort('nama_peserta_didik')} style={{ padding: '0.75rem', borderBottom: '2px solid #e2e8f0', color: '#475569', fontWeight: '600', cursor: 'pointer' }}>
+                      Nama {modalSortConfig.key === 'nama_peserta_didik' ? (modalSortConfig.direction === 'asc' ? '↑' : '↓') : ''}
+                    </th>
+                    <th onClick={() => handleModalSort('jenis_kelamin')} style={{ padding: '0.75rem', borderBottom: '2px solid #e2e8f0', color: '#475569', fontWeight: '600', cursor: 'pointer' }}>
+                      L/P {modalSortConfig.key === 'jenis_kelamin' ? (modalSortConfig.direction === 'asc' ? '↑' : '↓') : ''}
+                    </th>
+                    <th onClick={() => handleModalSort('kelas')} style={{ padding: '0.75rem', borderBottom: '2px solid #e2e8f0', color: '#475569', fontWeight: '600', cursor: 'pointer' }}>
+                      Kelas {modalSortConfig.key === 'kelas' ? (modalSortConfig.direction === 'asc' ? '↑' : '↓') : ''}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {modalData.length > 0 ? (
+                    modalData.map((s, idx) => (
+                      <tr key={idx} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                        <td style={{ padding: '0.75rem', color: '#64748b' }}>{idx + 1}</td>
+                        <td style={{ padding: '0.75rem', color: '#3b82f6', fontWeight: '500' }}>{s.nisn}</td>
+                        <td style={{ padding: '0.75rem', color: '#334155' }}>{s.nama_peserta_didik}</td>
+                        <td style={{ padding: '0.75rem', color: '#64748b' }}>{s.jenis_kelamin}</td>
+                        <td style={{ padding: '0.75rem', color: '#64748b' }}>{s.kelas}</td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr><td colSpan="5" style={{ padding: '1rem', textAlign: 'center', color: '#64748b' }}>Tidak ada data</td></tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+            
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
