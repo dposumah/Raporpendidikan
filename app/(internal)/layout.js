@@ -1,7 +1,8 @@
 import Link from 'next/link';
-import { Home, Users, BookOpen, Settings } from 'lucide-react';
+import { Home, Users, BookOpen, Settings, School } from 'lucide-react';
 
 export default function InternalLayout({ children }) {
+  
   return (
     <>
       <nav className="navbar" style={{ padding: '0.75rem 2rem', alignItems: 'center' }}>
@@ -16,7 +17,9 @@ export default function InternalLayout({ children }) {
           </div>
         </Link>
         <div className="nav-links">
-          <Link href="/rapor" style={{ display: 'flex', alignItems: 'center' }}><Home size={16} style={{marginRight: '6px'}}/> Dashboard</Link>
+          <Link href="/rapor" style={{ display: 'flex', alignItems: 'center' }}><BookOpen size={16} style={{marginRight: '6px'}}/> Rapor Daerah</Link>
+          <Link href="/rapor-sekolah" style={{ display: 'flex', alignItems: 'center' }}><School size={16} style={{marginRight: '6px'}}/> Capaian Sekolah</Link>
+
           <Link href="/partisipasi" style={{ display: 'flex', alignItems: 'center' }}><Users size={16} style={{marginRight: '6px'}}/> Angka Partisipasi</Link>
           <Link href="/glosarium" style={{ display: 'flex', alignItems: 'center' }}><BookOpen size={16} style={{marginRight: '6px'}}/> Glosarium</Link>
           <Link href="/admin" style={{ display: 'flex', alignItems: 'center' }}><Settings size={16} style={{marginRight: '6px'}}/> Upload (Admin)</Link>
