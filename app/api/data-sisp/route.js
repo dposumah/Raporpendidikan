@@ -8,25 +8,12 @@ export const revalidate = 31536000; // Cache 1 year
 
 export async function GET(request) {
   try {
-    const { data: periodeData } = await supabase
-      .from('periode_aktif')
-      .select('periode')
-      .eq('is_active', true)
-      .single();
-
-    if (!periodeData) {
-      return new Response(JSON.stringify([]), {
-        status: 200,
-        headers: { 'Content-Type': 'application/json' },
-      });
-    }
-
-    const currentPeriode = periodeData.periode;
-
+    // Just fetch all data without strict active periode filtering
+    // because some users might upload to a different periode name.
     const { data, error } = await supabase
       .from('satuan_pendidikan')
       .select('*')
-      .eq('periode', currentPeriode);
+      .order('nama_satuan_pendidikan', { ascending: true });
 
     if (error) {
       console.error('Supabase error:', error);
@@ -36,7 +23,7 @@ export async function GET(request) {
       });
     }
 
-    return new Response(JSON.stringify(data), {
+    return new Response(JSON.stringify(data || []), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });
