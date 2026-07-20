@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { Filter, School, Map as MapIcon, GraduationCap, ArrowRight, Layers, Eye } from 'lucide-react';
+import { Filter, School, Map as MapIcon, GraduationCap, ArrowRight, Layers, Eye, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 
@@ -16,6 +16,11 @@ export default function DashboardSispPage() {
   // Filters
   const [kecamatan, setKecamatan] = useState('');
   const [kelurahan, setKelurahan] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
 
   const [availableFilters, setAvailableFilters] = useState({
     kecamatan: [],
@@ -59,9 +64,32 @@ export default function DashboardSispPage() {
     return data.filter(d => {
       const matchKec = !kecamatan || d.kecamatan === kecamatan;
       const matchKel = !kelurahan || d.kelurahan === kelurahan;
-      return matchKec && matchKel;
+      
+      let matchSearch = true;
+      if (searchQuery) {
+        const q = searchQuery.toLowerCase();
+        const nama = (d.nama_satuan_pendidikan || '').toLowerCase();
+        const npsn = (d.npsn || '').toLowerCase();
+        if (!nama.includes(q) && !npsn.includes(q)) {
+          matchSearch = false;
+        }
+      }
+      
+      return matchKec && matchKel && matchSearch;
     });
-  }, [data, kecamatan, kelurahan]);
+  }, [data, kecamatan, kelurahan, searchQuery]);
+
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [kecamatan, kelurahan, searchQuery]);
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage) || 1;
+  const paginatedData = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return filteredData.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredData, currentPage]);
 
   // Aggregate stats
   const totalSekolah = filteredData.length;
@@ -177,8 +205,18 @@ export default function DashboardSispPage() {
 
           {/* TABLE */}
           <div style={{ backgroundColor: 'white', borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', overflow: 'hidden' }}>
-            <div style={{ padding: '1.5rem', borderBottom: '1px solid #e2e8f0' }}>
+            <div style={{ padding: '1.5rem', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
               <h3 style={{ margin: 0, color: '#0f172a', fontSize: '1.1rem', fontWeight: 'bold' }}>Daftar Satuan Pendidikan</h3>
+              <div style={{ position: 'relative', width: '300px' }}>
+                <Search size={18} color="#64748b" style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)' }} />
+                <input 
+                  type="text" 
+                  placeholder="Cari NPSN atau Nama Sekolah..." 
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  style={{ width: '100%', padding: '0.6rem 1rem 0.6rem 2.5rem', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none', fontSize: '0.9rem' }}
+                />
+              </div>
             </div>
             <div style={{ overflowX: 'auto' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
@@ -191,7 +229,7 @@ export default function DashboardSispPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredData.slice(0, 100).map((sekolah, index) => (
+                  {paginatedData.map((sekolah, index) => (
                     <tr key={index} style={{ borderBottom: '1px solid #e2e8f0', transition: 'background 0.2s' }} onMouseEnter={e => e.currentTarget.style.backgroundColor = '#f8fafc'} onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}>
                       <td style={{ padding: '1rem 1.5rem' }}>
                         <div style={{ fontWeight: '600', color: '#0f172a' }}>{sekolah.nama_satuan_pendidikan}</div>
@@ -215,23 +253,44 @@ export default function DashboardSispPage() {
                       </td>
                     </tr>
                   ))}
-                  {filteredData.length > 100 && (
-                    <tr>
-                      <td colSpan="4" style={{ padding: '1.5rem', textAlign: 'center', color: '#64748b', fontSize: '0.9rem' }}>
-                        Menampilkan 100 dari {filteredData.length} sekolah. Gunakan pencarian untuk hasil lebih spesifik.
-                      </td>
-                    </tr>
-                  )}
                   {filteredData.length === 0 && (
                     <tr>
                       <td colSpan="4" style={{ padding: '3rem', textAlign: 'center', color: '#64748b' }}>
-                        Tidak ada sekolah yang cocok dengan filter.
+                        Tidak ada sekolah yang cocok dengan filter atau pencarian.
                       </td>
                     </tr>
                   )}
                 </tbody>
               </table>
             </div>
+            
+            {/* PAGINATION CONTROLS */}
+            {filteredData.length > 0 && (
+              <div style={{ padding: '1rem 1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #e2e8f0', backgroundColor: '#f8fafc' }}>
+                <div style={{ fontSize: '0.85rem', color: '#64748b' }}>
+                  Menampilkan {(currentPage - 1) * itemsPerPage + 1} - {Math.min(currentPage * itemsPerPage, filteredData.length)} dari {filteredData.length} sekolah
+                </div>
+                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                  <button 
+                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                    disabled={currentPage === 1}
+                    style={{ padding: '0.4rem', border: '1px solid #cbd5e1', borderRadius: '6px', backgroundColor: currentPage === 1 ? '#f1f5f9' : 'white', color: currentPage === 1 ? '#94a3b8' : '#334155', cursor: currentPage === 1 ? 'not-allowed' : 'pointer' }}
+                  >
+                    <ChevronLeft size={16} />
+                  </button>
+                  <span style={{ fontSize: '0.85rem', color: '#334155', fontWeight: '500', padding: '0 0.5rem' }}>
+                    Halaman {currentPage} dari {totalPages}
+                  </span>
+                  <button 
+                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                    disabled={currentPage === totalPages}
+                    style={{ padding: '0.4rem', border: '1px solid #cbd5e1', borderRadius: '6px', backgroundColor: currentPage === totalPages ? '#f1f5f9' : 'white', color: currentPage === totalPages ? '#94a3b8' : '#334155', cursor: currentPage === totalPages ? 'not-allowed' : 'pointer' }}
+                  >
+                    <ChevronRight size={16} />
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
 
         </div>
