@@ -346,8 +346,8 @@ export default function DetailSekolahPage() {
                   'kemampuan numerasi', 
                   'karakter', 
                   'iklim inklusivitas', 
-                  'iklim keamanan sekolah', 
-                  'iklim kebhinekaan'
+                  'iklim keamanan', 
+                  'iklim kebinekaan'
                 ];
                 const extracted = [];
 
