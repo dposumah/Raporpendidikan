@@ -20,17 +20,28 @@ export async function POST(req) {
     const worksheet = workbook.Sheets[sheetName];
     const rows = xlsx.utils.sheet_to_json(worksheet, { header: 1 });
     
-    if (rows.length < 4) {
-      return NextResponse.json({ error: 'Format file tidak sesuai. Butuh minimal 4 baris.' }, { status: 400 });
+    let dataStartRow = -1;
+    for (let i = 0; i < Math.min(20, rows.length); i++) {
+      const row = rows[i];
+      if (!row) continue;
+      const col0 = String(row[0] || '').trim();
+      if (/^[0-9]+$/.test(col0) && col0.length >= 6) {
+        dataStartRow = i;
+        break;
+      }
     }
 
-    const row2 = rows[1]; // Sub-headers (misal: "D.18 Kesiapsiagaan Bencana")
-    const row3 = rows[2]; // Tipe kolom (misal: "Label Capaian", "Perubahan Nilai")
+    if (dataStartRow < 2) {
+      return NextResponse.json({ error: 'Format file tidak dikenali. Tidak dapat menemukan baris data NPSN.' }, { status: 400 });
+    }
+
+    const row2 = rows[dataStartRow - 2]; // Sub-headers (misal: "D.18 Kesiapsiagaan Bencana")
+    const row3 = rows[dataStartRow - 1]; // Tipe kolom (misal: "Label Capaian", "Perubahan Nilai")
 
     const parsedData = [];
     
-    // Iterasi dari baris ke-4 (index 3) sampai habis
-    for (let i = 3; i < rows.length; i++) {
+    // Iterasi dari dataStartRow sampai habis
+    for (let i = dataStartRow; i < rows.length; i++) {
       const row = rows[i];
       // Lewati baris kosong atau tanpa NPSN
       if (!row || !row[0] || String(row[0]).trim() === '') continue;
