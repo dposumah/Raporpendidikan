@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { School, ChevronDown, ChevronRight, Users, User, Download, Search } from 'lucide-react';
+import { School, ChevronDown, ChevronRight, Users, User, Download, Search, X, MapPin, GraduationCap, Briefcase, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 
 export default function AnalisisRekapGuruPage() {
   const [data, setData] = useState([]);
@@ -9,8 +9,14 @@ export default function AnalisisRekapGuruPage() {
   
   const [searchQuery, setSearchQuery] = useState('');
   
+  // Sort State
+  const [sortConfig, setSortConfig] = useState({ key: 'totalGuru', direction: 'desc' });
+
   // State for expanded rows (store by school name)
   const [expandedSchools, setExpandedSchools] = useState(new Set());
+
+  // Detail Modal State
+  const [selectedGuru, setSelectedGuru] = useState(null);
 
   useEffect(() => {
     fetchData();
@@ -47,7 +53,22 @@ export default function AnalisisRekapGuruPage() {
       grouped[sekolah].guruList.push(guru);
     });
 
-    let result = Object.values(grouped).sort((a, b) => b.totalGuru - a.totalGuru);
+    let result = Object.values(grouped);
+    
+    // Sort logic
+    if (sortConfig.key) {
+      result.sort((a, b) => {
+        let valA = a[sortConfig.key];
+        let valB = b[sortConfig.key];
+        
+        if (typeof valA === 'string') valA = valA.toLowerCase();
+        if (typeof valB === 'string') valB = valB.toLowerCase();
+        
+        if (valA < valB) return sortConfig.direction === 'asc' ? -1 : 1;
+        if (valA > valB) return sortConfig.direction === 'asc' ? 1 : -1;
+        return 0;
+      });
+    }
     
     // Filter by search query
     if (searchQuery) {
@@ -56,7 +77,20 @@ export default function AnalisisRekapGuruPage() {
     }
     
     return result;
-  }, [data, searchQuery]);
+  }, [data, searchQuery, sortConfig]);
+
+  const requestSort = (key) => {
+    let direction = 'asc';
+    if (sortConfig.key === key && sortConfig.direction === 'asc') {
+      direction = 'desc';
+    }
+    setSortConfig({ key, direction });
+  };
+
+  const getSortIcon = (key) => {
+    if (sortConfig.key !== key) return <ArrowUpDown size={14} color="#94a3b8" />;
+    return sortConfig.direction === 'asc' ? <ArrowUp size={14} color="#4f46e5" /> : <ArrowDown size={14} color="#4f46e5" />;
+  };
 
   const toggleExpand = (sekolahName) => {
     const newSet = new Set(expandedSchools);
@@ -115,10 +149,18 @@ export default function AnalisisRekapGuruPage() {
               <thead>
                 <tr style={{ backgroundColor: '#f1f5f9', borderBottom: '2px solid #e2e8f0' }}>
                   <th style={{ width: '50px', padding: '1rem' }}></th>
-                  <th style={{ padding: '1rem', color: '#475569', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase' }}>Nama Sekolah</th>
-                  <th style={{ padding: '1rem', color: '#475569', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase' }}>Jenjang</th>
-                  <th style={{ padding: '1rem', color: '#475569', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase' }}>Kecamatan</th>
-                  <th style={{ padding: '1rem', color: '#475569', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase', textAlign: 'right' }}>Total Guru</th>
+                  <th onClick={() => requestSort('sekolah')} style={{ padding: '1rem', color: '#475569', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase', cursor: 'pointer', userSelect: 'none' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>Nama Sekolah {getSortIcon('sekolah')}</div>
+                  </th>
+                  <th onClick={() => requestSort('jenjang')} style={{ padding: '1rem', color: '#475569', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase', cursor: 'pointer', userSelect: 'none' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>Jenjang {getSortIcon('jenjang')}</div>
+                  </th>
+                  <th onClick={() => requestSort('kecamatan')} style={{ padding: '1rem', color: '#475569', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase', cursor: 'pointer', userSelect: 'none' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>Kecamatan {getSortIcon('kecamatan')}</div>
+                  </th>
+                  <th onClick={() => requestSort('totalGuru')} style={{ padding: '1rem', color: '#475569', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase', cursor: 'pointer', userSelect: 'none', textAlign: 'right' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '0.5rem' }}>Total Guru {getSortIcon('totalGuru')}</div>
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -154,9 +196,15 @@ export default function AnalisisRekapGuruPage() {
                               <h4 style={{ margin: '0 0 1rem 0', color: '#334155', fontSize: '0.9rem', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                 <Users size={16} /> Daftar Guru ({s.sekolah})
                               </h4>
-                              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '1rem' }}>
+                              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1rem' }}>
                                 {s.guruList.map((g, i) => (
-                                  <div key={i} style={{ backgroundColor: 'white', padding: '1rem', borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
+                                  <div 
+                                    key={i} 
+                                    onClick={() => setSelectedGuru(g)}
+                                    style={{ backgroundColor: 'white', padding: '1rem', borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 1px 2px rgba(0,0,0,0.05)', cursor: 'pointer', transition: 'all 0.2s' }}
+                                    onMouseEnter={e => { e.currentTarget.style.borderColor = '#4f46e5'; e.currentTarget.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)' }}
+                                    onMouseLeave={e => { e.currentTarget.style.borderColor = '#e2e8f0'; e.currentTarget.style.boxShadow = '0 1px 2px rgba(0,0,0,0.05)' }}
+                                  >
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
                                       <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: '#e0e7ff', display: 'flex', justifyContent: 'center', alignItems: 'center', color: '#4f46e5', flexShrink: 0 }}>
                                         <User size={16} />
@@ -168,7 +216,7 @@ export default function AnalisisRekapGuruPage() {
                                     </div>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: '#475569', marginTop: '0.5rem', paddingTop: '0.5rem', borderTop: '1px dashed #cbd5e1' }}>
                                       <span>NUPTK: {g.nuptk || '-'}</span>
-                                      <span>Pendidikan: {g.pendidikan || '-'}</span>
+                                      <span>Pend: {g.pendidikan || '-'}</span>
                                     </div>
                                   </div>
                                 ))}
@@ -192,6 +240,121 @@ export default function AnalisisRekapGuruPage() {
         </div>
 
       </div>
+
+      {/* MODAL DETAIL GURU */}
+      {selectedGuru && (
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 100, padding: '1rem' }}>
+          <div style={{ backgroundColor: 'white', borderRadius: '16px', width: '100%', maxWidth: '800px', maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)' }}>
+            
+            <div style={{ position: 'sticky', top: 0, backgroundColor: 'white', padding: '1.5rem 2rem', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', zIndex: 10 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <div style={{ width: '48px', height: '48px', borderRadius: '50%', backgroundColor: '#e0e7ff', display: 'flex', justifyContent: 'center', alignItems: 'center', color: '#4f46e5' }}>
+                  <User size={24} />
+                </div>
+                <div>
+                  <h2 style={{ margin: 0, fontSize: '1.25rem', color: '#0f172a', fontWeight: 'bold' }}>Profil Guru</h2>
+                  <p style={{ margin: 0, color: '#64748b', fontSize: '0.9rem' }}>Detail Informasi & Kualifikasi</p>
+                </div>
+              </div>
+              <button onClick={() => setSelectedGuru(null)} style={{ background: '#f1f5f9', border: 'none', borderRadius: '50%', width: '36px', height: '36px', display: 'flex', justifyContent: 'center', alignItems: 'center', cursor: 'pointer', color: '#64748b', transition: 'background 0.2s' }} onMouseEnter={e => e.currentTarget.style.backgroundColor = '#e2e8f0'} onMouseLeave={e => e.currentTarget.style.backgroundColor = '#f1f5f9'}>
+                <X size={20} />
+              </button>
+            </div>
+
+            <div style={{ padding: '2rem' }}>
+              {/* Header Info */}
+              <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+                <h1 style={{ margin: '0 0 0.5rem 0', fontSize: '1.75rem', color: '#0f172a', fontWeight: 'bold' }}>{selectedGuru.nama}</h1>
+                <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+                  <span style={{ backgroundColor: '#f1f5f9', padding: '0.25rem 0.75rem', borderRadius: '16px', fontSize: '0.85rem', color: '#475569', fontWeight: '500' }}>
+                    NUPTK: {selectedGuru.nuptk || '-'}
+                  </span>
+                  <span style={{ backgroundColor: '#f1f5f9', padding: '0.25rem 0.75rem', borderRadius: '16px', fontSize: '0.85rem', color: '#475569', fontWeight: '500' }}>
+                    NIK: {selectedGuru.nik?.startsWith('TMP_') ? 'Belum Tersedia' : selectedGuru.nik}
+                  </span>
+                  <span style={{ backgroundColor: '#e0e7ff', padding: '0.25rem 0.75rem', borderRadius: '16px', fontSize: '0.85rem', color: '#4f46e5', fontWeight: '600' }}>
+                    {selectedGuru.status_kepegawaian || 'Status Tidak Diketahui'}
+                  </span>
+                </div>
+              </div>
+
+              {/* Grid Info */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+                
+                {/* Data Pribadi */}
+                <div style={{ backgroundColor: '#f8fafc', padding: '1.5rem', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                  <h3 style={{ margin: '0 0 1rem 0', color: '#0f172a', fontSize: '1.05rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <User size={18} color="#4f46e5" /> Data Pribadi
+                  </h3>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                    <DetailRow label="Jenis Kelamin" value={selectedGuru.jenis_kelamin} />
+                    <DetailRow label="Tempat Lahir" value={selectedGuru.tempat_lahir} />
+                    <DetailRow label="Tanggal Lahir" value={selectedGuru.tanggal_lahir} />
+                    <DetailRow label="Nomor HP" value={selectedGuru.nomor_hp} />
+                    <DetailRow label="Status Tugas" value={selectedGuru.status_tugas} />
+                  </div>
+                </div>
+
+                {/* Data Tugas */}
+                <div style={{ backgroundColor: '#f8fafc', padding: '1.5rem', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                  <h3 style={{ margin: '0 0 1rem 0', color: '#0f172a', fontSize: '1.05rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <MapPin size={18} color="#10b981" /> Lokasi Tugas
+                  </h3>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                    <DetailRow label="Tempat Tugas" value={selectedGuru.tempat_tugas} />
+                    <DetailRow label="Jenjang" value={selectedGuru.jenjang} />
+                    <DetailRow label="NPSN" value={selectedGuru.npsn} />
+                    <DetailRow label="Kecamatan" value={selectedGuru.kecamatan} />
+                    <DetailRow label="Kabupaten/Kota" value={selectedGuru.kabupaten_kota} />
+                  </div>
+                </div>
+
+                {/* Kualifikasi & Sertifikasi */}
+                <div style={{ backgroundColor: '#f8fafc', padding: '1.5rem', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                  <h3 style={{ margin: '0 0 1rem 0', color: '#0f172a', fontSize: '1.05rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <GraduationCap size={18} color="#0ea5e9" /> Pendidikan & Sertifikasi
+                  </h3>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                    <DetailRow label="Pendidikan Terakhir" value={selectedGuru.pendidikan} />
+                    <DetailRow label="Bidang Studi Pendidikan" value={selectedGuru.bidang_studi_pendidikan} />
+                    <DetailRow label="Bidang Studi Sertifikasi" value={selectedGuru.bidang_studi_sertifikasi} />
+                  </div>
+                </div>
+
+                {/* Kepegawaian & Kinerja */}
+                <div style={{ backgroundColor: '#f8fafc', padding: '1.5rem', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                  <h3 style={{ margin: '0 0 1rem 0', color: '#0f172a', fontSize: '1.05rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <Briefcase size={18} color="#f59e0b" /> Jabatan & Kepegawaian
+                  </h3>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                    <DetailRow label="NIP" value={selectedGuru.nip} />
+                    <DetailRow label="Pangkat/Golongan" value={selectedGuru.pangkat_gol} />
+                    <DetailRow label="TMT Pengangkatan" value={selectedGuru.tmt_pengangkatan} />
+                    <DetailRow label="Masa Kerja" value={selectedGuru.masa_kerja_tahun ? `${selectedGuru.masa_kerja_tahun} Tahun ${selectedGuru.masa_kerja_bulan || 0} Bulan` : '-'} />
+                    <DetailRow label="Jenis PTK" value={selectedGuru.jenis_ptk} />
+                    <DetailRow label="Jabatan PTK" value={selectedGuru.jabatan_ptk} />
+                    <DetailRow label="Mata Pelajaran Diajarkan" value={selectedGuru.mata_pelajaran_diajarkan} />
+                    <DetailRow label="Jam Mengajar/Minggu" value={selectedGuru.jam_mengajar_perminggu ? `${selectedGuru.jam_mengajar_perminggu} Jam` : '-'} />
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+        </div>
+      )}
+
+    </div>
+  );
+}
+
+// Helper Component for Details
+function DetailRow({ label, value }) {
+  return (
+    <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px dashed #cbd5e1', paddingBottom: '0.25rem' }}>
+      <span style={{ color: '#64748b', fontSize: '0.85rem' }}>{label}</span>
+      <span style={{ color: '#0f172a', fontSize: '0.85rem', fontWeight: '500', textAlign: 'right', maxWidth: '60%' }}>{value || '-'}</span>
     </div>
   );
 }

@@ -41,9 +41,10 @@ export async function POST(req) {
       let jenjang = '';
       const ttLower = tempatTugas.toLowerCase();
       if (ttLower.includes('sd ') || ttLower.includes('sdn ') || ttLower.includes('sekolah dasar') || ttLower.match(/\bsd\b/)) jenjang = 'SD';
-      else if (ttLower.includes('smp ') || ttLower.includes('smpn ') || ttLower.includes('sekolah menengah pertama') || ttLower.match(/\bsmp\b/)) jenjang = 'SMP';
+      else if (ttLower.includes('smp ') || ttLower.includes('smpn ') || ttLower.includes('smps ') || ttLower.includes('sekolah menengah pertama') || ttLower.match(/\bsmp\b/) || ttLower.match(/\bsmps\b/)) jenjang = 'SMP';
       else if (ttLower.includes('sma ') || ttLower.includes('sman ') || ttLower.includes('smk ') || ttLower.includes('smkn ')) jenjang = 'SMA/SMK';
-      else if (ttLower.includes('tk ') || ttLower.includes('tkn ') || ttLower.includes('paud ') || ttLower.includes('kb ')) jenjang = 'PAUD';
+      else if (ttLower.includes('tk ') || ttLower.includes('tkn ') || ttLower.includes('paud ') || ttLower.includes('kb ') || ttLower.match(/\bsps\b/)) jenjang = 'PAUD';
+      else if (ttLower.includes('pkbm') || ttLower.includes('spnf')) jenjang = 'Kesetaraan';
       else jenjang = 'Lainnya';
 
       return {
