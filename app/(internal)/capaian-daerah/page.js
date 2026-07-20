@@ -238,7 +238,7 @@ export default function CapaianDaerahPage() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               {groupedFilteredData.map((group, idx) => {
                 const { mainData, sub } = group;
-                const { kode, title, label_capaian, nilai_teks } = mainData;
+                const { kode, title, label_capaian, nilai_teks, perbandingan_teks } = mainData;
                 
                 return (
                   <div key={idx} style={{ border: '1px solid #e2e8f0', borderRadius: '8px', overflow: 'hidden', background: 'white', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
@@ -250,13 +250,23 @@ export default function CapaianDaerahPage() {
                           <span style={{ background: '#2563eb', color: 'white', padding: '0.3rem 0.6rem', borderRadius: '6px', fontSize: '0.85rem', fontWeight: 'bold' }}>{kode}</span>
                           <h4 style={{ margin: 0, color: '#0f172a', fontSize: '1.1rem', fontWeight: '700' }}>{title}</h4>
                         </div>
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem', marginTop: '0.75rem' }}>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '2rem', marginTop: '0.75rem' }}>
                           <div style={{ display: 'flex', flexDirection: 'column' }}>
                             <span style={{ color: '#64748b', fontSize: '0.75rem', fontWeight: '600', textTransform: 'uppercase' }}>Nilai / Capaian</span>
                             <div style={{ color: '#1e293b', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: '500' }}>
                               <span>{nilai_teks || '-'}</span>
                             </div>
                           </div>
+                          
+                          {perbandingan_teks && (
+                            <div style={{ display: 'flex', flexDirection: 'column' }}>
+                              <span style={{ color: '#64748b', fontSize: '0.75rem', fontWeight: '600', textTransform: 'uppercase' }}>Perbandingan (Tahun Sebelumnya)</span>
+                              <div style={{ color: perbandingan_teks.toLowerCase().includes('turun') ? '#b91c1c' : (perbandingan_teks.toLowerCase().includes('naik') ? '#15803d' : '#1e293b'), fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.25rem', fontWeight: '500' }}>
+                                {perbandingan_teks.toLowerCase().includes('naik') ? <TrendingUp size={14} /> : (perbandingan_teks.toLowerCase().includes('turun') ? <TrendingDown size={14} /> : <Minus size={14} />)}
+                                <span>{perbandingan_teks}</span>
+                              </div>
+                            </div>
+                          )}
                         </div>
                       </div>
                       
@@ -333,13 +343,23 @@ export default function CapaianDaerahPage() {
                       )}
                     </div>
                     
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', background: '#f1f5f9', padding: '1rem', borderRadius: '6px' }}>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem', background: '#f1f5f9', padding: '1rem', borderRadius: '6px' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', minWidth: '150px' }}>
                         <span style={{ color: '#64748b', fontSize: '0.8rem', fontWeight: '600', textTransform: 'uppercase' }}>Nilai Capaian</span>
                         <div style={{ color: '#0f172a', fontSize: '0.95rem', fontWeight: '600' }}>
                           {sub.nilai_teks || '-'}
                         </div>
                       </div>
+                      
+                      {sub.perbandingan_teks && (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', minWidth: '200px' }}>
+                          <span style={{ color: '#64748b', fontSize: '0.8rem', fontWeight: '600', textTransform: 'uppercase' }}>Perbandingan (Tahun Sebelumnya)</span>
+                          <div style={{ color: sub.perbandingan_teks.toLowerCase().includes('turun') ? '#b91c1c' : (sub.perbandingan_teks.toLowerCase().includes('naik') ? '#15803d' : '#0f172a'), fontSize: '0.95rem', display: 'flex', alignItems: 'center', gap: '0.25rem', fontWeight: '600' }}>
+                            {sub.perbandingan_teks.toLowerCase().includes('naik') ? <TrendingUp size={16} /> : (sub.perbandingan_teks.toLowerCase().includes('turun') ? <TrendingDown size={16} /> : <Minus size={16} />)}
+                            <span>{sub.perbandingan_teks}</span>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}

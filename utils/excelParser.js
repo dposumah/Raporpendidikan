@@ -34,6 +34,7 @@ export function parseExcelData(buffer, defaultTahun) {
       const labelCapaian = row[4];
       const nilaiTeks = row[5] || '';
       const definisiCapaian = row[6] || '';
+      const perbandinganTeks = row[7] || '';
 
       // Ambil kalimat pertama sebagai judul, sisanya sebagai glosarium
       let namaIndikator = namaIndikatorRaw;
@@ -77,7 +78,8 @@ export function parseExcelData(buffer, defaultTahun) {
           label_capaian: labelCapaian,
           nilai_angka: nilaiAngka,
           nilai_teks: nilaiTeks.toString(),
-          definisi_capaian: definisiCapaian
+          definisi_capaian: definisiCapaian,
+          perbandingan_teks: perbandinganTeks ? perbandinganTeks.toString() : null
         });
       }
     }
