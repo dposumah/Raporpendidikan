@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { ArrowLeft, MapPin, Users, UserCheck, School, CheckCircle, Info, Layers, CheckSquare } from 'lucide-react';
 import dynamic from 'next/dynamic';
+import { createClient } from '@/utils/supabase/client';
 
 // Dynamically import the map to prevent SSR issues with leaflet
 const SispMap = dynamic(() => import('../../../../components/SispMap'), { ssr: false, loading: () => <div style={{ height: '300px', display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: '#e2e8f0', borderRadius: '12px' }}>Memuat Peta Lokasi...</div> });
@@ -19,6 +20,8 @@ export default function DetailSekolahPage() {
   const [totalSiswa, setTotalSiswa] = useState(0);
   const [totalGuru, setTotalGuru] = useState(0);
   const [loadingStats, setLoadingStats] = useState(true);
+
+  const supabase = createClient();
 
   useEffect(() => {
     if (npsn) {
@@ -48,27 +51,24 @@ export default function DetailSekolahPage() {
 
   const fetchStats = async (sekolahData) => {
     try {
-      // Fetch SIDS
-      const resSiswa = await fetch('/api/data');
-      const dataSiswa = await resSiswa.ok ? await resSiswa.json() : [];
-      
-      // Fetch SIDG
-      const resGuru = await fetch('/api/data-guru');
-      const dataGuru = await resGuru.ok ? await resGuru.json() : [];
+      // Fetch SIDS Count
+      const { count: countSiswa, error: errSiswa } = await supabase
+        .from('siswa')
+        .select('*', { count: 'exact', head: true })
+        .or(`npsn.eq.${sekolahData.npsn},nama_sekolah.ilike.%${sekolahData.nama_satuan_pendidikan}%`);
+        
+      if (errSiswa) console.error('Error count siswa:', errSiswa);
 
-      // Match logic: Priority NPSN, Fallback Nama Sekolah
-      const matchSiswa = dataSiswa.filter(s => 
-        s.npsn === sekolahData.npsn || 
-        (s.asal_sekolah && s.asal_sekolah.toLowerCase() === sekolahData.nama_satuan_pendidikan.toLowerCase())
-      );
-      
-      const matchGuru = dataGuru.filter(g => 
-        g.npsn === sekolahData.npsn || 
-        (g.tempat_tugas && g.tempat_tugas.toLowerCase() === sekolahData.nama_satuan_pendidikan.toLowerCase())
-      );
+      // Fetch SIDG Count
+      const { count: countGuru, error: errGuru } = await supabase
+        .from('guru')
+        .select('*', { count: 'exact', head: true })
+        .or(`npsn.eq.${sekolahData.npsn},tempat_tugas.ilike.%${sekolahData.nama_satuan_pendidikan}%`);
 
-      setTotalSiswa(matchSiswa.length);
-      setTotalGuru(matchGuru.length);
+      if (errGuru) console.error('Error count guru:', errGuru);
+
+      setTotalSiswa(countSiswa || 0);
+      setTotalGuru(countGuru || 0);
     } catch (error) {
       console.error('Error fetching stats:', error);
     } finally {
