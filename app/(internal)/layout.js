@@ -19,7 +19,7 @@ export default function InternalLayout({ children }) {
         <div className="nav-links">
           <Link href="/rapor" style={{ display: 'flex', alignItems: 'center' }}><BookOpen size={16} style={{marginRight: '6px'}}/> Rapor Daerah</Link>
           <Link href="/rapor-sekolah" style={{ display: 'flex', alignItems: 'center' }}><School size={16} style={{marginRight: '6px'}}/> Capaian Sekolah</Link>
-
+          <Link href="/pembenahan" style={{ display: 'flex', alignItems: 'center' }}><BookOpen size={16} style={{marginRight: '6px'}}/> Referensi Pembenahan</Link>
           <Link href="/partisipasi" style={{ display: 'flex', alignItems: 'center' }}><Users size={16} style={{marginRight: '6px'}}/> Angka Partisipasi</Link>
           <Link href="/glosarium" style={{ display: 'flex', alignItems: 'center' }}><BookOpen size={16} style={{marginRight: '6px'}}/> Glosarium</Link>
           <Link href="/admin" style={{ display: 'flex', alignItems: 'center' }}><Settings size={16} style={{marginRight: '6px'}}/> Upload (Admin)</Link>

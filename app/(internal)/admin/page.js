@@ -13,6 +13,7 @@ export default function AdminPage() {
   const [tahun, setTahun] = useState('2025');
   const [status, setStatus] = useState({ loading: false, error: null, success: null });
   const [sekolahStatus, setSekolahStatus] = useState({ loading: false, error: null, success: null });
+  const [pembenahanStatus, setPembenahanStatus] = useState({ loading: false, error: null, success: null });
 
   // State untuk Input SPM
   const [spmTahun, setSpmTahun] = useState('2025');
@@ -88,6 +89,39 @@ export default function AdminPage() {
       }
     } catch (err) {
       setSekolahStatus({ loading: false, error: 'Terjadi kesalahan jaringan.', success: null });
+    }
+  };
+
+  
+  const handleUploadPembenahan = async (e) => {
+    e.preventDefault();
+    if (!file) {
+      setPembenahanStatus({ ...pembenahanStatus, error: 'Silakan pilih file Excel terlebih dahulu.' });
+      return;
+    }
+
+    setPembenahanStatus({ loading: true, error: null, success: null });
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const response = await fetch('/api/upload-pembenahan', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setPembenahanStatus({ loading: false, error: null, success: data.message });
+        setFile(null); // reset
+        router.refresh();
+      } else {
+        setPembenahanStatus({ loading: false, error: data.error, success: null });
+      }
+    } catch (err) {
+      setPembenahanStatus({ loading: false, error: 'Terjadi kesalahan jaringan.', success: null });
     }
   };
 
@@ -176,6 +210,19 @@ export default function AdminPage() {
           <School size={20} />
           Upload Capaian Sekolah
         </button>
+        <button 
+          onClick={() => setActiveTab('pembenahan')}
+          style={{
+            display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.75rem 1.5rem',
+            border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: '600',
+            backgroundColor: activeTab === 'pembenahan' ? 'var(--primary-color)' : '#f1f5f9',
+            color: activeTab === 'pembenahan' ? 'white' : 'var(--text-main)',
+            transition: 'all 0.2s'
+          }}
+        >
+          <FileText size={20} />
+          Upload Pembenahan
+        </button>
       </div>
 
       {activeTab === 'upload' && (
@@ -232,7 +279,7 @@ export default function AdminPage() {
           <button 
             className="btn btn-primary" 
             style={{ width: '100%' }}
-            onClick={handleUpload}
+            onClick={() => handleUpload(null, '/api/upload')}
             disabled={status.loading}
           >
             {status.loading ? 'Mengunggah dan Memproses...' : 'Upload Data'}
@@ -372,6 +419,46 @@ export default function AdminPage() {
               {spmStatus.loading ? 'Menyimpan...' : 'Simpan Data SPM'}
             </button>
           </form>
+        </div>
+      )}
+
+      {/* UPLOAD PEMBENAHAN */}
+      {activeTab === 'pembenahan' && (
+        <div className="card" style={{ maxWidth: '600px' }}>
+          <h2 style={{ marginBottom: '1.5rem', color: 'var(--primary-color)' }}>Upload Akar Masalah & Pembenahan</h2>
+          <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>
+            Unggah file Excel <b>Akar Masalah dan Pembenahan.xlsx</b>. File ini biasanya berisi referensi kegiatan benahi untuk setiap indikator prioritas dan akar masalah. Data yang lama akan dihapus dan diganti dengan yang baru (Overwrite).
+          </p>
+
+          <form onSubmit={handleUploadPembenahan}>
+            <div className="form-group">
+              <label className="form-label">Pilih File Excel (.xlsx)</label>
+              <input 
+                type="file" 
+                accept=".xlsx, .xls"
+                onChange={(e) => setFile(e.target.files[0])}
+                className="form-input"
+                required
+                style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)' }}
+              />
+            </div>
+
+            <button 
+              type="submit" 
+              disabled={pembenahanStatus.loading}
+              className="btn btn-primary"
+              style={{ width: '100%' }}
+            >
+              {pembenahanStatus.loading ? 'Mengunggah...' : 'Upload Referensi Pembenahan'}
+            </button>
+          </form>
+
+          {(pembenahanStatus.success || pembenahanStatus.error) && (
+            <div style={{ marginTop: '1.5rem', padding: '1rem', backgroundColor: pembenahanStatus.success ? '#f0fdf4' : '#fef2f2', color: pembenahanStatus.success ? '#166534' : '#991b1b', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              {pembenahanStatus.success ? <CheckCircle size={20} /> : <AlertCircle size={20} />}
+              {pembenahanStatus.success || pembenahanStatus.error}
+            </div>
+          )}
         </div>
       )}
 
