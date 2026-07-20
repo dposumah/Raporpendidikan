@@ -151,12 +151,22 @@ export default function AdminSiswaPage() {
             throw new Error("Tidak ada data valid yang ditemukan (Pastikan ada kolom NISN dan NIK).");
           }
 
+          // Deduplicate the data based on NISN and Periode before sending to database.
+          // This prevents the PostgreSQL ON CONFLICT error within the same chunk.
+          const uniqueNisnMap = new Map();
+          formattedData.forEach(row => {
+            const key = `${row.nisn}_${row.periode}`;
+            uniqueNisnMap.set(key, row);
+          });
+          
+          let deduplicatedData = Array.from(uniqueNisnMap.values());
+
           const CHUNK_SIZE = 1000;
           let successCount = 0;
           
-          for (let i = 0; i < formattedData.length; i += CHUNK_SIZE) {
-            const chunk = formattedData.slice(i, i + CHUNK_SIZE);
-            setMessage(`Memproses data: ${Math.min(i + CHUNK_SIZE, formattedData.length)} dari ${formattedData.length} baris...`);
+          for (let i = 0; i < deduplicatedData.length; i += CHUNK_SIZE) {
+            const chunk = deduplicatedData.slice(i, i + CHUNK_SIZE);
+            setMessage(`Memproses data: ${Math.min(i + CHUNK_SIZE, deduplicatedData.length)} dari ${deduplicatedData.length} baris...`);
             
             const { error: dbError } = await supabase
               .from('siswa')
