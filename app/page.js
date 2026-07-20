@@ -37,7 +37,7 @@ export default function PortalPage() {
       </div>
 
       {/* Cards section */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '2rem', width: '100%', maxWidth: '900px', zIndex: 1, animation: 'fadeInUp 0.8s ease-out 0.2s backwards' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '2rem', width: '100%', maxWidth: '1200px', zIndex: 1, animation: 'fadeInUp 0.8s ease-out 0.2s backwards' }}>
         
         {/* Card 1: Rapor Pendidikan */}
         <Link href="/rapor" style={{ textDecoration: 'none' }}>
@@ -128,6 +128,50 @@ export default function PortalPage() {
           </div>
         </Link>
 
+        {/* Card 3: Data Guru */}
+        <Link href="/dashboard-guru" style={{ textDecoration: 'none' }}>
+          <div 
+            style={{
+              background: 'rgba(255, 255, 255, 0.03)',
+              backdropFilter: 'blur(16px)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              borderRadius: '16px',
+              padding: '2.5rem 2rem',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              textAlign: 'center',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease',
+              height: '100%',
+              boxShadow: '0 10px 30px rgba(0,0,0,0.2)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-8px)';
+              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)';
+              e.currentTarget.style.borderColor = 'rgba(16, 185, 129, 0.5)';
+              e.currentTarget.style.boxShadow = '0 20px 40px rgba(0,0,0,0.4)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.03)';
+              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+              e.currentTarget.style.boxShadow = '0 10px 30px rgba(0,0,0,0.2)';
+            }}
+          >
+            <div style={{ background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', padding: '1.2rem', borderRadius: '50%', marginBottom: '1.5rem', boxShadow: '0 4px 15px rgba(16,185,129,0.4)' }}>
+              <Database size={40} color="white" />
+            </div>
+            <h3 style={{ fontSize: '1.5rem', fontWeight: '600', color: 'white', marginBottom: '0.75rem' }}>Data Guru (SIDG)</h3>
+            <p style={{ color: '#94a3b8', fontSize: '0.95rem', lineHeight: '1.5', marginBottom: '2rem' }}>
+              Pusat Informasi Data Guru dan Tenaga Kependidikan untuk analisis sebaran dan kualifikasi guru.
+            </p>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#34d399', fontWeight: '600', fontSize: '1rem', marginTop: 'auto' }}>
+              Akses SIDG <ChevronRight size={18} />
+            </div>
+          </div>
+        </Link>
       </div>
 
       {/* Footer */}
