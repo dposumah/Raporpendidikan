@@ -16,9 +16,9 @@ export default function DetailSekolahPage() {
   const [sekolah, setSekolah] = useState(null);
   const [loading, setLoading] = useState(true);
   
-  // Aggregate Stats
   const [totalSiswa, setTotalSiswa] = useState(0);
   const [totalGuru, setTotalGuru] = useState(0);
+  const [totalRombelCalc, setTotalRombelCalc] = useState(0);
   const [kepalaSekolah, setKepalaSekolah] = useState('-');
   const [raporSekolah, setRaporSekolah] = useState(null);
   const [loadingStats, setLoadingStats] = useState(true);
@@ -26,6 +26,8 @@ export default function DetailSekolahPage() {
   // Guru Detail State
   const [daftarGuru, setDaftarGuru] = useState([]);
   const [showGuruModal, setShowGuruModal] = useState(false);
+  const [daftarRombel, setDaftarRombel] = useState([]);
+  const [showRombelModal, setShowRombelModal] = useState(false);
 
   const supabase = createClient();
 
@@ -57,13 +59,23 @@ export default function DetailSekolahPage() {
 
   const fetchStats = async (sekolahData) => {
     try {
-      // Fetch SIDS Count
-      const { count: countSiswa, error: errSiswa } = await supabase
+      // Fetch SIDS Count & Rombel Data
+      const { data: dataSiswa, count: countSiswa, error: errSiswa } = await supabase
         .from('siswa')
-        .select('*', { count: 'exact', head: true })
+        .select('nama_rombel', { count: 'exact' })
         .or(`npsn.eq.${sekolahData.npsn},nama_sekolah.ilike.%${sekolahData.nama_satuan_pendidikan}%`);
         
       if (errSiswa) console.error('Error count siswa:', errSiswa);
+
+      let rombels = [];
+      if (dataSiswa) {
+        const rMap = {};
+        dataSiswa.forEach(s => {
+          const r = s.nama_rombel || 'Tanpa Rombel';
+          rMap[r] = (rMap[r] || 0) + 1;
+        });
+        rombels = Object.entries(rMap).map(([nama, jumlah]) => ({ nama, jumlah })).sort((a,b) => a.nama.localeCompare(b.nama));
+      }
 
       // Fetch SIDG Count & Data
       const { data: dataGuru, count: countGuru, error: errGuru } = await supabase
@@ -89,7 +101,9 @@ export default function DetailSekolahPage() {
 
       setTotalSiswa(countSiswa || 0);
       setTotalGuru(countGuru || 0);
+      setTotalRombelCalc(rombels.length);
       setDaftarGuru(dataGuru || []);
+      setDaftarRombel(rombels);
       setKepalaSekolah(kepsek);
       setRaporSekolah(dataRapor || null);
     } catch (error) {
@@ -188,6 +202,30 @@ export default function DetailSekolahPage() {
               <div style={{ backgroundColor: '#dcfce7', padding: '0.75rem', borderRadius: '12px', color: '#10b981' }}><Users size={28} /></div>
             </div>
             <p style={{ margin: '1rem 0 0 0', fontSize: '0.8rem', color: '#94a3b8' }}>*Data diambil sinkron dari modul SIDS berdasarkan NPSN</p>
+          </div>
+
+          <div style={{ backgroundColor: 'white', padding: '1.5rem', borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', borderLeft: '4px solid #f59e0b' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+              <div>
+                <p style={{ margin: 0, color: '#64748b', fontSize: '0.85rem', fontWeight: '600', textTransform: 'uppercase' }}>Total Rombel</p>
+                {loadingStats ? (
+                  <div className="animate-pulse" style={{ height: '36px', width: '100px', backgroundColor: '#e2e8f0', borderRadius: '4px', marginTop: '0.5rem' }}></div>
+                ) : (
+                  <h3 style={{ margin: '0.5rem 0 0 0', color: '#0f172a', fontSize: '2rem', fontWeight: 'bold' }}>{totalRombelCalc.toLocaleString()} <span style={{fontSize:'1rem', color:'#64748b', fontWeight:'normal'}}>Rombel</span></h3>
+                )}
+              </div>
+              <div style={{ backgroundColor: '#fef3c7', padding: '0.75rem', borderRadius: '12px', color: '#f59e0b' }}><Layers size={28} /></div>
+            </div>
+            
+            <button 
+              onClick={() => setShowRombelModal(true)}
+              style={{ marginTop: '1rem', padding: '0.5rem 1rem', background: '#fef3c7', color: '#d97706', border: '1px solid #fde68a', borderRadius: '8px', fontSize: '0.85rem', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', transition: 'background 0.2s' }}
+              onMouseEnter={e => e.currentTarget.style.background = '#fde68a'}
+              onMouseLeave={e => e.currentTarget.style.background = '#fef3c7'}
+            >
+              Lihat Daftar Rombel
+            </button>
+            <p style={{ margin: '1rem 0 0 0', fontSize: '0.8rem', color: '#94a3b8' }}>*Data rombel aktif berdasarkan peserta didik (SIDS)</p>
           </div>
 
           <div style={{ backgroundColor: 'white', padding: '1.5rem', borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', borderLeft: '4px solid #4f46e5' }}>
@@ -303,15 +341,25 @@ export default function DetailSekolahPage() {
           ) : raporSekolah && raporSekolah.indikator ? (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
               {(() => {
-                const targetIndicators = ['literasi', 'numerasi', 'karakter', 'inklusivitas', 'keamanan', 'kebhinekaan'];
+                const targetIndicators = [
+                  'kemampuan literasi', 
+                  'kemampuan numerasi', 
+                  'karakter', 
+                  'iklim inklusivitas', 
+                  'iklim keamanan sekolah', 
+                  'iklim kebhinekaan'
+                ];
                 const extracted = [];
 
                 Object.entries(raporSekolah.indikator).forEach(([key, fields]) => {
                   const lowerKey = key.toLowerCase();
-                  if (targetIndicators.some(ti => lowerKey.includes(ti)) && !lowerKey.includes('kesenjangan') && !lowerKey.includes('proporsi') && key.match(/^[A-Z]\.\d+(?:\s|$)/)) {
-                    extracted.push({ key, fields });
+                  const matchedIndex = targetIndicators.findIndex(ti => lowerKey.includes(ti));
+                  if (matchedIndex !== -1 && !lowerKey.includes('kesenjangan') && !lowerKey.includes('proporsi') && key.match(/^[A-Z]\.\d+(?:\s|$)/)) {
+                    extracted.push({ key, fields, order: matchedIndex });
                   }
                 });
+                
+                extracted.sort((a, b) => a.order - b.order);
 
                 if (extracted.length === 0) {
                   return <p style={{ color: '#64748b' }}>Data indikator utama tidak tersedia dalam rapor ini.</p>;
@@ -356,6 +404,50 @@ export default function DetailSekolahPage() {
         </div>
 
       </div>
+
+      {/* MODAL DAFTAR ROMBEL */}
+      {showRombelModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(15, 23, 42, 0.6)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999, padding: '1rem' }}>
+          <div style={{ backgroundColor: 'white', borderRadius: '16px', width: '100%', maxWidth: '600px', maxHeight: '85vh', display: 'flex', flexDirection: 'column', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)' }}>
+            <div style={{ padding: '1.5rem', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 'bold', color: '#0f172a' }}>Data Rombel & Jumlah Siswa</h3>
+                <p style={{ margin: '0.25rem 0 0 0', color: '#64748b', fontSize: '0.9rem' }}>{sekolah.nama_satuan_pendidikan}</p>
+              </div>
+              <button 
+                onClick={() => setShowRombelModal(false)}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8', padding: '0.5rem' }}
+                onMouseEnter={e => e.currentTarget.style.color = '#0f172a'}
+                onMouseLeave={e => e.currentTarget.style.color = '#94a3b8'}
+              >
+                <X size={24} />
+              </button>
+            </div>
+            
+            <div style={{ padding: '1.5rem', overflowY: 'auto', flex: 1 }}>
+              {daftarRombel.length === 0 ? (
+                <div style={{ textAlign: 'center', color: '#64748b', padding: '2rem' }}>Tidak ada data rombel yang ditemukan.</div>
+              ) : (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1rem' }}>
+                  {daftarRombel.map((rombel, i) => (
+                    <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem', border: '1px solid #e2e8f0', borderRadius: '12px', background: '#f8fafc' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                        <div style={{ width: '36px', height: '36px', borderRadius: '8px', background: '#fef3c7', color: '#f59e0b', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                          <Layers size={18} />
+                        </div>
+                        <h4 style={{ margin: 0, fontSize: '1rem', fontWeight: '600', color: '#0f172a' }}>{rombel.nama}</h4>
+                      </div>
+                      <div style={{ background: '#e0f2fe', color: '#0284c7', padding: '0.25rem 0.75rem', borderRadius: '16px', fontSize: '0.85rem', fontWeight: 'bold' }}>
+                        {rombel.jumlah} Siswa
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* MODAL DAFTAR GURU */}
       {showGuruModal && (
