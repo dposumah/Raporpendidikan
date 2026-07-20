@@ -145,10 +145,20 @@ export default function AdminSiswaPage() {
               lingkar_kepala: getVal(['lingkar kepala']),
               jumlah_saudara_kandung: getVal(['jumlah saudara kandung'])
             };
-          }).filter(row => row.nisn && row.nik);
+          }).filter(row => row.nama_peserta_didik); // Hanya wajibkan nama agar siswa tanpa NIK/NISN tidak terbuang
+
+          // Berikan fallback untuk NISN dan NIK yang kosong
+          formattedData.forEach(row => {
+            if (!row.nisn || String(row.nisn).trim() === '') {
+              row.nisn = (row.nik && String(row.nik).trim() !== '') ? row.nik : `TMP_${row.nama_peserta_didik.replace(/\s+/g, '')}_${row.tanggal_lahir || ''}`;
+            }
+            if (!row.nik || String(row.nik).trim() === '') {
+              row.nik = row.nisn; // Samakan agar tidak null
+            }
+          });
 
           if (formattedData.length === 0) {
-            throw new Error("Tidak ada data valid yang ditemukan (Pastikan ada kolom NISN dan NIK).");
+            throw new Error("Tidak ada data valid yang ditemukan (Pastikan ada kolom Nama Peserta Didik).");
           }
 
           // Deduplicate the data based on NISN and Periode before sending to database.
