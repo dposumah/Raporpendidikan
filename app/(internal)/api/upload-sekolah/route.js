@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@/utils/supabase/server';
+import { supabase } from '@/utils/supabase';
 import * as xlsx from 'xlsx';
 
 export async function POST(req) {
@@ -82,8 +82,6 @@ export async function POST(req) {
     });
     
     const deduplicatedData = Array.from(uniqueDataMap.values());
-
-    const supabase = createClient();
     
     // Chunking karena row bisa ribuan, Supabase max 1000 per insert (lebih aman 200 jika payload JSON besar)
     const CHUNK_SIZE = 200;
