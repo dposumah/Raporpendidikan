@@ -216,6 +216,12 @@ export default function PembenahanPage() {
                             <strong>Mengapa menjadi akar masalah?</strong><br/>
                             {item.mengapa_akar_masalah}
                           </div>
+                          {item.deskripsi_sumber_data && (
+                            <div style={{ background: '#fff1f2', padding: '0.75rem', borderRadius: '6px', fontSize: '0.85rem', color: '#9f1239', marginTop: '0.5rem', border: '1px dashed #fecdd3' }}>
+                              <strong>Deskripsi Sumber Data:</strong><br/>
+                              {item.deskripsi_sumber_data}
+                            </div>
+                          )}
                         </div>
                       </div>
 
