@@ -50,6 +50,28 @@ export default function SidgLayout({ children }) {
             }} onMouseEnter={e => e.currentTarget.style.borderBottomColor = '#38bdf8'} onMouseLeave={e => e.currentTarget.style.borderBottomColor = 'transparent'}>
               Dashboard Guru
             </Link>
+            <Link href="/pencarian-guru" style={{
+              color: 'white',
+              textDecoration: 'none',
+              fontSize: '0.95rem',
+              fontWeight: '500',
+              padding: '0.5rem',
+              borderBottom: '2px solid transparent',
+              transition: 'all 0.2s'
+            }} onMouseEnter={e => e.currentTarget.style.borderBottomColor = '#38bdf8'} onMouseLeave={e => e.currentTarget.style.borderBottomColor = 'transparent'}>
+              Pencarian Guru
+            </Link>
+            <Link href="/analisis-rekap-guru" style={{
+              color: 'white',
+              textDecoration: 'none',
+              fontSize: '0.95rem',
+              fontWeight: '500',
+              padding: '0.5rem',
+              borderBottom: '2px solid transparent',
+              transition: 'all 0.2s'
+            }} onMouseEnter={e => e.currentTarget.style.borderBottomColor = '#38bdf8'} onMouseLeave={e => e.currentTarget.style.borderBottomColor = 'transparent'}>
+              Tabel Rekapitulasi
+            </Link>
             <Link href="/admin-guru" style={{
               color: 'white',
               textDecoration: 'none',
