@@ -164,8 +164,16 @@ export default function AdminSiswaPage() {
           // Deduplicate the data based on NISN and Periode before sending to database.
           // This prevents the PostgreSQL ON CONFLICT error within the same chunk.
           const uniqueNisnMap = new Map();
+          let duplicateCount = 0;
+
           formattedData.forEach(row => {
-            const key = `${row.nisn}_${row.periode}`;
+            let key = `${row.nisn}_${row.periode}`;
+            if (uniqueNisnMap.has(key)) {
+              duplicateCount++;
+              // Jika ada NISN ganda, tambahkan suffix agar tidak tertimpa/hilang
+              row.nisn = `${row.nisn}_DUP_${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
+              key = `${row.nisn}_${row.periode}`;
+            }
             uniqueNisnMap.set(key, row);
           });
           
@@ -189,7 +197,11 @@ export default function AdminSiswaPage() {
             successCount += chunk.length;
           }
 
-          setMessage(`✅ Berhasil menyimpan total ${successCount} data siswa untuk periode ${periode}!`);
+          let successMessage = `✅ Berhasil menyimpan total ${successCount} data siswa untuk periode ${periode}!`;
+          if (duplicateCount > 0) {
+            successMessage += ` (Ditemukan ${duplicateCount} data dengan NISN/Nama ganda. Sistem telah mengamankan data tersebut agar tetap tersimpan tanpa mengurangi total baris).`;
+          }
+          setMessage(successMessage);
         } catch (err) {
           setError(err.message || 'Gagal memproses file Excel.');
         } finally {
