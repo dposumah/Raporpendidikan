@@ -141,39 +141,39 @@ export default function DashboardSispPage() {
             <p style={{ margin: '0.25rem 0 0 0', color: '#64748b', fontSize: '0.95rem' }}>Peta persebaran dan daftar sekolah</p>
           </div>
 
-          {/* DYNAMIC CARDS */}
+          {/* DYNAMIC CARDS - SUMMARY */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
             <div style={{ backgroundColor: 'white', padding: '1.5rem', borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', borderLeft: '4px solid #4f46e5' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <div>
-                  <p style={{ margin: 0, color: '#64748b', fontSize: '0.85rem', fontWeight: '600', textTransform: 'uppercase' }}>Total Sekolah</p>
-                  <h3 style={{ margin: '0.5rem 0 0 0', color: '#0f172a', fontSize: '1.8rem', fontWeight: 'bold' }}>{totalSekolah.toLocaleString()}</h3>
+                  <p style={{ margin: 0, color: '#64748b', fontSize: '0.85rem', fontWeight: '600', textTransform: 'uppercase' }}>Total Sekolah Terdaftar</p>
+                  <h3 style={{ margin: '0.5rem 0 0 0', color: '#0f172a', fontSize: '2rem', fontWeight: 'bold' }}>{totalSekolah.toLocaleString()}</h3>
                 </div>
-                <div style={{ backgroundColor: '#e0e7ff', padding: '0.6rem', borderRadius: '8px', color: '#4f46e5' }}><School size={24} /></div>
+                <div style={{ backgroundColor: '#e0e7ff', padding: '0.6rem', borderRadius: '8px', color: '#4f46e5' }}><School size={28} /></div>
               </div>
             </div>
+          </div>
 
-            <div style={{ backgroundColor: 'white', padding: '1.5rem', borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', borderLeft: '4px solid #10b981' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                <div>
-                  <p style={{ margin: 0, color: '#64748b', fontSize: '0.85rem', fontWeight: '600', textTransform: 'uppercase' }}>Status Dominan</p>
-                  <h3 style={{ margin: '0.5rem 0 0.25rem 0', color: '#0f172a', fontSize: '1.5rem', fontWeight: 'bold' }}>{dominantStatus[0]}</h3>
-                  <span style={{ color: '#64748b', fontSize: '0.85rem' }}>{dominantStatus[1]} Sekolah</span>
-                </div>
-                <div style={{ backgroundColor: '#dcfce7', padding: '0.6rem', borderRadius: '8px', color: '#10b981' }}><MapIcon size={24} /></div>
+          {/* DYNAMIC CARDS - STATUS SEKOLAH */}
+          <h3 style={{ margin: '0 0 1rem 0', color: '#334155', fontSize: '1.1rem', fontWeight: 'bold' }}>Berdasarkan Status Sekolah</h3>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
+            {Object.entries(statusCounts).sort((a, b) => b[1] - a[1]).map(([status, count]) => (
+              <div key={status} style={{ backgroundColor: 'white', padding: '1.25rem', borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', borderLeft: '4px solid #10b981' }}>
+                <p style={{ margin: 0, color: '#64748b', fontSize: '0.8rem', fontWeight: '600', textTransform: 'uppercase' }}>{status || 'Tanpa Status'}</p>
+                <h3 style={{ margin: '0.5rem 0 0 0', color: '#0f172a', fontSize: '1.5rem', fontWeight: 'bold' }}>{count.toLocaleString()}</h3>
               </div>
-            </div>
+            ))}
+          </div>
 
-            <div style={{ backgroundColor: 'white', padding: '1.5rem', borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', borderLeft: '4px solid #f59e0b' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                <div>
-                  <p style={{ margin: 0, color: '#64748b', fontSize: '0.85rem', fontWeight: '600', textTransform: 'uppercase' }}>Bentuk Pend. Terbanyak</p>
-                  <h3 style={{ margin: '0.5rem 0 0.25rem 0', color: '#0f172a', fontSize: '1.5rem', fontWeight: 'bold' }}>{dominantBentuk[0]}</h3>
-                  <span style={{ color: '#64748b', fontSize: '0.85rem' }}>{dominantBentuk[1]} Sekolah</span>
-                </div>
-                <div style={{ backgroundColor: '#fef3c7', padding: '0.6rem', borderRadius: '8px', color: '#f59e0b' }}><GraduationCap size={24} /></div>
+          {/* DYNAMIC CARDS - BENTUK PENDIDIKAN */}
+          <h3 style={{ margin: '0 0 1rem 0', color: '#334155', fontSize: '1.1rem', fontWeight: 'bold' }}>Berdasarkan Bentuk Pendidikan</h3>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
+            {Object.entries(bentukCounts).sort((a, b) => b[1] - a[1]).map(([bentuk, count]) => (
+              <div key={bentuk} style={{ backgroundColor: 'white', padding: '1.25rem', borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', borderLeft: '4px solid #f59e0b' }}>
+                <p style={{ margin: 0, color: '#64748b', fontSize: '0.8rem', fontWeight: '600', textTransform: 'uppercase' }}>{bentuk || 'Tanpa Bentuk'}</p>
+                <h3 style={{ margin: '0.5rem 0 0 0', color: '#0f172a', fontSize: '1.5rem', fontWeight: 'bold' }}>{count.toLocaleString()}</h3>
               </div>
-            </div>
+            ))}
           </div>
 
           {/* MAP */}

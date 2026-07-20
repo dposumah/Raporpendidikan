@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { ArrowLeft, MapPin, Users, UserCheck, School, CheckCircle, Info, Layers, CheckSquare } from 'lucide-react';
+import { ArrowLeft, MapPin, Users, UserCheck, School, CheckCircle, Info, Layers, CheckSquare, X, Briefcase } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { createClient } from '@/utils/supabase/client';
 
@@ -20,6 +20,10 @@ export default function DetailSekolahPage() {
   const [totalSiswa, setTotalSiswa] = useState(0);
   const [totalGuru, setTotalGuru] = useState(0);
   const [loadingStats, setLoadingStats] = useState(true);
+
+  // Guru Detail State
+  const [daftarGuru, setDaftarGuru] = useState([]);
+  const [showGuruModal, setShowGuruModal] = useState(false);
 
   const supabase = createClient();
 
@@ -59,16 +63,18 @@ export default function DetailSekolahPage() {
         
       if (errSiswa) console.error('Error count siswa:', errSiswa);
 
-      // Fetch SIDG Count
-      const { count: countGuru, error: errGuru } = await supabase
+      // Fetch SIDG Count & Data
+      const { data: dataGuru, count: countGuru, error: errGuru } = await supabase
         .from('guru')
-        .select('*', { count: 'exact', head: true })
-        .or(`npsn.eq.${sekolahData.npsn},tempat_tugas.ilike.%${sekolahData.nama_satuan_pendidikan}%`);
+        .select('nama, jabatan_ptk', { count: 'exact' })
+        .or(`npsn.eq.${sekolahData.npsn},tempat_tugas.ilike.%${sekolahData.nama_satuan_pendidikan}%`)
+        .order('nama', { ascending: true });
 
       if (errGuru) console.error('Error count guru:', errGuru);
 
       setTotalSiswa(countSiswa || 0);
       setTotalGuru(countGuru || 0);
+      setDaftarGuru(dataGuru || []);
     } catch (error) {
       console.error('Error fetching stats:', error);
     } finally {
@@ -169,6 +175,15 @@ export default function DetailSekolahPage() {
               </div>
               <div style={{ backgroundColor: '#e0e7ff', padding: '0.75rem', borderRadius: '12px', color: '#4f46e5' }}><UserCheck size={28} /></div>
             </div>
+            
+            <button 
+              onClick={() => setShowGuruModal(true)}
+              style={{ marginTop: '1rem', padding: '0.5rem 1rem', background: '#e0e7ff', color: '#4f46e5', border: '1px solid #c7d2fe', borderRadius: '8px', fontSize: '0.85rem', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', transition: 'background 0.2s' }}
+              onMouseEnter={e => e.currentTarget.style.background = '#c7d2fe'}
+              onMouseLeave={e => e.currentTarget.style.background = '#e0e7ff'}
+            >
+              Lihat Daftar Guru
+            </button>
             <p style={{ margin: '1rem 0 0 0', fontSize: '0.8rem', color: '#94a3b8' }}>*Data diambil sinkron dari modul SIDG berdasarkan NPSN</p>
           </div>
 
@@ -242,6 +257,52 @@ export default function DetailSekolahPage() {
         </div>
 
       </div>
+
+      {/* MODAL DAFTAR GURU */}
+      {showGuruModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(15, 23, 42, 0.6)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999, padding: '1rem' }}>
+          <div style={{ backgroundColor: 'white', borderRadius: '16px', width: '100%', maxWidth: '600px', maxHeight: '85vh', display: 'flex', flexDirection: 'column', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)' }}>
+            <div style={{ padding: '1.5rem', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 'bold', color: '#0f172a' }}>Daftar Guru Bertugas</h3>
+                <p style={{ margin: '0.25rem 0 0 0', color: '#64748b', fontSize: '0.9rem' }}>{sekolah.nama_satuan_pendidikan}</p>
+              </div>
+              <button 
+                onClick={() => setShowGuruModal(false)}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8', padding: '0.5rem' }}
+                onMouseEnter={e => e.currentTarget.style.color = '#0f172a'}
+                onMouseLeave={e => e.currentTarget.style.color = '#94a3b8'}
+              >
+                <X size={24} />
+              </button>
+            </div>
+            
+            <div style={{ padding: '1.5rem', overflowY: 'auto', flex: 1 }}>
+              {daftarGuru.length === 0 ? (
+                <div style={{ textAlign: 'center', color: '#64748b', padding: '2rem' }}>Tidak ada data guru yang ditemukan untuk sekolah ini.</div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                  {daftarGuru.map((guru, i) => (
+                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1rem', border: '1px solid #e2e8f0', borderRadius: '12px', background: '#f8fafc' }}>
+                      <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#e0e7ff', color: '#4f46e5', display: 'flex', justifyContent: 'center', alignItems: 'center', fontWeight: 'bold', flexShrink: 0 }}>
+                        {guru.nama ? guru.nama.charAt(0).toUpperCase() : '?'}
+                      </div>
+                      <div>
+                        <h4 style={{ margin: 0, fontSize: '1rem', fontWeight: '600', color: '#0f172a' }}>{guru.nama || '-'}</h4>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.25rem', color: '#64748b', fontSize: '0.85rem' }}>
+                          <Briefcase size={14} />
+                          <span>{guru.jabatan_ptk || 'Tidak ada jabatan'}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
