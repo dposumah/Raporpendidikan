@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { ArrowLeft, MapPin, Users, UserCheck, School, CheckCircle, Info, Layers, CheckSquare, X, Briefcase } from 'lucide-react';
+import { ArrowLeft, MapPin, Users, UserCheck, School, CheckCircle, Info, Layers, CheckSquare, X, Briefcase, Activity, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { createClient } from '@/utils/supabase/client';
 
@@ -19,6 +19,8 @@ export default function DetailSekolahPage() {
   // Aggregate Stats
   const [totalSiswa, setTotalSiswa] = useState(0);
   const [totalGuru, setTotalGuru] = useState(0);
+  const [kepalaSekolah, setKepalaSekolah] = useState('-');
+  const [raporSekolah, setRaporSekolah] = useState(null);
   const [loadingStats, setLoadingStats] = useState(true);
 
   // Guru Detail State
@@ -72,9 +74,24 @@ export default function DetailSekolahPage() {
 
       if (errGuru) console.error('Error count guru:', errGuru);
 
+      const kepsek = dataGuru?.find(g => g.jabatan_ptk?.toLowerCase().includes('kepala sekolah'))?.nama || '-';
+
+      // Fetch Rapor Pendidikan (latest)
+      const { data: dataRapor, error: errRapor } = await supabase
+        .from('rapor_sekolah')
+        .select('indikator, tahun')
+        .eq('npsn', sekolahData.npsn)
+        .order('tahun', { ascending: false })
+        .limit(1)
+        .single();
+
+      if (errRapor && errRapor.code !== 'PGRST116') console.error('Error fetch rapor:', errRapor); // PGRST116 is no rows found
+
       setTotalSiswa(countSiswa || 0);
       setTotalGuru(countGuru || 0);
       setDaftarGuru(dataGuru || []);
+      setKepalaSekolah(kepsek);
+      setRaporSekolah(dataRapor || null);
     } catch (error) {
       console.error('Error fetching stats:', error);
     } finally {
@@ -140,6 +157,16 @@ export default function DetailSekolahPage() {
               <div>
                 <span style={{ display: 'block', color: '#64748b', fontSize: '0.85rem', textTransform: 'uppercase', fontWeight: '600' }}>Akreditasi</span>
                 <span style={{ color: '#0f172a', fontWeight: '600', fontSize: '1.1rem' }}>{sekolah.akreditasi || '-'} <span style={{fontSize:'0.85rem', color:'#94a3b8', fontWeight:'normal'}}>({sekolah.tmt_akreditasi || '-'})</span></span>
+              </div>
+              <div>
+                <span style={{ display: 'block', color: '#64748b', fontSize: '0.85rem', textTransform: 'uppercase', fontWeight: '600' }}>Kepala Sekolah</span>
+                {loadingStats ? (
+                  <div className="animate-pulse" style={{ height: '24px', width: '150px', backgroundColor: '#e2e8f0', borderRadius: '4px', marginTop: '0.25rem' }}></div>
+                ) : (
+                  <span style={{ color: '#0f172a', fontWeight: '600', fontSize: '1.1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <Briefcase size={16} color="#64748b" /> {kepalaSekolah}
+                  </span>
+                )}
               </div>
             </div>
           </div>
@@ -254,6 +281,79 @@ export default function DetailSekolahPage() {
             </table>
           </div>
 
+        </div>
+
+        {/* RAPOR PENDIDIKAN SECTION */}
+        <div style={{ marginTop: '2rem', backgroundColor: 'white', padding: '1.5rem', borderRadius: '16px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+            <h3 style={{ margin: 0, color: '#0f172a', fontSize: '1.25rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Activity color="#3b82f6" /> Capaian Rapor Pendidikan
+            </h3>
+            {raporSekolah && (
+              <span style={{ backgroundColor: '#e0f2fe', color: '#0369a1', padding: '0.25rem 0.75rem', borderRadius: '16px', fontSize: '0.85rem', fontWeight: '600' }}>
+                Tahun {raporSekolah.tahun}
+              </span>
+            )}
+          </div>
+          
+          {loadingStats ? (
+            <div className="animate-pulse" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.5rem' }}>
+              {[1,2,3,4,5,6].map(i => <div key={i} style={{ height: '100px', backgroundColor: '#e2e8f0', borderRadius: '12px' }}></div>)}
+            </div>
+          ) : raporSekolah && raporSekolah.indikator ? (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
+              {(() => {
+                const targetIndicators = ['literasi', 'numerasi', 'karakter', 'inklusivitas', 'keamanan', 'kebhinekaan'];
+                const extracted = [];
+
+                Object.entries(raporSekolah.indikator).forEach(([key, fields]) => {
+                  const lowerKey = key.toLowerCase();
+                  if (targetIndicators.some(ti => lowerKey.includes(ti)) && !lowerKey.includes('kesenjangan') && !lowerKey.includes('proporsi') && key.match(/^[A-Z]\.\d+(?:\s|$)/)) {
+                    extracted.push({ key, fields });
+                  }
+                });
+
+                if (extracted.length === 0) {
+                  return <p style={{ color: '#64748b' }}>Data indikator utama tidak tersedia dalam rapor ini.</p>;
+                }
+
+                return extracted.map((ind, idx) => {
+                  const labelCapaian = ind.fields['Label Capaian'] || ind.fields['label_capaian'] || ind.fields['Label Capaian '];
+                  const nilaiRapor = ind.fields['Nilai Rapor'] || ind.fields['nilai_rapor'] || ind.fields['Nilai Sekolah'] || ind.fields['Nilai Rapor '];
+                  
+                  let labelColor = '#e2e8f0';
+                  let labelText = '#475569';
+                  if (labelCapaian) {
+                    const lc = labelCapaian.toLowerCase();
+                    if (lc.includes('baik')) { labelColor = '#dcfce7'; labelText = '#166534'; }
+                    else if (lc.includes('sedang')) { labelColor = '#fef08a'; labelText = '#854d0e'; }
+                    else if (lc.includes('kurang')) { labelColor = '#fee2e2'; labelText = '#991b1b'; }
+                  }
+
+                  return (
+                    <div key={idx} style={{ border: '1px solid #e2e8f0', borderRadius: '12px', padding: '1.25rem', backgroundColor: '#f8fafc' }}>
+                      <h4 style={{ margin: '0 0 1rem 0', color: '#0f172a', fontSize: '1rem', fontWeight: 'bold' }}>{ind.key}</h4>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+                        <div>
+                          <span style={{ display: 'block', color: '#64748b', fontSize: '0.8rem', textTransform: 'uppercase', fontWeight: '600' }}>Nilai</span>
+                          <span style={{ color: '#0f172a', fontSize: '1.5rem', fontWeight: 'bold' }}>{nilaiRapor || '-'}</span>
+                        </div>
+                        {labelCapaian && (
+                          <div style={{ backgroundColor: labelColor, color: labelText, padding: '0.35rem 0.75rem', borderRadius: '8px', fontSize: '0.85rem', fontWeight: '600' }}>
+                            {labelCapaian}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                });
+              })()}
+            </div>
+          ) : (
+            <div style={{ padding: '2rem', textAlign: 'center', color: '#64748b', backgroundColor: '#f8fafc', borderRadius: '12px', border: '1px dashed #cbd5e1' }}>
+              Tidak ada data Rapor Pendidikan untuk sekolah ini.
+            </div>
+          )}
         </div>
 
       </div>
