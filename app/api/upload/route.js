@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { parseExcelData } from '../../../utils/excelParser';
 import { supabase } from '../../../utils/supabase';
 
@@ -46,6 +47,11 @@ export async function POST(request) {
         throw new Error('Gagal menyimpan sebagian data ke database');
       }
     }
+
+    // Bersihkan cache agar data baru langsung muncul
+    revalidatePath('/api/data');
+    revalidatePath('/rapor');
+    revalidatePath('/capaian-daerah');
 
     return NextResponse.json({ success: true, message: `Berhasil menyimpan ${parsedData.length} baris untuk tahun ${tahun} ke Database` });
   } catch (error) {

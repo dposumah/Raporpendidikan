@@ -22,13 +22,12 @@ export default function PembenahanPage() {
 
   const fetchData = async () => {
     setLoading(true);
-    const supabase = createClient();
     try {
-      const { data: result, error } = await supabase
-        .from('akar_masalah')
-        .select('*');
-
-      if (error) throw error;
+      const response = await fetch('/api/data-pembenahan');
+      if (!response.ok) {
+        throw new Error('Gagal memuat data pembenahan');
+      }
+      const result = await response.json();
       setData(result || []);
     } catch (error) {
       console.error('Error fetching akar masalah:', error);

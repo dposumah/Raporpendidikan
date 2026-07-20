@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { supabase } from '@/utils/supabase';
 import * as xlsx from 'xlsx';
 
@@ -110,6 +111,9 @@ export async function POST(req) {
       }
       totalInserted += chunk.length;
     }
+
+    revalidatePath('/api/data-sekolah');
+    revalidatePath('/rapor-sekolah');
 
     return NextResponse.json({ 
       success: true, 

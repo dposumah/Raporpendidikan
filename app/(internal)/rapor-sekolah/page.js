@@ -13,27 +13,22 @@ export default function RaporSekolahPage() {
   const [selectedSekolah, setSelectedSekolah] = useState(null);
   const [selectedDetail, setSelectedDetail] = useState(null);
 
-  const supabase = createClient();
+  const [allData, setAllData] = useState([]);
 
   useEffect(() => {
     fetchData();
-  }, [tahun]);
+  }, []);
 
   const fetchData = async () => {
     setLoading(true);
     setSelectedSekolah(null);
     try {
-      const { data: result, error } = await supabase
-        .from('rapor_sekolah')
-        .select('*')
-        .eq('tahun', tahun)
-        .order('nama_sekolah', { ascending: true });
-
-      if (error) {
-        console.error('Error fetching rapor sekolah:', error);
-      } else {
-        setData(result || []);
+      const response = await fetch(`/api/data-sekolah`);
+      if (!response.ok) {
+        throw new Error('Gagal memuat data rapor sekolah');
       }
+      const result = await response.json();
+      setAllData(result || []);
     } catch (err) {
       console.error(err);
     } finally {
@@ -42,13 +37,15 @@ export default function RaporSekolahPage() {
   };
 
   const filteredData = useMemo(() => {
-    if (!search) return data;
+    let dataForYear = allData.filter(d => d.tahun.toString() === tahun.toString());
+    if (!search) return dataForYear;
+    
     const lowerSearch = search.toLowerCase();
-    return data.filter(s => 
+    return dataForYear.filter(s => 
       s.nama_sekolah.toLowerCase().includes(lowerSearch) || 
       s.npsn.includes(lowerSearch)
     );
-  }, [data, search]);
+  }, [allData, tahun, search]);
 
   const renderTrendIcon = (text) => {
     if (!text) return <Minus size={16} color="#94a3b8" />;

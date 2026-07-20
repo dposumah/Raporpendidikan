@@ -1,13 +1,12 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '../../../utils/supabase';
 
-// Cache data selama 1 tahun. Cache akan di-reset (revalidate) saat ada upload data baru.
-export const revalidate = 31536000;
+export const revalidate = 31536000; // Cache 1 tahun
 
 export async function GET() {
   try {
     const { count, error: countError } = await supabase
-      .from('rapor_data')
+      .from('rapor_sekolah')
       .select('*', { count: 'exact', head: true });
 
     if (countError) {
@@ -18,19 +17,17 @@ export async function GET() {
     const pageSize = 1000;
     const promises = [];
     
-    // Siapkan semua request secara paralel (concurrent)
+    // Tarik semua data secara batch agar bisa di-cache statis oleh Next.js
     for (let i = 0; i < count; i += pageSize) {
       promises.push(
         supabase
-          .from('rapor_data')
+          .from('rapor_sekolah')
           .select('*')
           .range(i, i + pageSize - 1)
-          .order('tahun', { ascending: true })
-          .order('id', { ascending: true })
+          .order('nama_sekolah', { ascending: true })
       );
     }
 
-    // Jalankan semua request sekaligus
     const results = await Promise.all(promises);
     
     let allData = [];
@@ -46,7 +43,7 @@ export async function GET() {
 
     return NextResponse.json(allData);
   } catch (error) {
-    console.error('Error fetching data:', error);
-    return NextResponse.json({ error: 'Gagal memuat data dari database' }, { status: 500 });
+    console.error('Error fetching data-sekolah:', error);
+    return NextResponse.json({ error: 'Gagal mengambil data' }, { status: 500 });
   }
 }
