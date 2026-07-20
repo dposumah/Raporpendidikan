@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { School, ChevronDown, ChevronRight, Users, User, Download, Search, X, MapPin, GraduationCap, Briefcase, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
+import { School, ChevronDown, ChevronRight, Users, User, Download, Search, X, MapPin, GraduationCap, Briefcase, ArrowUpDown, ArrowUp, ArrowDown, Filter } from 'lucide-react';
 
 export default function AnalisisRekapGuruPage() {
   const [data, setData] = useState([]);
@@ -9,6 +9,17 @@ export default function AnalisisRekapGuruPage() {
   
   const [searchQuery, setSearchQuery] = useState('');
   
+  // Filters
+  const [jenjang, setJenjang] = useState('');
+  const [kecamatan, setKecamatan] = useState('');
+  const [sekolah, setSekolah] = useState('');
+
+  const [availableFilters, setAvailableFilters] = useState({
+    jenjang: [],
+    kecamatan: [],
+    sekolah: []
+  });
+
   // Sort State
   const [sortConfig, setSortConfig] = useState({ key: 'totalGuru', direction: 'desc' });
 
@@ -28,6 +39,11 @@ export default function AnalisisRekapGuruPage() {
       if (!response.ok) throw new Error('Gagal memuat data');
       const result = await response.json();
       setData(result || []);
+
+      const uniqueJenjang = [...new Set(result.map(d => d.jenjang).filter(Boolean))].sort();
+      const uniqueKec = [...new Set(result.map(d => d.kecamatan).filter(Boolean))].sort();
+      
+      setAvailableFilters(prev => ({ ...prev, jenjang: uniqueJenjang, kecamatan: uniqueKec }));
     } catch (error) {
       console.error(error);
     } finally {
@@ -35,22 +51,44 @@ export default function AnalisisRekapGuruPage() {
     }
   };
 
+  useEffect(() => {
+    let filtered = data;
+    if (jenjang) filtered = filtered.filter(d => d.jenjang === jenjang);
+    if (kecamatan) filtered = filtered.filter(d => d.kecamatan === kecamatan);
+    
+    const uniqueSekolah = [...new Set(filtered.map(d => d.tempat_tugas).filter(Boolean))].sort();
+    setAvailableFilters(prev => ({ ...prev, sekolah: uniqueSekolah }));
+    
+    if (sekolah && !uniqueSekolah.includes(sekolah)) {
+      setSekolah('');
+    }
+  }, [jenjang, kecamatan, data, sekolah]);
+
+  const filteredData = useMemo(() => {
+    return data.filter(d => {
+      const matchJenjang = !jenjang || d.jenjang === jenjang;
+      const matchKecamatan = !kecamatan || d.kecamatan === kecamatan;
+      const matchSekolah = !sekolah || d.tempat_tugas === sekolah;
+      return matchJenjang && matchKecamatan && matchSekolah;
+    });
+  }, [data, jenjang, kecamatan, sekolah]);
+
   // Group data by school
   const schoolData = useMemo(() => {
     const grouped = {};
-    data.forEach(guru => {
-      const sekolah = guru.tempat_tugas || 'Tidak Diketahui';
-      if (!grouped[sekolah]) {
-        grouped[sekolah] = {
-          sekolah,
+    filteredData.forEach(guru => {
+      const tempatSekolah = guru.tempat_tugas || 'Tidak Diketahui';
+      if (!grouped[tempatSekolah]) {
+        grouped[tempatSekolah] = {
+          sekolah: tempatSekolah,
           jenjang: guru.jenjang || '-',
           kecamatan: guru.kecamatan || '-',
           totalGuru: 0,
           guruList: []
         };
       }
-      grouped[sekolah].totalGuru++;
-      grouped[sekolah].guruList.push(guru);
+      grouped[tempatSekolah].totalGuru++;
+      grouped[tempatSekolah].guruList.push(guru);
     });
 
     let result = Object.values(grouped);
@@ -77,7 +115,7 @@ export default function AnalisisRekapGuruPage() {
     }
     
     return result;
-  }, [data, searchQuery, sortConfig]);
+  }, [filteredData, searchQuery, sortConfig]);
 
   const requestSort = (key) => {
     let direction = 'asc';
@@ -115,130 +153,179 @@ export default function AnalisisRekapGuruPage() {
 
   return (
     <div style={{ backgroundColor: '#f8fafc', minHeight: 'calc(100vh - 75px)', padding: '2rem' }}>
-      <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+      <div style={{ display: 'flex', gap: '2rem', maxWidth: '1400px', margin: '0 auto' }}>
         
-        {/* Header */}
-        <div style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-          <div>
-            <h1 style={{ margin: 0, fontSize: '1.75rem', color: '#0f172a', fontWeight: 'bold' }}>Rekapitulasi Guru per Sekolah</h1>
-            <p style={{ margin: '0.25rem 0 0 0', color: '#64748b', fontSize: '0.95rem' }}>Klik nama sekolah untuk melihat daftar lengkap tenaga pendidik di sekolah tersebut.</p>
+        {/* LEFT SIDEBAR: FILTERS */}
+        <div style={{ width: '300px', flexShrink: 0 }}>
+          <div style={{ backgroundColor: 'white', padding: '1.5rem', borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', position: 'sticky', top: '100px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem', color: '#0f172a', borderBottom: '1px solid #e2e8f0', paddingBottom: '1rem' }}>
+              <Filter size={20} />
+              <h2 style={{ margin: 0, fontSize: '1.1rem', fontWeight: '600' }}>Filter Data</h2>
+            </div>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#64748b', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Jenjang</label>
+                <select value={jenjang} onChange={(e) => setJenjang(e.target.value)} style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none', backgroundColor: '#f8fafc', color: '#0f172a', fontSize: '0.95rem' }}>
+                  <option value="">Semua Jenjang</option>
+                  {availableFilters.jenjang.map(j => <option key={j} value={j}>{j}</option>)}
+                </select>
+              </div>
+              
+              <div>
+                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#64748b', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Kecamatan</label>
+                <select value={kecamatan} onChange={(e) => setKecamatan(e.target.value)} style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none', backgroundColor: '#f8fafc', color: '#0f172a', fontSize: '0.95rem' }}>
+                  <option value="">Semua Kecamatan</option>
+                  {availableFilters.kecamatan.map(k => <option key={k} value={k}>{k}</option>)}
+                </select>
+              </div>
+              
+              <div>
+                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#64748b', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Sekolah (Tempat Tugas)</label>
+                <select value={sekolah} onChange={(e) => setSekolah(e.target.value)} style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none', backgroundColor: '#f8fafc', color: '#0f172a', fontSize: '0.95rem' }}>
+                  <option value="">Semua Sekolah</option>
+                  {availableFilters.sekolah.map(s => <option key={s} value={s}>{s}</option>)}
+                </select>
+              </div>
+              
+              <button 
+                onClick={() => { setJenjang(''); setKecamatan(''); setSekolah(''); }}
+                style={{ marginTop: '1rem', padding: '0.75rem', backgroundColor: '#f1f5f9', color: '#475569', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer', transition: 'background 0.2s' }}
+                onMouseEnter={e => e.currentTarget.style.backgroundColor = '#e2e8f0'}
+                onMouseLeave={e => e.currentTarget.style.backgroundColor = '#f1f5f9'}
+              >
+                Reset Filter
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* Search */}
-        <div style={{ backgroundColor: 'white', padding: '1rem', borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', marginBottom: '1.5rem', display: 'flex', gap: '1rem', alignItems: 'center' }}>
-          <div style={{ position: 'relative', width: '350px' }}>
-            <Search size={18} color="#94a3b8" style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)' }} />
-            <input
-              type="text"
-              placeholder="Cari Nama Sekolah atau Kecamatan..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              style={{ width: '100%', padding: '0.6rem 1rem 0.6rem 2.5rem', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none', fontSize: '0.95rem' }}
-            />
+        {/* MAIN CONTENT */}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          
+          {/* Header */}
+          <div style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <div>
+              <h1 style={{ margin: 0, fontSize: '1.75rem', color: '#0f172a', fontWeight: 'bold' }}>Rekapitulasi Guru per Sekolah</h1>
+              <p style={{ margin: '0.25rem 0 0 0', color: '#64748b', fontSize: '0.95rem' }}>Klik nama sekolah untuk melihat daftar lengkap tenaga pendidik di sekolah tersebut.</p>
+            </div>
           </div>
-          <div style={{ color: '#64748b', fontSize: '0.9rem' }}>
-            Total Sekolah: <span style={{ fontWeight: '600', color: '#0f172a' }}>{schoolData.length}</span>
+
+          {/* Search */}
+          <div style={{ backgroundColor: 'white', padding: '1rem', borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', marginBottom: '1.5rem', display: 'flex', gap: '1rem', alignItems: 'center' }}>
+            <div style={{ position: 'relative', width: '350px' }}>
+              <Search size={18} color="#94a3b8" style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)' }} />
+              <input
+                type="text"
+                placeholder="Cari Nama Sekolah atau Kecamatan..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                style={{ width: '100%', padding: '0.6rem 1rem 0.6rem 2.5rem', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none', fontSize: '0.95rem' }}
+              />
+            </div>
+            <div style={{ color: '#64748b', fontSize: '0.9rem' }}>
+              Total Sekolah: <span style={{ fontWeight: '600', color: '#0f172a' }}>{schoolData.length}</span>
+            </div>
           </div>
-        </div>
 
-        {/* Expandable Table */}
-        <div style={{ backgroundColor: 'white', borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', overflow: 'hidden' }}>
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-              <thead>
-                <tr style={{ backgroundColor: '#f1f5f9', borderBottom: '2px solid #e2e8f0' }}>
-                  <th style={{ width: '50px', padding: '1rem' }}></th>
-                  <th onClick={() => requestSort('sekolah')} style={{ padding: '1rem', color: '#475569', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase', cursor: 'pointer', userSelect: 'none' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>Nama Sekolah {getSortIcon('sekolah')}</div>
-                  </th>
-                  <th onClick={() => requestSort('jenjang')} style={{ padding: '1rem', color: '#475569', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase', cursor: 'pointer', userSelect: 'none' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>Jenjang {getSortIcon('jenjang')}</div>
-                  </th>
-                  <th onClick={() => requestSort('kecamatan')} style={{ padding: '1rem', color: '#475569', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase', cursor: 'pointer', userSelect: 'none' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>Kecamatan {getSortIcon('kecamatan')}</div>
-                  </th>
-                  <th onClick={() => requestSort('totalGuru')} style={{ padding: '1rem', color: '#475569', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase', cursor: 'pointer', userSelect: 'none', textAlign: 'right' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '0.5rem' }}>Total Guru {getSortIcon('totalGuru')}</div>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {schoolData.length > 0 ? schoolData.map((s, index) => {
-                  const isExpanded = expandedSchools.has(s.sekolah);
-                  return (
-                    <React.Fragment key={s.sekolah + index}>
-                      {/* Parent Row */}
-                      <tr 
-                        onClick={() => toggleExpand(s.sekolah)}
-                        style={{ borderBottom: '1px solid #e2e8f0', cursor: 'pointer', transition: 'background 0.2s', backgroundColor: isExpanded ? '#f8fafc' : 'white' }}
-                        onMouseEnter={e => { if(!isExpanded) e.currentTarget.style.backgroundColor = '#f8fafc' }}
-                        onMouseLeave={e => { if(!isExpanded) e.currentTarget.style.backgroundColor = 'white' }}
-                      >
-                        <td style={{ padding: '1rem', textAlign: 'center', color: '#64748b' }}>
-                          {isExpanded ? <ChevronDown size={20} /> : <ChevronRight size={20} />}
-                        </td>
-                        <td style={{ padding: '1rem', fontWeight: '600', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                          <School size={18} color="#4f46e5" /> {s.sekolah}
-                        </td>
-                        <td style={{ padding: '1rem', color: '#334155', fontSize: '0.9rem' }}>{s.jenjang}</td>
-                        <td style={{ padding: '1rem', color: '#334155', fontSize: '0.9rem' }}>{s.kecamatan}</td>
-                        <td style={{ padding: '1rem', textAlign: 'right', fontWeight: 'bold', color: '#10b981', fontSize: '1rem' }}>
-                          {s.totalGuru}
-                        </td>
-                      </tr>
-
-                      {/* Child Rows (Expanded) */}
-                      {isExpanded && (
-                        <tr>
-                          <td colSpan="5" style={{ padding: 0 }}>
-                            <div style={{ backgroundColor: '#f8fafc', padding: '1.5rem 3rem', borderBottom: '2px solid #e2e8f0', borderLeft: '4px solid #4f46e5' }}>
-                              <h4 style={{ margin: '0 0 1rem 0', color: '#334155', fontSize: '0.9rem', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                <Users size={16} /> Daftar Guru ({s.sekolah})
-                              </h4>
-                              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1rem' }}>
-                                {s.guruList.map((g, i) => (
-                                  <div 
-                                    key={i} 
-                                    onClick={() => setSelectedGuru(g)}
-                                    style={{ backgroundColor: 'white', padding: '1rem', borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 1px 2px rgba(0,0,0,0.05)', cursor: 'pointer', transition: 'all 0.2s' }}
-                                    onMouseEnter={e => { e.currentTarget.style.borderColor = '#4f46e5'; e.currentTarget.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)' }}
-                                    onMouseLeave={e => { e.currentTarget.style.borderColor = '#e2e8f0'; e.currentTarget.style.boxShadow = '0 1px 2px rgba(0,0,0,0.05)' }}
-                                  >
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
-                                      <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: '#e0e7ff', display: 'flex', justifyContent: 'center', alignItems: 'center', color: '#4f46e5', flexShrink: 0 }}>
-                                        <User size={16} />
-                                      </div>
-                                      <div>
-                                        <div style={{ fontWeight: '600', color: '#0f172a', fontSize: '0.95rem', lineHeight: '1.2' }}>{g.nama}</div>
-                                        <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '0.2rem' }}>{g.status_kepegawaian || 'Status Tdk Diketahui'}</div>
-                                      </div>
-                                    </div>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: '#475569', marginTop: '0.5rem', paddingTop: '0.5rem', borderTop: '1px dashed #cbd5e1' }}>
-                                      <span>NUPTK: {g.nuptk || '-'}</span>
-                                      <span>Pend: {g.pendidikan || '-'}</span>
-                                    </div>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
+          {/* Expandable Table */}
+          <div style={{ backgroundColor: 'white', borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', overflow: 'hidden' }}>
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                <thead>
+                  <tr style={{ backgroundColor: '#f1f5f9', borderBottom: '2px solid #e2e8f0' }}>
+                    <th style={{ width: '50px', padding: '1rem' }}></th>
+                    <th onClick={() => requestSort('sekolah')} style={{ padding: '1rem', color: '#475569', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase', cursor: 'pointer', userSelect: 'none' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>Nama Sekolah {getSortIcon('sekolah')}</div>
+                    </th>
+                    <th onClick={() => requestSort('jenjang')} style={{ padding: '1rem', color: '#475569', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase', cursor: 'pointer', userSelect: 'none' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>Jenjang {getSortIcon('jenjang')}</div>
+                    </th>
+                    <th onClick={() => requestSort('kecamatan')} style={{ padding: '1rem', color: '#475569', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase', cursor: 'pointer', userSelect: 'none' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>Kecamatan {getSortIcon('kecamatan')}</div>
+                    </th>
+                    <th onClick={() => requestSort('totalGuru')} style={{ padding: '1rem', color: '#475569', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase', cursor: 'pointer', userSelect: 'none', textAlign: 'right' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '0.5rem' }}>Total Guru {getSortIcon('totalGuru')}</div>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {schoolData.length > 0 ? schoolData.map((s, index) => {
+                    const isExpanded = expandedSchools.has(s.sekolah);
+                    return (
+                      <React.Fragment key={s.sekolah + index}>
+                        {/* Parent Row */}
+                        <tr 
+                          onClick={() => toggleExpand(s.sekolah)}
+                          style={{ borderBottom: '1px solid #e2e8f0', cursor: 'pointer', transition: 'background 0.2s', backgroundColor: isExpanded ? '#f8fafc' : 'white' }}
+                          onMouseEnter={e => { if(!isExpanded) e.currentTarget.style.backgroundColor = '#f8fafc' }}
+                          onMouseLeave={e => { if(!isExpanded) e.currentTarget.style.backgroundColor = 'white' }}
+                        >
+                          <td style={{ padding: '1rem', textAlign: 'center', color: '#64748b' }}>
+                            {isExpanded ? <ChevronDown size={20} /> : <ChevronRight size={20} />}
+                          </td>
+                          <td style={{ padding: '1rem', fontWeight: '600', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                            <School size={18} color="#4f46e5" /> {s.sekolah}
+                          </td>
+                          <td style={{ padding: '1rem', color: '#334155', fontSize: '0.9rem' }}>{s.jenjang}</td>
+                          <td style={{ padding: '1rem', color: '#334155', fontSize: '0.9rem' }}>{s.kecamatan}</td>
+                          <td style={{ padding: '1rem', textAlign: 'right', fontWeight: 'bold', color: '#10b981', fontSize: '1rem' }}>
+                            {s.totalGuru}
                           </td>
                         </tr>
-                      )}
-                    </React.Fragment>
-                  );
-                }) : (
-                  <tr>
-                    <td colSpan="5" style={{ padding: '3rem', textAlign: 'center', color: '#64748b' }}>
-                      Tidak ada sekolah yang cocok dengan pencarian Anda.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
 
+                        {/* Child Rows (Expanded) */}
+                        {isExpanded && (
+                          <tr>
+                            <td colSpan="5" style={{ padding: 0 }}>
+                              <div style={{ backgroundColor: '#f8fafc', padding: '1.5rem 3rem', borderBottom: '2px solid #e2e8f0', borderLeft: '4px solid #4f46e5' }}>
+                                <h4 style={{ margin: '0 0 1rem 0', color: '#334155', fontSize: '0.9rem', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                  <Users size={16} /> Daftar Guru ({s.sekolah})
+                                </h4>
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1rem' }}>
+                                  {s.guruList.map((g, i) => (
+                                    <div 
+                                      key={i} 
+                                      onClick={() => setSelectedGuru(g)}
+                                      style={{ backgroundColor: 'white', padding: '1rem', borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 1px 2px rgba(0,0,0,0.05)', cursor: 'pointer', transition: 'all 0.2s' }}
+                                      onMouseEnter={e => { e.currentTarget.style.borderColor = '#4f46e5'; e.currentTarget.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)' }}
+                                      onMouseLeave={e => { e.currentTarget.style.borderColor = '#e2e8f0'; e.currentTarget.style.boxShadow = '0 1px 2px rgba(0,0,0,0.05)' }}
+                                    >
+                                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
+                                        <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: '#e0e7ff', display: 'flex', justifyContent: 'center', alignItems: 'center', color: '#4f46e5', flexShrink: 0 }}>
+                                          <User size={16} />
+                                        </div>
+                                        <div>
+                                          <div style={{ fontWeight: '600', color: '#0f172a', fontSize: '0.95rem', lineHeight: '1.2' }}>{g.nama}</div>
+                                          <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '0.2rem' }}>{g.status_kepegawaian || 'Status Tdk Diketahui'}</div>
+                                        </div>
+                                      </div>
+                                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: '#475569', marginTop: '0.5rem', paddingTop: '0.5rem', borderTop: '1px dashed #cbd5e1' }}>
+                                        <span>NUPTK: {g.nuptk || '-'}</span>
+                                        <span>Pend: {g.pendidikan || '-'}</span>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                        )}
+                      </React.Fragment>
+                    );
+                  }) : (
+                    <tr>
+                      <td colSpan="5" style={{ padding: '3rem', textAlign: 'center', color: '#64748b' }}>
+                        Tidak ada sekolah yang cocok dengan pencarian Anda.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
       </div>
 
       {/* MODAL DETAIL GURU */}
