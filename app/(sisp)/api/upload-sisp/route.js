@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { revalidatePath } from 'next/cache';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -134,6 +135,11 @@ export async function POST(request) {
         return new Response(JSON.stringify({ error: error.message }), { status: 500 });
       }
     }
+
+    // Revalidate the cache so the dashboard updates immediately
+    revalidatePath('/api/data-sisp');
+    revalidatePath('/dashboard-sisp');
+    revalidatePath('/sekolah');
 
     return new Response(JSON.stringify({ message: 'Data berhasil diunggah', count: uniqueData.length }), { status: 200 });
 
