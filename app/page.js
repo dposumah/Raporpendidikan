@@ -2,228 +2,176 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { BarChart2, Database, ChevronRight, X, School } from 'lucide-react';
+import { BarChart2, Database, ChevronRight, School, Users, UserCheck } from 'lucide-react';
 
 export default function PortalPage() {
+  const [showData, setShowData] = useState(false);
+
   return (
     <div style={{
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%)', // Premium Dark Navy
-      color: 'white',
+      background: 'linear-gradient(135deg, #fdfbf7 0%, #f3f0e7 100%)', // Putih gading
+      color: '#1e293b',
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
-      justifyContent: 'center',
-      padding: '2rem',
+      padding: '4rem 2rem',
       position: 'relative',
       overflow: 'hidden'
     }}>
-      {/* Background ambient light effects */}
-      <div style={{ position: 'absolute', top: '-10%', left: '-10%', width: '40vw', height: '40vw', background: 'radial-gradient(circle, rgba(59,130,246,0.15) 0%, rgba(0,0,0,0) 70%)', borderRadius: '50%', filter: 'blur(60px)' }}></div>
-      <div style={{ position: 'absolute', bottom: '-10%', right: '-10%', width: '50vw', height: '50vw', background: 'radial-gradient(circle, rgba(99,102,241,0.15) 0%, rgba(0,0,0,0) 70%)', borderRadius: '50%', filter: 'blur(60px)' }}></div>
+      {/* Background ambient light effects - Merah elegan */}
+      <div style={{ position: 'absolute', top: '-10%', left: '-10%', width: '40vw', height: '40vw', background: 'radial-gradient(circle, rgba(153,27,27,0.05) 0%, rgba(0,0,0,0) 70%)', borderRadius: '50%', filter: 'blur(60px)' }}></div>
+      <div style={{ position: 'absolute', bottom: '-10%', right: '-10%', width: '50vw', height: '50vw', background: 'radial-gradient(circle, rgba(185,28,28,0.05) 0%, rgba(0,0,0,0) 70%)', borderRadius: '50%', filter: 'blur(60px)' }}></div>
 
       {/* Header / Logo section */}
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '4rem', zIndex: 1, animation: 'fadeInDown 0.8s ease-out' }}>
-        <img src="/logo.png" alt="Logo Tomohon" style={{ height: '90px', marginBottom: '1.5rem', filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.3))' }} />
-        <h2 style={{ fontSize: '1.1rem', fontWeight: '500', letterSpacing: '2px', color: '#94a3b8', textTransform: 'uppercase', marginBottom: '0.5rem', textAlign: 'center' }}>
+        <img src="/logo.png" alt="Logo Tomohon" style={{ height: '100px', marginBottom: '1.5rem', filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.1))' }} />
+        <h2 style={{ fontSize: '1.1rem', fontWeight: '600', letterSpacing: '2px', color: '#991b1b', textTransform: 'uppercase', marginBottom: '0.5rem', textAlign: 'center' }}>
           Pemerintah Kota Tomohon
         </h2>
-        <h1 style={{ fontSize: '2.5rem', fontWeight: '700', margin: 0, textAlign: 'center', lineHeight: '1.2', background: 'linear-gradient(to right, #ffffff, #93c5fd)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-          Portal Data Pendidikan
+        <h1 style={{ fontSize: '2.5rem', fontWeight: '800', margin: 0, textAlign: 'center', lineHeight: '1.2', color: '#1e293b' }}>
+          Portal Pendidikan Daerah
         </h1>
-        <p style={{ marginTop: '1rem', color: '#cbd5e1', fontSize: '1.1rem', maxWidth: '600px', textAlign: 'center', lineHeight: '1.6' }}>
+        <p style={{ marginTop: '1rem', color: '#475569', fontSize: '1.1rem', maxWidth: '600px', textAlign: 'center', lineHeight: '1.6' }}>
           Pusat integrasi informasi dan capaian pendidikan untuk memajukan kualitas belajar mengajar di Kota Tomohon.
         </p>
       </div>
 
-      {/* Cards section */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem', width: '100%', maxWidth: '1200px', zIndex: 1, animation: 'fadeInUp 0.8s ease-out 0.2s backwards' }}>
+      {/* MAIN MODULES */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '2rem', width: '100%', maxWidth: '800px', zIndex: 1, animation: 'fadeInUp 0.8s ease-out 0.2s backwards' }}>
         
-        {/* Card 1: Rapor Pendidikan */}
+        {/* Modul 1: Rapor Pendidikan */}
         <Link href="/rapor" style={{ textDecoration: 'none' }}>
           <div className="portal-card" style={{
-            background: 'rgba(255, 255, 255, 0.03)',
-            backdropFilter: 'blur(16px)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-            borderRadius: '16px',
+            background: 'white',
+            border: '1px solid #e2e8f0',
+            borderRadius: '20px',
             padding: '2.5rem 2rem',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            justifyContent: 'center',
             textAlign: 'center',
             cursor: 'pointer',
             transition: 'all 0.3s ease',
             height: '100%',
-            boxShadow: '0 10px 30px rgba(0,0,0,0.2)'
+            boxShadow: '0 10px 30px rgba(0,0,0,0.05)'
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.transform = 'translateY(-8px)';
-            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)';
-            e.currentTarget.style.borderColor = 'rgba(59, 130, 246, 0.5)';
-            e.currentTarget.style.boxShadow = '0 20px 40px rgba(0,0,0,0.4)';
+            e.currentTarget.style.borderColor = '#991b1b';
+            e.currentTarget.style.boxShadow = '0 20px 40px rgba(153,27,27,0.1)';
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.transform = 'translateY(0)';
-            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.03)';
-            e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
-            e.currentTarget.style.boxShadow = '0 10px 30px rgba(0,0,0,0.2)';
+            e.currentTarget.style.borderColor = '#e2e8f0';
+            e.currentTarget.style.boxShadow = '0 10px 30px rgba(0,0,0,0.05)';
+          }}>
+            <div style={{ background: '#fef2f2', border: '1px solid #fecaca', padding: '1.25rem', borderRadius: '50%', marginBottom: '1.5rem', color: '#b91c1c' }}>
+              <BarChart2 size={40} />
+            </div>
+            <h3 style={{ fontSize: '1.5rem', fontWeight: '700', color: '#1e293b', marginBottom: '0.75rem' }}>Rapor Pendidikan</h3>
+            <p style={{ color: '#64748b', fontSize: '0.95rem', lineHeight: '1.5', marginBottom: '2rem' }}>
+              Lihat dan analisis indeks pencapaian SPM dan kinerja pendidikan lainnya secara menyeluruh.
+            </p>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#991b1b', fontWeight: '600', fontSize: '1rem', marginTop: 'auto' }}>
+              Akses Modul <ChevronRight size={18} />
+            </div>
+          </div>
+        </Link>
+
+        {/* Modul 2: Data Pendidikan */}
+        <div 
+          onClick={() => setShowData(!showData)}
+          style={{
+            background: showData ? '#fef2f2' : 'white',
+            border: '1px solid',
+            borderColor: showData ? '#fca5a5' : '#e2e8f0',
+            borderRadius: '20px',
+            padding: '2.5rem 2rem',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            textAlign: 'center',
+            cursor: 'pointer',
+            transition: 'all 0.3s ease',
+            height: '100%',
+            boxShadow: '0 10px 30px rgba(0,0,0,0.05)'
           }}
-          >
-            <div style={{ background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)', padding: '1.2rem', borderRadius: '50%', marginBottom: '1.5rem', boxShadow: '0 4px 15px rgba(59,130,246,0.4)' }}>
-              <BarChart2 size={40} color="white" />
-            </div>
-            <h3 style={{ fontSize: '1.5rem', fontWeight: '600', color: 'white', marginBottom: '0.75rem' }}>Rapor Pendidikan</h3>
-            <p style={{ color: '#94a3b8', fontSize: '0.95rem', lineHeight: '1.5', marginBottom: '2rem' }}>
-              Lihat dan analisis indeks pencapaian SPM dan kinerja pendidikan lainnya.
-            </p>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#60a5fa', fontWeight: '600', fontSize: '1rem', marginTop: 'auto' }}>
-              Akses Dashboard <ChevronRight size={18} />
-            </div>
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'translateY(-8px)';
+            e.currentTarget.style.boxShadow = '0 20px 40px rgba(153,27,27,0.1)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'translateY(0)';
+            e.currentTarget.style.boxShadow = '0 10px 30px rgba(0,0,0,0.05)';
+          }}>
+          <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', padding: '1.25rem', borderRadius: '50%', marginBottom: '1.5rem', color: '#334155' }}>
+            <Database size={40} />
           </div>
-        </Link>
+          <h3 style={{ fontSize: '1.5rem', fontWeight: '700', color: '#1e293b', marginBottom: '0.75rem' }}>Data Pendidikan</h3>
+          <p style={{ color: '#64748b', fontSize: '0.95rem', lineHeight: '1.5', marginBottom: '2rem' }}>
+            Pusat data referensi pendidikan: Data Sekolah (SISP), Data Guru (SIDG), dan Data Siswa (SIDS).
+          </p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#475569', fontWeight: '600', fontSize: '1rem', marginTop: 'auto' }}>
+            {showData ? 'Tutup Pilihan' : 'Lihat Aplikasi'} <ChevronRight size={18} style={{ transform: showData ? 'rotate(90deg)' : 'none', transition: '0.2s' }} />
+          </div>
+        </div>
 
-        {/* Card 2: Data Sekolah (SISP) */}
-        <Link href="/dashboard-sisp" style={{ textDecoration: 'none' }}>
-          <div 
-            style={{
-              background: 'rgba(255, 255, 255, 0.03)',
-              backdropFilter: 'blur(16px)',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
-              borderRadius: '16px',
-              padding: '2.5rem 2rem',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              textAlign: 'center',
-              cursor: 'pointer',
-              transition: 'all 0.3s ease',
-              height: '100%',
-              boxShadow: '0 10px 30px rgba(0,0,0,0.2)'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-8px)';
-              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)';
-              e.currentTarget.style.borderColor = 'rgba(245, 158, 11, 0.5)';
-              e.currentTarget.style.boxShadow = '0 20px 40px rgba(0,0,0,0.4)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.03)';
-              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
-              e.currentTarget.style.boxShadow = '0 10px 30px rgba(0,0,0,0.2)';
-            }}
-          >
-            <div style={{ background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)', padding: '1.2rem', borderRadius: '50%', marginBottom: '1.5rem', boxShadow: '0 4px 15px rgba(245,158,11,0.4)' }}>
-              <School size={40} color="white" />
-            </div>
-            <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: '600', color: 'white', marginBottom: '0.5rem' }}>Data Sekolah (SISP)</h3>
-            <p style={{ color: '#94a3b8', fontSize: '0.95rem', lineHeight: '1.5', marginBottom: '2rem' }}>
-              Sistem Informasi Satuan Pendidikan. Pemetaan lokasi, fasilitas, dan profil lengkap sekolah.
-            </p>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#fbbf24', fontWeight: '600', fontSize: '1rem', marginTop: 'auto' }}>
-              Akses SISP <ChevronRight size={18} />
-            </div>
-          </div>
-        </Link>
-
-        {/* Card 3: Data Guru */}
-        <Link href="/dashboard-guru" style={{ textDecoration: 'none' }}>
-          <div 
-            style={{
-              background: 'rgba(255, 255, 255, 0.03)',
-              backdropFilter: 'blur(16px)',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
-              borderRadius: '16px',
-              padding: '2.5rem 2rem',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              textAlign: 'center',
-              cursor: 'pointer',
-              transition: 'all 0.3s ease',
-              height: '100%',
-              boxShadow: '0 10px 30px rgba(0,0,0,0.2)'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-8px)';
-              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)';
-              e.currentTarget.style.borderColor = 'rgba(16, 185, 129, 0.5)';
-              e.currentTarget.style.boxShadow = '0 20px 40px rgba(0,0,0,0.4)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.03)';
-              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
-              e.currentTarget.style.boxShadow = '0 10px 30px rgba(0,0,0,0.2)';
-            }}
-          >
-            <div style={{ background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', padding: '1.2rem', borderRadius: '50%', marginBottom: '1.5rem', boxShadow: '0 4px 15px rgba(16,185,129,0.4)' }}>
-              <Database size={40} color="white" />
-            </div>
-            <h3 style={{ fontSize: '1.5rem', fontWeight: '600', color: 'white', marginBottom: '0.75rem' }}>Data Guru (SIDG)</h3>
-            <p style={{ color: '#94a3b8', fontSize: '0.95rem', lineHeight: '1.5', marginBottom: '2rem' }}>
-              Pusat Informasi Data Guru dan Tenaga Kependidikan (Persebaran dan kualifikasi).
-            </p>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#34d399', fontWeight: '600', fontSize: '1rem', marginTop: 'auto' }}>
-              Akses SIDG <ChevronRight size={18} />
-            </div>
-          </div>
-        </Link>
-
-        {/* Card 4: Data Siswa (SIDS) */}
-        <Link href="/dashboard-analitik" style={{ textDecoration: 'none' }}>
-          <div 
-            style={{
-              background: 'rgba(255, 255, 255, 0.03)',
-              backdropFilter: 'blur(16px)',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
-              borderRadius: '16px',
-              padding: '2.5rem 2rem',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              textAlign: 'center',
-              cursor: 'pointer',
-              transition: 'all 0.3s ease',
-              height: '100%',
-              boxShadow: '0 10px 30px rgba(0,0,0,0.2)'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-8px)';
-              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)';
-              e.currentTarget.style.borderColor = 'rgba(168, 85, 247, 0.5)';
-              e.currentTarget.style.boxShadow = '0 20px 40px rgba(0,0,0,0.4)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.03)';
-              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
-              e.currentTarget.style.boxShadow = '0 10px 30px rgba(0,0,0,0.2)';
-            }}
-          >
-            <div style={{ background: 'linear-gradient(135deg, #a855f7 0%, #7e22ce 100%)', padding: '1.2rem', borderRadius: '50%', marginBottom: '1.5rem', boxShadow: '0 4px 15px rgba(168,85,247,0.4)' }}>
-              <Database size={40} color="white" />
-            </div>
-            <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: '600', color: 'white', marginBottom: '0.5rem' }}>Data Siswa (SIDS)</h3>
-            <p style={{ color: '#94a3b8', fontSize: '0.95rem', lineHeight: '1.5', marginBottom: '2rem' }}>
-              Sistem Informasi Data Siswa. Statistik demografi dan daftar siswa aktif.
-            </p>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#c084fc', fontWeight: '600', fontSize: '1rem', marginTop: 'auto' }}>
-              Akses SIDS <ChevronRight size={18} />
-            </div>
-          </div>
-        </Link>
-        
       </div>
 
-      {/* Footer */}
-      <div style={{ position: 'absolute', bottom: '2rem', zIndex: 1, color: '#64748b', fontSize: '0.85rem' }}>
-        &copy; {new Date().getFullYear()} Dinas Pendidikan dan Kebudayaan Kota Tomohon
-      </div>
+      {/* SUB APPS (DATA PENDIDIKAN) */}
+      {showData && (
+        <div style={{ width: '100%', maxWidth: '1000px', marginTop: '3rem', animation: 'fadeInUp 0.4s ease-out' }}>
+          <h3 style={{ textAlign: 'center', color: '#1e293b', marginBottom: '2rem', fontSize: '1.5rem', fontWeight: '700' }}>
+            Aplikasi Data Pendidikan
+          </h3>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
+            
+            {/* SISP */}
+            <Link href="/dashboard-sisp" style={{ textDecoration: 'none' }}>
+              <div style={{ background: 'white', borderRadius: '16px', padding: '1.5rem', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: '1rem', transition: 'all 0.2s', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = '#991b1b'; e.currentTarget.style.transform = 'translateY(-4px)'; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = '#e2e8f0'; e.currentTarget.style.transform = 'translateY(0)'; }}
+              >
+                <div style={{ background: '#fef2f2', color: '#b91c1c', padding: '1rem', borderRadius: '12px' }}><School size={28}/></div>
+                <div>
+                  <h4 style={{ margin: '0 0 0.25rem 0', color: '#0f172a', fontSize: '1.1rem', fontWeight: '700' }}>Data Sekolah (SISP)</h4>
+                  <p style={{ margin: 0, color: '#64748b', fontSize: '0.85rem' }}>Profil & fasilitas sekolah</p>
+                </div>
+              </div>
+            </Link>
+
+            {/* SIDG */}
+            <Link href="/dashboard-guru" style={{ textDecoration: 'none' }}>
+              <div style={{ background: 'white', borderRadius: '16px', padding: '1.5rem', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: '1rem', transition: 'all 0.2s', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = '#991b1b'; e.currentTarget.style.transform = 'translateY(-4px)'; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = '#e2e8f0'; e.currentTarget.style.transform = 'translateY(0)'; }}
+              >
+                <div style={{ background: '#fef2f2', color: '#b91c1c', padding: '1rem', borderRadius: '12px' }}><UserCheck size={28}/></div>
+                <div>
+                  <h4 style={{ margin: '0 0 0.25rem 0', color: '#0f172a', fontSize: '1.1rem', fontWeight: '700' }}>Data Guru (SIDG)</h4>
+                  <p style={{ margin: 0, color: '#64748b', fontSize: '0.85rem' }}>Statistik & kualifikasi guru</p>
+                </div>
+              </div>
+            </Link>
+
+            {/* SIDS */}
+            <Link href="/dashboard-analitik" style={{ textDecoration: 'none' }}>
+              <div style={{ background: 'white', borderRadius: '16px', padding: '1.5rem', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: '1rem', transition: 'all 0.2s', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = '#991b1b'; e.currentTarget.style.transform = 'translateY(-4px)'; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = '#e2e8f0'; e.currentTarget.style.transform = 'translateY(0)'; }}
+              >
+                <div style={{ background: '#fef2f2', color: '#b91c1c', padding: '1rem', borderRadius: '12px' }}><Users size={28}/></div>
+                <div>
+                  <h4 style={{ margin: '0 0 0.25rem 0', color: '#0f172a', fontSize: '1.1rem', fontWeight: '700' }}>Data Siswa (SIDS)</h4>
+                  <p style={{ margin: 0, color: '#64748b', fontSize: '0.85rem' }}>Demografi peserta didik</p>
+                </div>
+              </div>
+            </Link>
+
+          </div>
+        </div>
+      )}
 
       <style jsx global>{`
         @keyframes fadeInUp {
