@@ -179,18 +179,22 @@ export default function RaporSekolahPage() {
                   {(() => {
                     const grouped = {};
                     const forbiddenTitles = ['Penyerapan lulusan SMK', 'Pendapatan lulusan SMK', 'Kompetensi lulusan SMK', 'Link and match dengan dunia kerja'];
+                    const forbiddenKodes = new Set();
                     
                     Object.entries(selectedSekolah.indikator).forEach(([groupName, fields]) => {
                       const kodeMatch = groupName.match(/^([A-Z])\.(\d+)(?:\.(\d+))?/);
                       if (!kodeMatch) return;
                       
                       const titleStr = groupName.substring(kodeMatch[0].length).trim();
-                      if (forbiddenTitles.some(f => titleStr.toLowerCase().includes(f.toLowerCase()))) return;
+                      const mainKode = `${kodeMatch[1]}.${kodeMatch[2]}`;
+                      
+                      if (forbiddenTitles.some(f => titleStr.toLowerCase().includes(f.toLowerCase()))) {
+                        forbiddenKodes.add(mainKode);
+                      }
                       
                       const letter = kodeMatch[1];
                       const mainNum = kodeMatch[2];
                       const subNum = kodeMatch[3];
-                      const mainKode = `${letter}.${mainNum}`;
                       
                       if (!grouped[mainKode]) {
                         grouped[mainKode] = { main: null, sub: [] };
@@ -201,6 +205,10 @@ export default function RaporSekolahPage() {
                       } else {
                         grouped[mainKode].sub.push({ groupName, fields, kode: kodeMatch[0], title: titleStr });
                       }
+                    });
+                    
+                    forbiddenKodes.forEach(kode => {
+                      delete grouped[kode];
                     });
                     
                     const sortedMainCodes = Object.keys(grouped).sort((a, b) => {
