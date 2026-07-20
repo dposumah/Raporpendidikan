@@ -319,7 +319,6 @@ export default function DetailSekolahPage() {
 
                 return extracted.map((ind, idx) => {
                   const labelCapaian = ind.fields['Label Capaian'] || ind.fields['label_capaian'] || ind.fields['Label Capaian '];
-                  const nilaiRapor = ind.fields['Nilai Rapor'] || ind.fields['nilai_rapor'] || ind.fields['Nilai Sekolah'] || ind.fields['Nilai Rapor '];
                   
                   let labelColor = '#e2e8f0';
                   let labelText = '#475569';
@@ -332,15 +331,15 @@ export default function DetailSekolahPage() {
 
                   return (
                     <div key={idx} style={{ border: '1px solid #e2e8f0', borderRadius: '12px', padding: '1.25rem', backgroundColor: '#f8fafc' }}>
-                      <h4 style={{ margin: '0 0 1rem 0', color: '#0f172a', fontSize: '1rem', fontWeight: 'bold' }}>{ind.key}</h4>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-                        <div>
-                          <span style={{ display: 'block', color: '#64748b', fontSize: '0.8rem', textTransform: 'uppercase', fontWeight: '600' }}>Nilai</span>
-                          <span style={{ color: '#0f172a', fontSize: '1.5rem', fontWeight: 'bold' }}>{nilaiRapor || '-'}</span>
-                        </div>
-                        {labelCapaian && (
-                          <div style={{ backgroundColor: labelColor, color: labelText, padding: '0.35rem 0.75rem', borderRadius: '8px', fontSize: '0.85rem', fontWeight: '600' }}>
+                      <h4 style={{ margin: '0 0 1rem 0', color: '#0f172a', fontSize: '1rem', fontWeight: 'bold', minHeight: '2.5rem' }}>{ind.key}</h4>
+                      <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
+                        {labelCapaian ? (
+                          <div style={{ backgroundColor: labelColor, color: labelText, padding: '0.5rem 1rem', borderRadius: '8px', fontSize: '0.9rem', fontWeight: '700', border: `1px solid ${labelText}30` }}>
                             {labelCapaian}
+                          </div>
+                        ) : (
+                          <div style={{ backgroundColor: '#f1f5f9', color: '#64748b', padding: '0.5rem 1rem', borderRadius: '8px', fontSize: '0.9rem', fontWeight: '600' }}>
+                            Data Tidak Tersedia
                           </div>
                         )}
                       </div>
