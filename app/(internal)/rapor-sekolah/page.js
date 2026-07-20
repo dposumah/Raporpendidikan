@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { createClient } from '@/utils/supabase/client';
-import { Search, School, MapPin, ChevronDown, ChevronRight, Activity, TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { Search, School, MapPin, ChevronDown, ChevronRight, Activity, TrendingUp, TrendingDown, Minus, X, Info } from 'lucide-react';
 
 export default function RaporSekolahPage() {
   const [data, setData] = useState([]);
@@ -11,6 +11,7 @@ export default function RaporSekolahPage() {
   const [search, setSearch] = useState('');
   
   const [selectedSekolah, setSelectedSekolah] = useState(null);
+  const [selectedDetail, setSelectedDetail] = useState(null);
 
   const supabase = createClient();
 
@@ -177,10 +178,14 @@ export default function RaporSekolahPage() {
                   
                   {(() => {
                     const grouped = {};
+                    const forbiddenTitles = ['Penyerapan lulusan SMK', 'Pendapatan lulusan SMK', 'Kompetensi lulusan SMK', 'Link and match dengan dunia kerja'];
                     
                     Object.entries(selectedSekolah.indikator).forEach(([groupName, fields]) => {
                       const kodeMatch = groupName.match(/^([A-Z])\.(\d+)(?:\.(\d+))?/);
                       if (!kodeMatch) return;
+                      
+                      const titleStr = groupName.substring(kodeMatch[0].length).trim();
+                      if (forbiddenTitles.some(f => titleStr.toLowerCase().includes(f.toLowerCase()))) return;
                       
                       const letter = kodeMatch[1];
                       const mainNum = kodeMatch[2];
@@ -190,8 +195,6 @@ export default function RaporSekolahPage() {
                       if (!grouped[mainKode]) {
                         grouped[mainKode] = { main: null, sub: [] };
                       }
-                      
-                      const titleStr = groupName.substring(kodeMatch[0].length).trim();
                       
                       if (!subNum) {
                         grouped[mainKode].main = { groupName, fields, kode: mainKode, title: titleStr };
@@ -209,7 +212,6 @@ export default function RaporSekolahPage() {
 
                     return sortedMainCodes.map((mainKode, idx) => {
                       const group = grouped[mainKode];
-                      // Jika kebetulan header utamanya tidak ada tapi sub-nya ada, kita buatkan dummy
                       const mainData = group.main || { fields: {}, kode: mainKode, title: 'Indikator ' + mainKode };
                       const { fields, kode, title } = mainData;
                       
@@ -218,8 +220,7 @@ export default function RaporSekolahPage() {
                       return (
                         <div key={idx} style={{ border: '1px solid #e2e8f0', borderRadius: '8px', overflow: 'hidden', marginBottom: '1.5rem', background: 'white' }}>
                           
-                          {/* MAIN INDICATOR HEADER */}
-                          <div style={{ background: '#f1f5f9', padding: '1rem', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                          <div style={{ background: '#f1f5f9', padding: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                             <div style={{ flex: 1, paddingRight: '1rem' }}>
                               <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
                                 <span style={{ background: '#2563eb', color: 'white', padding: '0.3rem 0.6rem', borderRadius: '6px', fontSize: '0.85rem', fontWeight: 'bold' }}>{kode}</span>
@@ -238,42 +239,25 @@ export default function RaporSekolahPage() {
                               </div>
                             </div>
                             
-                            {labelCapaian && (
-                              <div style={{ background: getLabelColor(labelCapaian), color: getLabelTextColor(labelCapaian), padding: '0.5rem 1rem', borderRadius: '20px', fontSize: '0.85rem', fontWeight: '700', whiteSpace: 'nowrap', border: `1px solid ${getLabelTextColor(labelCapaian)}30` }}>
-                                {labelCapaian}
-                              </div>
-                            )}
-                          </div>
-
-                          {/* SUB INDICATORS LIST */}
-                          {group.sub.length > 0 && (
-                            <div style={{ padding: '0.5rem 1rem' }}>
-                              {group.sub.sort((a, b) => {
-                                const aNum = parseInt(a.kode.split('.')[2] || 0);
-                                const bNum = parseInt(b.kode.split('.')[2] || 0);
-                                return aNum - bNum;
-                              }).map((sub, sIdx) => (
-                                <div key={sIdx} style={{ padding: '0.75rem 0', borderBottom: sIdx === group.sub.length - 1 ? 'none' : '1px dashed #cbd5e1' }}>
-                                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                                    <span style={{ color: '#3b82f6', fontWeight: '700', fontSize: '0.85rem' }}>{sub.kode}</span>
-                                    <h5 style={{ margin: 0, color: '#334155', fontSize: '0.9rem', fontWeight: '600' }}>{sub.title}</h5>
-                                  </div>
-                                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', paddingLeft: '2.5rem' }}>
-                                    {Object.entries(sub.fields).map(([k, v], i) => (
-                                      <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                        <span style={{ color: '#64748b', fontSize: '0.8rem' }}>{k}:</span>
-                                        <div style={{ color: '#0f172a', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.25rem', fontWeight: '500' }}>
-                                          {k.toLowerCase().includes('perubahan') && renderTrendIcon(v)}
-                                          <span>{v || '-'}</span>
-                                        </div>
-                                      </div>
-                                    ))}
-                                  </div>
+                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.75rem' }}>
+                              {labelCapaian && (
+                                <div style={{ background: getLabelColor(labelCapaian), color: getLabelTextColor(labelCapaian), padding: '0.5rem 1rem', borderRadius: '20px', fontSize: '0.85rem', fontWeight: '700', whiteSpace: 'nowrap', border: `1px solid ${getLabelTextColor(labelCapaian)}30` }}>
+                                  {labelCapaian}
                                 </div>
-                              ))}
+                              )}
+                              
+                              {group.sub.length > 0 && (
+                                <button 
+                                  onClick={() => setSelectedDetail({ kode, title, sub: group.sub })}
+                                  style={{ background: 'white', border: '1px solid #cbd5e1', color: '#334155', padding: '0.4rem 0.75rem', borderRadius: '6px', fontSize: '0.8rem', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.25rem', transition: 'all 0.2s' }}
+                                  onMouseOver={(e) => { e.currentTarget.style.background = '#f8fafc'; e.currentTarget.style.borderColor = '#94a3b8'; }}
+                                  onMouseOut={(e) => { e.currentTarget.style.background = 'white'; e.currentTarget.style.borderColor = '#cbd5e1'; }}
+                                >
+                                  <Info size={14} /> Lihat Detail Sub
+                                </button>
+                              )}
                             </div>
-                          )}
-
+                          </div>
                         </div>
                       );
                     });
@@ -291,6 +275,59 @@ export default function RaporSekolahPage() {
         </div>
 
       </div>
+
+      {/* MODAL DETAIL SUB INDIKATOR */}
+      {selectedDetail && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(15, 23, 42, 0.6)', backdropFilter: 'blur(4px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
+          <div style={{ background: 'white', borderRadius: '16px', width: '100%', maxWidth: '800px', maxHeight: '90vh', display: 'flex', flexDirection: 'column', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)' }}>
+            
+            <div style={{ padding: '1.5rem', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                  <span style={{ background: '#2563eb', color: 'white', padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 'bold' }}>{selectedDetail.kode}</span>
+                  <h3 style={{ margin: 0, color: '#0f172a', fontSize: '1.25rem' }}>Detail Sub-Indikator</h3>
+                </div>
+                <p style={{ margin: 0, color: '#64748b', fontSize: '0.95rem' }}>{selectedDetail.title}</p>
+              </div>
+              <button 
+                onClick={() => setSelectedDetail(null)}
+                style={{ background: '#f1f5f9', border: 'none', width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#64748b' }}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div style={{ padding: '1.5rem', overflowY: 'auto', flex: 1, backgroundColor: '#f8fafc' }}>
+              <div style={{ display: 'grid', gap: '1rem' }}>
+                {selectedDetail.sub.sort((a, b) => {
+                  const aNum = parseInt(a.kode.split('.')[2] || 0);
+                  const bNum = parseInt(b.kode.split('.')[2] || 0);
+                  return aNum - bNum;
+                }).map((sub, sIdx) => (
+                  <div key={sIdx} style={{ background: 'white', padding: '1.25rem', borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
+                      <span style={{ color: '#3b82f6', fontWeight: '700', fontSize: '0.9rem', backgroundColor: '#eff6ff', padding: '0.2rem 0.5rem', borderRadius: '4px' }}>{sub.kode}</span>
+                      <h5 style={{ margin: 0, color: '#1e293b', fontSize: '1rem', fontWeight: '600' }}>{sub.title}</h5>
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
+                      {Object.entries(sub.fields).map(([k, v], i) => (
+                        <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                          <span style={{ color: '#64748b', fontSize: '0.8rem', fontWeight: '500' }}>{k}</span>
+                          <div style={{ color: '#0f172a', fontSize: '0.95rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: '600' }}>
+                            {k.toLowerCase().includes('perubahan') && renderTrendIcon(v)}
+                            <span>{v || '-'}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+          </div>
+        </div>
+      )}
     </div>
   );
 }
