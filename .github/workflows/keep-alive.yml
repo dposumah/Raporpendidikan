@@ -12,6 +12,4 @@ jobs:
     steps:
       - name: Ping Supabase Keep Alive Endpoint
         run: |
-          # Ganti URL_APLIKASI_ANDA dengan URL domain aplikasi Anda setelah dihosting (misal: https://rapor-tomohon.vercel.app)
-          # Contoh: curl -sSf https://rapor-tomohon.vercel.app/api/keep-alive
-          curl -sSf ${{ secrets.PRODUCTION_URL }}/api/keep-alive || echo "Ping failed or PRODUCTION_URL secret not set"
+          curl -sSf https://dikbud-raporpendidikan.vercel.app/api/keep-alive || echo "Ping failed"
