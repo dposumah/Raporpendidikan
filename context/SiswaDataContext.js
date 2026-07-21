@@ -38,32 +38,56 @@ export function SiswaDataProvider({ children }) {
 
   const fetchData = async (periode) => {
     setLoading(true);
-    let allResult = [];
-    let from = 0;
-    const limit = 1000;
-    let hasMore = true;
-
     try {
-      while (hasMore) {
-        let query = supabase.from('siswa').select('*').eq('periode', periode).range(from, from + limit - 1);
-        const { data: result, error } = await query;
-        
-        if (error) {
-          console.error('Error fetching data:', error);
-          hasMore = false;
-        } else {
-          if (result && result.length > 0) {
-            allResult = [...allResult, ...result];
-            from += limit;
-            if (result.length < limit) hasMore = false;
-          } else {
-            hasMore = false;
-          }
-        }
+      // 1. Get total count
+      const { count, error } = await supabase
+        .from('siswa')
+        .select('*', { count: 'exact', head: true })
+        .eq('periode', periode);
+      
+      if (error) {
+        console.error('Error fetching count:', error);
+        setAllData([]);
+        return;
       }
+      if (!count) {
+        setAllData([]);
+        return;
+      }
+
+      // 2. Prepare parallel requests
+      const limit = 1000;
+      const totalPages = Math.ceil(count / limit);
+      const promises = [];
+
+      for (let i = 0; i < totalPages; i++) {
+        const from = i * limit;
+        const to = from + limit - 1;
+        promises.push(
+          supabase
+            .from('siswa')
+            .select('*')
+            .eq('periode', periode)
+            .range(from, to)
+        );
+      }
+
+      // 3. Execute in batches of 5 to avoid rate limits while remaining fast
+      let allResult = [];
+      const batchSize = 5;
+      for (let i = 0; i < promises.length; i += batchSize) {
+        const batch = promises.slice(i, i + batchSize);
+        const results = await Promise.all(batch);
+        results.forEach((res) => {
+          if (res.data) {
+            allResult = [...allResult, ...res.data];
+          }
+        });
+      }
+      
       setAllData(allResult);
     } catch (err) {
-      console.error('Error in fetching data chunk:', err);
+      console.error('Error in fetching data:', err);
     } finally {
       setLoading(false);
     }
