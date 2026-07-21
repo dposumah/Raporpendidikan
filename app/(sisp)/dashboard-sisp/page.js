@@ -16,6 +16,7 @@ export default function DashboardSispPage() {
   // Filters
   const [kecamatan, setKecamatan] = useState('');
   const [kelurahan, setKelurahan] = useState('');
+  const [bentuk, setBentuk] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   
   // Pagination
@@ -24,7 +25,8 @@ export default function DashboardSispPage() {
 
   const [availableFilters, setAvailableFilters] = useState({
     kecamatan: [],
-    kelurahan: []
+    kelurahan: [],
+    bentuk: []
   });
 
   useEffect(() => {
@@ -40,7 +42,8 @@ export default function DashboardSispPage() {
       setData(result || []);
 
       const uniqueKec = [...new Set(result.map(d => d.kecamatan).filter(Boolean))].sort();
-      setAvailableFilters(prev => ({ ...prev, kecamatan: uniqueKec }));
+      const uniqueBentuk = [...new Set(result.map(d => d.bentuk_pendidikan).filter(Boolean))].sort();
+      setAvailableFilters(prev => ({ ...prev, kecamatan: uniqueKec, bentuk: uniqueBentuk }));
     } catch (error) {
       console.error(error);
     } finally {
@@ -64,6 +67,7 @@ export default function DashboardSispPage() {
     return data.filter(d => {
       const matchKec = !kecamatan || d.kecamatan === kecamatan;
       const matchKel = !kelurahan || d.kelurahan === kelurahan;
+      const matchBentuk = !bentuk || d.bentuk_pendidikan === bentuk;
       
       let matchSearch = true;
       if (searchQuery) {
@@ -75,14 +79,14 @@ export default function DashboardSispPage() {
         }
       }
       
-      return matchKec && matchKel && matchSearch;
+      return matchKec && matchKel && matchBentuk && matchSearch;
     });
-  }, [data, kecamatan, kelurahan, searchQuery]);
+  }, [data, kecamatan, kelurahan, bentuk, searchQuery]);
 
   // Reset page when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [kecamatan, kelurahan, searchQuery]);
+  }, [kecamatan, kelurahan, bentuk, searchQuery]);
 
   // Pagination logic
   const totalPages = Math.ceil(filteredData.length / itemsPerPage) || 1;
@@ -148,9 +152,16 @@ export default function DashboardSispPage() {
                   {availableFilters.kelurahan.map(k => <option key={k} value={k}>{k}</option>)}
                 </select>
               </div>
-              
+              <div>
+                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#64748b', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Bentuk Pendidikan / Jenjang</label>
+                <select value={bentuk} onChange={(e) => setBentuk(e.target.value)} style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none', backgroundColor: '#f8fafc', color: '#0f172a', fontSize: '0.95rem' }}>
+                  <option value="">Semua Jenjang</option>
+                  {availableFilters.bentuk?.map(b => <option key={b} value={b}>{b}</option>)}
+                </select>
+              </div>
+
               <button 
-                onClick={() => { setKecamatan(''); setKelurahan(''); }}
+                onClick={() => { setKecamatan(''); setKelurahan(''); setBentuk(''); }}
                 style={{ marginTop: '1rem', padding: '0.75rem', backgroundColor: '#f1f5f9', color: '#475569', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer', transition: 'background 0.2s' }}
                 onMouseEnter={e => e.currentTarget.style.backgroundColor = '#e2e8f0'}
                 onMouseLeave={e => e.currentTarget.style.backgroundColor = '#f1f5f9'}

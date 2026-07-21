@@ -12,7 +12,7 @@ export default function SispLayout({ children }) {
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: '#f8fafc' }}>
       
       {/* Top Navbar specifically for SISP */}
-      <div style={{ backgroundColor: '#1e293b', color: 'white', padding: '0 2rem', height: '75px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)', position: 'sticky', top: 0, zIndex: 50 }}>
+      <div style={{ backgroundColor: '#1e293b', color: 'white', padding: '0 2rem', height: '75px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)', position: 'sticky', top: 0, zIndex: 1000 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
           <div style={{ backgroundColor: '#3b82f6', padding: '0.5rem', borderRadius: '8px' }}>
             <School size={24} color="white" />
