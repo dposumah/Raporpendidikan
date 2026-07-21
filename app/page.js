@@ -2,10 +2,20 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { BarChart2, Database, ChevronRight, School, Users, UserCheck } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { createClient } from '@/utils/supabase/client';
+import { BarChart2, Database, ChevronRight, School, Users, UserCheck, LogOut } from 'lucide-react';
 
 export default function PortalPage() {
   const [showData, setShowData] = useState(false);
+  const router = useRouter();
+  const supabase = createClient();
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    router.push('/login');
+    router.refresh();
+  };
 
   return (
     <div style={{
@@ -22,6 +32,16 @@ export default function PortalPage() {
       {/* Background ambient light effects - Merah elegan */}
       <div style={{ position: 'absolute', top: '-10%', left: '-10%', width: '40vw', height: '40vw', background: 'radial-gradient(circle, rgba(153,27,27,0.05) 0%, rgba(0,0,0,0) 70%)', borderRadius: '50%', filter: 'blur(60px)' }}></div>
       <div style={{ position: 'absolute', bottom: '-10%', right: '-10%', width: '50vw', height: '50vw', background: 'radial-gradient(circle, rgba(185,28,28,0.05) 0%, rgba(0,0,0,0) 70%)', borderRadius: '50%', filter: 'blur(60px)' }}></div>
+
+      {/* Logout button */}
+      <button 
+        onClick={handleLogout} 
+        style={{ position: 'absolute', top: '1.5rem', right: '2rem', display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', backgroundColor: 'white', border: '1px solid #e2e8f0', borderRadius: '8px', cursor: 'pointer', fontWeight: '600', color: '#991b1b', zIndex: 10, boxShadow: '0 2px 4px rgba(0,0,0,0.05)', transition: 'background 0.2s' }}
+        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#fef2f2'}
+        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'white'}
+      >
+        <LogOut size={16} /> Keluar
+      </button>
 
       {/* Header / Logo section */}
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '4rem', zIndex: 1, animation: 'fadeInDown 0.8s ease-out' }}>
