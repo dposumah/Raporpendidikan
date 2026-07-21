@@ -28,7 +28,7 @@ export default function LoginPage() {
       setError(error.message);
       setLoading(false);
     } else {
-      router.push('/dashboard-analitik');
+      router.push('/');
       router.refresh(); // Refresh to update server components and middleware state
     }
   };
@@ -43,9 +43,7 @@ export default function LoginPage() {
       padding: '1rem',
       position: 'relative'
     }}>
-      <Link href="/" style={{ position: 'absolute', top: '2rem', left: '2rem', color: '#94a3b8', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem', transition: 'color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.color='white'} onMouseLeave={(e) => e.currentTarget.style.color='#94a3b8'}>
-        <ArrowLeft size={16} /> Kembali ke Portal
-      </Link>
+
 
       <div style={{
         background: 'rgba(255, 255, 255, 0.05)',
@@ -59,8 +57,8 @@ export default function LoginPage() {
       }}>
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
           <img src="/logo.png" alt="Logo Tomohon" style={{ height: '60px', marginBottom: '1rem' }} />
-          <h1 style={{ color: 'white', fontSize: '1.5rem', fontWeight: '600', marginBottom: '0.5rem' }}>Login Internal SIDS</h1>
-          <p style={{ color: '#94a3b8', fontSize: '0.9rem' }}>Masukkan kredensial Anda untuk mengakses modul Data Pendidikan.</p>
+          <h1 style={{ color: 'white', fontSize: '1.5rem', fontWeight: '600', marginBottom: '0.5rem' }}>Portal Pendidikan Tomohon</h1>
+          <p style={{ color: '#94a3b8', fontSize: '0.9rem' }}>Masuk dengan kredensial Anda untuk mengakses data pendidikan yang bersifat rahasia.</p>
         </div>
 
         {error && (
