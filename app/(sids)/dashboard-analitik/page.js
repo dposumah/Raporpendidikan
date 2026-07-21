@@ -620,6 +620,17 @@ export default function DataPendidikanPage() {
     );
   };
 
+  if (loading) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#f8fafc' }}>
+        <div style={{ textAlign: 'center' }}>
+          <div className="animate-spin" style={{ width: '40px', height: '40px', border: '4px solid #e2e8f0', borderTopColor: '#4f46e5', borderRadius: '50%', margin: '0 auto 1rem auto' }}></div>
+          <p style={{ color: '#64748b', fontWeight: '500' }}>Memuat Data Siswa (SIDS)...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div style={{ backgroundColor: '#f8fafc', minHeight: 'calc(100vh - 75px)', padding: '2rem' }}>
       <div style={{ maxWidth: '1400px', margin: '0 auto', display: 'flex', gap: '2rem', alignItems: 'flex-start' }}>
