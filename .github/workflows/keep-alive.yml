@@ -1,0 +1,17 @@
+name: Supabase Keep Alive Cron
+
+on:
+  schedule:
+    # Runs every 3 days at 00:00 UTC
+    - cron: '0 0 */3 * *'
+  workflow_dispatch: # Allows manual trigger from GitHub UI
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase Keep Alive Endpoint
+        run: |
+          # Ganti URL_APLIKASI_ANDA dengan URL domain aplikasi Anda setelah dihosting (misal: https://rapor-tomohon.vercel.app)
+          # Contoh: curl -sSf https://rapor-tomohon.vercel.app/api/keep-alive
+          curl -sSf ${{ secrets.PRODUCTION_URL }}/api/keep-alive || echo "Ping failed or PRODUCTION_URL secret not set"
