@@ -292,7 +292,7 @@ export default function DataPendidikanPage() {
         <label style={{ display: 'block', fontSize: '0.85rem', color: '#64748b', marginBottom: '0.5rem', fontWeight: '500' }}>{label}</label>
         <div 
           onClick={() => setIsOpen(!isOpen)}
-          style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #cbd5e1', color: value ? '#0f172a' : '#94a3b8', background: 'white', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+          style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #cbd5e1', color: value ? '#450a0a' : '#94a3b8', background: 'white', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
         >
           <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{value || placeholder}</span>
           <ChevronDown size={16} color="#64748b" style={{ transform: isOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
@@ -300,7 +300,7 @@ export default function DataPendidikanPage() {
         
         {isOpen && (
           <div style={{ position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 0, background: 'white', border: '1px solid #e2e8f0', borderRadius: '8px', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)', zIndex: 50, maxHeight: '250px', display: 'flex', flexDirection: 'column' }}>
-            <div style={{ padding: '0.5rem', borderBottom: '1px solid #f1f5f9' }}>
+            <div style={{ padding: '0.5rem', borderBottom: '1px solid #f3f0e7' }}>
               <input 
                 type="text" 
                 autoFocus
@@ -313,9 +313,9 @@ export default function DataPendidikanPage() {
             <div style={{ overflowY: 'auto', flex: 1 }}>
               <div 
                 onClick={() => { onChange(''); setIsOpen(false); setSearchTerm(''); }}
-                style={{ padding: '0.5rem 1rem', cursor: 'pointer', fontSize: '0.9rem', color: '#64748b', background: !value ? '#f1f5f9' : 'transparent' }}
-                onMouseEnter={e => e.currentTarget.style.background = '#f8fafc'}
-                onMouseLeave={e => e.currentTarget.style.background = !value ? '#f1f5f9' : 'transparent'}
+                style={{ padding: '0.5rem 1rem', cursor: 'pointer', fontSize: '0.9rem', color: '#64748b', background: !value ? '#f3f0e7' : 'transparent' }}
+                onMouseEnter={e => e.currentTarget.style.background = '#fdfbf7'}
+                onMouseLeave={e => e.currentTarget.style.background = !value ? '#f3f0e7' : 'transparent'}
               >
                 {placeholder} (Semua)
               </div>
@@ -323,9 +323,9 @@ export default function DataPendidikanPage() {
                 <div 
                   key={opt}
                   onClick={() => { onChange(opt); setIsOpen(false); setSearchTerm(''); }}
-                  style={{ padding: '0.5rem 1rem', cursor: 'pointer', fontSize: '0.9rem', color: '#0f172a', background: value === opt ? '#e0f2fe' : 'transparent' }}
-                  onMouseEnter={e => e.currentTarget.style.background = value === opt ? '#e0f2fe' : '#f8fafc'}
-                  onMouseLeave={e => e.currentTarget.style.background = value === opt ? '#e0f2fe' : 'transparent'}
+                  style={{ padding: '0.5rem 1rem', cursor: 'pointer', fontSize: '0.9rem', color: '#450a0a', background: value === opt ? '#fee2e2' : 'transparent' }}
+                  onMouseEnter={e => e.currentTarget.style.background = value === opt ? '#fee2e2' : '#fdfbf7'}
+                  onMouseLeave={e => e.currentTarget.style.background = value === opt ? '#fee2e2' : 'transparent'}
                 >
                   {opt}
                 </div>
@@ -594,7 +594,7 @@ export default function DataPendidikanPage() {
     const paddingLeft = depth * 24 + 16;
     
     return (
-      <div style={{ borderBottom: '1px solid #f1f5f9' }}>
+      <div style={{ borderBottom: '1px solid #f3f0e7' }}>
         <div 
           onClick={() => isLeaf ? setSelectedSekolah(label) : setOpen(!open)}
           style={{ 
@@ -602,15 +602,15 @@ export default function DataPendidikanPage() {
             gridTemplateColumns: 'minmax(250px, 2fr) 1fr 1fr 1fr', 
             gap: '1rem', 
             padding: '1rem', 
-            background: depth === 0 ? '#f8fafc' : depth === 1 ? '#ffffff' : '#fcfcfc',
+            background: depth === 0 ? '#fdfbf7' : depth === 1 ? '#ffffff' : '#fcfcfc',
             cursor: 'pointer',
             alignItems: 'center',
             transition: 'background 0.2s',
             fontWeight: depth === 0 ? '700' : depth === 1 ? '600' : '500',
-            color: depth === 0 ? '#0f172a' : '#334155'
+            color: depth === 0 ? '#450a0a' : '#450a0a'
           }}
-          onMouseEnter={e => !isLeaf && (e.currentTarget.style.background = '#f1f5f9')}
-          onMouseLeave={e => !isLeaf && (e.currentTarget.style.background = depth === 0 ? '#f8fafc' : depth === 1 ? '#ffffff' : '#fcfcfc')}
+          onMouseEnter={e => !isLeaf && (e.currentTarget.style.background = '#f3f0e7')}
+          onMouseLeave={e => !isLeaf && (e.currentTarget.style.background = depth === 0 ? '#fdfbf7' : depth === 1 ? '#ffffff' : '#fcfcfc')}
         >
           <div style={{ display: 'flex', alignItems: 'center', paddingLeft: `${paddingLeft}px` }}>
             {!isLeaf ? (
@@ -623,7 +623,7 @@ export default function DataPendidikanPage() {
             {label}
           </div>
           <div style={{ textAlign: 'center' }}>
-            <span style={{ background: '#e0f2fe', color: '#0369a1', padding: '0.25rem 0.75rem', borderRadius: '999px', fontSize: '0.85rem' }}>
+            <span style={{ background: '#fee2e2', color: '#991b1b', padding: '0.25rem 0.75rem', borderRadius: '999px', fontSize: '0.85rem' }}>
               {aggTotal.toLocaleString('id-ID')} Siswa
             </span>
           </div>
@@ -643,20 +643,20 @@ export default function DataPendidikanPage() {
   };
 
   return (
-    <div style={{ backgroundColor: '#f8fafc', minHeight: 'calc(100vh - 75px)', padding: '2rem' }}>
+    <div style={{ backgroundColor: '#fdfbf7', minHeight: 'calc(100vh - 75px)', padding: '2rem' }}>
       <div style={{ maxWidth: '1400px', margin: '0 auto', display: 'flex', gap: '2rem', alignItems: 'flex-start' }}>
         
         {/* SIDEBAR FILTER */}
         <div style={{ width: '300px', flexShrink: 0, background: 'white', padding: '1.5rem', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', position: 'sticky', top: '2rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '1rem' }}>
-            <div style={{ background: '#f1f5f9', padding: '0.5rem', borderRadius: '8px', color: '#64748b' }}><Filter size={20} /></div>
-            <h3 style={{ margin: 0, fontSize: '1.1rem', color: '#0f172a' }}>Menu Filter</h3>
+            <div style={{ background: '#f3f0e7', padding: '0.5rem', borderRadius: '8px', color: '#64748b' }}><Filter size={20} /></div>
+            <h3 style={{ margin: 0, fontSize: '1.1rem', color: '#450a0a' }}>Menu Filter</h3>
           </div>
           
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
             <div>
               <label style={{ display: 'block', fontSize: '0.85rem', color: '#64748b', marginBottom: '0.5rem', fontWeight: '500' }}>Jenjang</label>
-              <select value={jenjang} onChange={e => setJenjang(e.target.value)} style={{ width: '100%', padding: '0.6rem', borderRadius: '8px', border: '1px solid #cbd5e1', color: '#334155', outline: 'none', fontSize: '0.9rem' }}>
+              <select value={jenjang} onChange={e => setJenjang(e.target.value)} style={{ width: '100%', padding: '0.6rem', borderRadius: '8px', border: '1px solid #cbd5e1', color: '#450a0a', outline: 'none', fontSize: '0.9rem' }}>
                 <option value="">Semua Jenjang</option>
                 {jenjangOptions.map(j => (
                   <option key={j} value={j}>{j}</option>
@@ -674,7 +674,7 @@ export default function DataPendidikanPage() {
             </div>
             <div>
               <label style={{ display: 'block', fontSize: '0.85rem', color: '#64748b', marginBottom: '0.5rem', fontWeight: '500' }}>Kelas</label>
-              <select value={kelas} onChange={e => setKelas(e.target.value)} style={{ width: '100%', padding: '0.6rem', borderRadius: '8px', border: '1px solid #cbd5e1', color: '#334155', outline: 'none', fontSize: '0.9rem' }}>
+              <select value={kelas} onChange={e => setKelas(e.target.value)} style={{ width: '100%', padding: '0.6rem', borderRadius: '8px', border: '1px solid #cbd5e1', color: '#450a0a', outline: 'none', fontSize: '0.9rem' }}>
                 <option value="">Semua Kelas</option>
                 {kelasOptions.map(k => (
                   <option key={k} value={k}>{k}</option>
@@ -683,7 +683,7 @@ export default function DataPendidikanPage() {
             </div>
             <div>
               <label style={{ display: 'block', fontSize: '0.85rem', color: '#64748b', marginBottom: '0.5rem', fontWeight: '500' }}>Status PIP</label>
-              <select value={statusPIP} onChange={e => setStatusPIP(e.target.value)} style={{ width: '100%', padding: '0.6rem', borderRadius: '8px', border: '1px solid #cbd5e1', color: '#334155', outline: 'none', fontSize: '0.9rem' }}>
+              <select value={statusPIP} onChange={e => setStatusPIP(e.target.value)} style={{ width: '100%', padding: '0.6rem', borderRadius: '8px', border: '1px solid #cbd5e1', color: '#450a0a', outline: 'none', fontSize: '0.9rem' }}>
                 <option value="">Semua Status</option>
                 <option value="layak">Layak PIP</option>
                 <option value="tidak_layak">Tidak Layak</option>
@@ -698,10 +698,10 @@ export default function DataPendidikanPage() {
           {/* Header Dashboard */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'white', padding: '1.5rem', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
             <div>
-              <h1 style={{ fontSize: '1.8rem', fontWeight: '700', color: '#0f172a', margin: 0 }}>Analisis & Rekapitulasi</h1>
+              <h1 style={{ fontSize: '1.8rem', fontWeight: '700', color: '#450a0a', margin: 0 }}>Analisis & Rekapitulasi</h1>
               <p style={{ color: '#64748b', fontSize: '0.95rem', marginTop: '0.25rem', marginBottom: 0 }}>Sistem Informasi Data Siswa (SIDS) - Tomohon</p>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', background: '#f8fafc', padding: '0.5rem 1rem', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', background: '#fdfbf7', padding: '0.5rem 1rem', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
               <label style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: '600' }}>Tahun Ajaran:</label>
               <select 
                 value={selectedPeriode} 
@@ -710,7 +710,7 @@ export default function DataPendidikanPage() {
                   padding: '0.4rem 2rem 0.4rem 0.5rem', 
                   borderRadius: '6px', 
                   border: '1px solid #cbd5e1', 
-                  color: '#0f172a', 
+                  color: '#450a0a', 
                   background: 'white', 
                   fontWeight: 'bold',
                   fontSize: '0.9rem',
@@ -733,7 +733,7 @@ export default function DataPendidikanPage() {
 
           {/* TABEL REKAPITULASI (EXISTING) */}
           <div style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', border: '1px solid #e2e8f0' }}>
-            <h3 style={{ margin: '0 0 1.5rem 0', color: '#0f172a', fontSize: '1.25rem', fontWeight: '600' }}>Tabel Analisis & Rekapitulasi</h3>
+            <h3 style={{ margin: '0 0 1.5rem 0', color: '#450a0a', fontSize: '1.25rem', fontWeight: '600' }}>Tabel Analisis & Rekapitulasi</h3>
             
             <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '2rem', flexWrap: 'wrap' }}>
               {[
@@ -754,7 +754,7 @@ export default function DataPendidikanPage() {
                     border: 'none',
                     cursor: 'pointer',
                     transition: 'all 0.2s',
-                    background: rekapTab === tab.id ? '#0284c7' : '#f1f5f9',
+                    background: rekapTab === tab.id ? '#0284c7' : '#f3f0e7',
                     color: rekapTab === tab.id ? 'white' : '#64748b',
                     boxShadow: rekapTab === tab.id ? '0 4px 6px rgba(2, 132, 199, 0.2)' : 'none'
                   }}
@@ -768,9 +768,9 @@ export default function DataPendidikanPage() {
                         {/* DOMISILI SUB-TAB */}
             {rekapTab === 'domisili' && (
               <div style={{ background: 'white', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
-                <div style={{ padding: '1.5rem', borderBottom: '1px solid #e2e8f0', background: '#f8fafc', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+                <div style={{ padding: '1.5rem', borderBottom: '1px solid #e2e8f0', background: '#fdfbf7', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
                   <div>
-                    <h3 style={{ margin: 0, color: '#0f172a', fontSize: '1.1rem', fontWeight: '600' }}>Tabel Rekapitulasi Berdasarkan Wilayah Domisili</h3>
+                    <h3 style={{ margin: 0, color: '#450a0a', fontSize: '1.1rem', fontWeight: '600' }}>Tabel Rekapitulasi Berdasarkan Wilayah Domisili</h3>
                     <p style={{ margin: '0.5rem 0 0 0', color: '#64748b', fontSize: '0.9rem' }}>Dikelompokkan menjadi Kota Tomohon (Kecamatan → Kelurahan) dan Luar Kota Tomohon (Kabupaten → Kecamatan).</p>
                   </div>
                   <div style={{ display: 'flex', gap: '0.5rem' }}>
@@ -809,7 +809,7 @@ export default function DataPendidikanPage() {
                 
                 <div style={{ width: '100%', overflowX: 'auto' }}>
                   <div style={{ minWidth: '800px' }}>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'minmax(250px, 2fr) 1fr 1fr 1fr', gap: '1rem', padding: '1rem', background: '#f1f5f9', borderBottom: '2px solid #e2e8f0', color: '#475569', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'minmax(250px, 2fr) 1fr 1fr 1fr', gap: '1rem', padding: '1rem', background: '#f3f0e7', borderBottom: '2px solid #e2e8f0', color: '#475569', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase' }}>
                       <div>Status & Wilayah Domisili</div>
                       <div style={{ textAlign: 'center' }}>Total Siswa</div>
                       <div style={{ textAlign: 'center' }}>Laki-Laki</div>
@@ -833,9 +833,9 @@ export default function DataPendidikanPage() {
             {/* JENIS KELAMIN SUB-TAB */}
             {rekapTab === 'jk' && (
               <div style={{ background: 'white', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
-                <div style={{ padding: '1.5rem', borderBottom: '1px solid #e2e8f0', background: '#f8fafc', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+                <div style={{ padding: '1.5rem', borderBottom: '1px solid #e2e8f0', background: '#fdfbf7', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
                   <div>
-                    <h3 style={{ margin: 0, color: '#0f172a', fontSize: '1.1rem', fontWeight: '600' }}>Rekapitulasi Jenis Kelamin</h3>
+                    <h3 style={{ margin: 0, color: '#450a0a', fontSize: '1.1rem', fontWeight: '600' }}>Rekapitulasi Jenis Kelamin</h3>
                     <p style={{ margin: '0.5rem 0 0 0', color: '#64748b', fontSize: '0.9rem' }}>Berdasarkan hasil saringan data saat ini.</p>
                   </div>
                   <div style={{ display: 'flex', gap: '0.5rem' }}>
@@ -867,7 +867,7 @@ export default function DataPendidikanPage() {
                 <div style={{ padding: '1.5rem' }}>
                   <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                     <thead>
-                      <tr style={{ background: '#f1f5f9', color: '#475569', textAlign: 'left' }}>
+                      <tr style={{ background: '#f3f0e7', color: '#475569', textAlign: 'left' }}>
                         <th style={{ padding: '1rem', borderBottom: '2px solid #e2e8f0', fontWeight: '600' }}>Kategori</th>
                         <th style={{ padding: '1rem', borderBottom: '2px solid #e2e8f0', fontWeight: '600', textAlign: 'right' }}>Total Siswa</th>
                       </tr>
@@ -887,7 +887,7 @@ export default function DataPendidikanPage() {
                           <td style={{ padding: '1rem', borderBottom: '1px solid #e2e8f0', textAlign: 'right', color: '#64748b' }}>{rekapitulasiAggregates.jenisKelamin.TidakDiketahui.toLocaleString('id-ID')}</td>
                         </tr>
                       )}
-                      <tr style={{ background: '#f8fafc', fontWeight: '700' }}>
+                      <tr style={{ background: '#fdfbf7', fontWeight: '700' }}>
                         <td style={{ padding: '1rem' }}>Total Keseluruhan</td>
                         <td style={{ padding: '1rem', textAlign: 'right' }}>{filteredData.length.toLocaleString('id-ID')}</td>
                       </tr>
@@ -902,9 +902,9 @@ export default function DataPendidikanPage() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
                 {/* Tabel Agama */}
                 <div style={{ background: 'white', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
-                  <div style={{ padding: '1.5rem', borderBottom: '1px solid #e2e8f0', background: '#f8fafc', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+                  <div style={{ padding: '1.5rem', borderBottom: '1px solid #e2e8f0', background: '#fdfbf7', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
                     <div>
-                      <h3 style={{ margin: 0, color: '#0f172a', fontSize: '1.1rem', fontWeight: '600' }}>Rekapitulasi Agama</h3>
+                      <h3 style={{ margin: 0, color: '#450a0a', fontSize: '1.1rem', fontWeight: '600' }}>Rekapitulasi Agama</h3>
                     </div>
                     <div style={{ display: 'flex', gap: '0.5rem' }}>
                       <button 
@@ -924,7 +924,7 @@ export default function DataPendidikanPage() {
                   <div style={{ padding: '1.5rem' }}>
                     <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                       <thead>
-                        <tr style={{ background: '#f1f5f9', color: '#475569', textAlign: 'left' }}>
+                        <tr style={{ background: '#f3f0e7', color: '#475569', textAlign: 'left' }}>
                           <th style={{ padding: '1rem', borderBottom: '2px solid #e2e8f0', fontWeight: '600' }}>Agama</th>
                           <th style={{ padding: '1rem', borderBottom: '2px solid #e2e8f0', fontWeight: '600', textAlign: 'right' }}>Total Siswa</th>
                         </tr>
@@ -943,9 +943,9 @@ export default function DataPendidikanPage() {
 
                 {/* Tabel Umur */}
                 <div style={{ background: 'white', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
-                  <div style={{ padding: '1.5rem', borderBottom: '1px solid #e2e8f0', background: '#f8fafc', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+                  <div style={{ padding: '1.5rem', borderBottom: '1px solid #e2e8f0', background: '#fdfbf7', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
                     <div>
-                      <h3 style={{ margin: 0, color: '#0f172a', fontSize: '1.1rem', fontWeight: '600' }}>Rekapitulasi Umur</h3>
+                      <h3 style={{ margin: 0, color: '#450a0a', fontSize: '1.1rem', fontWeight: '600' }}>Rekapitulasi Umur</h3>
                     </div>
                     <div style={{ display: 'flex', gap: '0.5rem' }}>
                       <button 
@@ -965,7 +965,7 @@ export default function DataPendidikanPage() {
                   <div style={{ padding: '1.5rem' }}>
                     <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                       <thead>
-                        <tr style={{ background: '#f1f5f9', color: '#475569', textAlign: 'left' }}>
+                        <tr style={{ background: '#f3f0e7', color: '#475569', textAlign: 'left' }}>
                           <th style={{ padding: '1rem', borderBottom: '2px solid #e2e8f0', fontWeight: '600' }}>Rentang Umur</th>
                           <th style={{ padding: '1rem', borderBottom: '2px solid #e2e8f0', fontWeight: '600', textAlign: 'right' }}>Total Siswa</th>
                         </tr>
@@ -990,7 +990,7 @@ export default function DataPendidikanPage() {
                 
                 {/* Kebutuhan Khusus Chart */}
                 <div style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', border: '1px solid #e2e8f0' }}>
-                  <h3 style={{ margin: '0 0 1.5rem 0', color: '#0f172a', fontSize: '1.1rem', fontWeight: '600' }}>Grafik Kebutuhan Khusus</h3>
+                  <h3 style={{ margin: '0 0 1.5rem 0', color: '#450a0a', fontSize: '1.1rem', fontWeight: '600' }}>Grafik Kebutuhan Khusus</h3>
                   <div style={{ width: '100%', height: '300px' }}>
                     <ResponsiveContainer>
                       <BarChart data={Object.entries(rekapitulasiAggregates.kebutuhanKhusus).map(([n,v]) => ({name: n, Total: v}))} layout="vertical" margin={{ left: 50 }}>
@@ -1006,7 +1006,7 @@ export default function DataPendidikanPage() {
 
                 {/* Jenis Tinggal Chart */}
                 <div style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', border: '1px solid #e2e8f0' }}>
-                  <h3 style={{ margin: '0 0 1.5rem 0', color: '#0f172a', fontSize: '1.1rem', fontWeight: '600' }}>Grafik Jenis Tinggal</h3>
+                  <h3 style={{ margin: '0 0 1.5rem 0', color: '#450a0a', fontSize: '1.1rem', fontWeight: '600' }}>Grafik Jenis Tinggal</h3>
                   <div style={{ width: '100%', height: '300px' }}>
                     <ResponsiveContainer>
                       <BarChart data={Object.entries(rekapitulasiAggregates.jenisTinggal).map(([n,v]) => ({name: n, Total: v}))} layout="vertical" margin={{ left: 50 }}>
@@ -1022,7 +1022,7 @@ export default function DataPendidikanPage() {
 
                 {/* Alat Transportasi Chart */}
                 <div style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', border: '1px solid #e2e8f0', gridColumn: '1 / -1' }}>
-                  <h3 style={{ margin: '0 0 1.5rem 0', color: '#0f172a', fontSize: '1.1rem', fontWeight: '600' }}>Grafik Alat Transportasi</h3>
+                  <h3 style={{ margin: '0 0 1.5rem 0', color: '#450a0a', fontSize: '1.1rem', fontWeight: '600' }}>Grafik Alat Transportasi</h3>
                   <div style={{ width: '100%', height: '350px' }}>
                     <ResponsiveContainer>
                       <BarChart data={Object.entries(rekapitulasiAggregates.transportasi).map(([n,v]) => ({name: n, Total: v}))}>
@@ -1042,9 +1042,9 @@ export default function DataPendidikanPage() {
             {/* SEKOLAH SUB-TAB */}
             {rekapTab === 'sekolah' && (
               <div style={{ background: 'white', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
-                <div style={{ padding: '1.5rem', borderBottom: '1px solid #e2e8f0', background: '#f8fafc', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+                <div style={{ padding: '1.5rem', borderBottom: '1px solid #e2e8f0', background: '#fdfbf7', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
                   <div>
-                    <h3 style={{ margin: 0, color: '#0f172a', fontSize: '1.1rem', fontWeight: '600' }}>Rekapitulasi Per Sekolah</h3>
+                    <h3 style={{ margin: 0, color: '#450a0a', fontSize: '1.1rem', fontWeight: '600' }}>Rekapitulasi Per Sekolah</h3>
                     <p style={{ margin: '0.5rem 0 0 0', color: '#64748b', fontSize: '0.9rem' }}>Ringkasan metrik demografi untuk setiap sekolah.</p>
                   </div>
                   <div style={{ display: 'flex', gap: '0.5rem' }}>
@@ -1105,7 +1105,7 @@ export default function DataPendidikanPage() {
                 <div style={{ width: '100%', overflowX: 'auto', maxHeight: '600px' }}>
                   <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '1000px' }}>
                     <thead style={{ position: 'sticky', top: 0, zIndex: 10 }}>
-                      <tr style={{ background: '#f1f5f9', color: '#475569' }}>
+                      <tr style={{ background: '#f3f0e7', color: '#475569' }}>
                         <th style={{ padding: '1rem', borderBottom: '2px solid #e2e8f0', fontWeight: '600' }}>Sekolah</th>
                         <th style={{ padding: '1rem', borderBottom: '2px solid #e2e8f0', fontWeight: '600' }}>Total</th>
                         <th style={{ padding: '1rem', borderBottom: '2px solid #e2e8f0', fontWeight: '600' }}>L/P</th>
@@ -1118,16 +1118,16 @@ export default function DataPendidikanPage() {
                     </thead>
                     <tbody>
                       {rekapSekolahData.length > 0 ? rekapSekolahData.map(([sekolah, d], idx) => (
-                        <tr key={idx} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                          <td style={{ padding: '1rem', fontWeight: '600', color: '#0f172a' }}>{sekolah}</td>
-                          <td style={{ padding: '1rem', color: '#0369a1', fontWeight: '600' }}>{d.total.toLocaleString('id-ID')}</td>
-                          <td style={{ padding: '1rem', color: '#334155', fontSize: '0.9rem' }}>{d.l} L / {d.p} P</td>
-                          <td style={{ padding: '1rem', color: '#334155', fontSize: '0.9rem' }}>{d.tomohon} T / {d.luar} L</td>
+                        <tr key={idx} style={{ borderBottom: '1px solid #f3f0e7' }}>
+                          <td style={{ padding: '1rem', fontWeight: '600', color: '#450a0a' }}>{sekolah}</td>
+                          <td style={{ padding: '1rem', color: '#991b1b', fontWeight: '600' }}>{d.total.toLocaleString('id-ID')}</td>
+                          <td style={{ padding: '1rem', color: '#450a0a', fontSize: '0.9rem' }}>{d.l} L / {d.p} P</td>
+                          <td style={{ padding: '1rem', color: '#450a0a', fontSize: '0.9rem' }}>{d.tomohon} T / {d.luar} L</td>
                           <td style={{ padding: '1rem', color: '#64748b', fontSize: '0.85rem', maxWidth: '200px' }}>{Object.entries(d.agama).map(([k,v]) => `${k}:${v}`).join(', ')}</td>
                           <td style={{ padding: '1rem', color: '#64748b', fontSize: '0.85rem', maxWidth: '200px' }}>{Object.entries(d.umur).map(([k,v]) => `${k}:${v}`).join(', ')}</td>
                           <td style={{ padding: '1rem', color: '#64748b', fontSize: '0.85rem', maxWidth: '150px' }}>{Object.entries(d.kelas).map(([k,v]) => `${k}:${v}`).join(', ')}</td>
                           <td style={{ padding: '1rem' }}>
-                            <button onClick={() => setSelectedSekolah(sekolah)} style={{ background: '#3b82f6', color: 'white', border: 'none', padding: '0.4rem 0.8rem', borderRadius: '6px', cursor: 'pointer', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}><Users size={14}/> Detail</button>
+                            <button onClick={() => setSelectedSekolah(sekolah)} style={{ background: '#b91c1c', color: 'white', border: 'none', padding: '0.4rem 0.8rem', borderRadius: '6px', cursor: 'pointer', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}><Users size={14}/> Detail</button>
                           </td>
                         </tr>
                       )) : (
@@ -1150,9 +1150,9 @@ export default function DataPendidikanPage() {
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
           <div style={{ background: 'white', borderRadius: '12px', width: '100%', maxWidth: '800px', maxHeight: '90vh', display: 'flex', flexDirection: 'column', overflow: 'hidden', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)' }}>
             
-            <div style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#f8fafc' }}>
+            <div style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#fdfbf7' }}>
               <div>
-                <h3 style={{ margin: 0, fontSize: '1.25rem', color: '#0f172a' }}>Data Siswa</h3>
+                <h3 style={{ margin: 0, fontSize: '1.25rem', color: '#450a0a' }}>Data Siswa</h3>
                 <p style={{ margin: '0.25rem 0 0 0', color: '#64748b', fontSize: '0.9rem' }}>{selectedSekolah}</p>
               </div>
               <button onClick={() => setSelectedSekolah(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b', padding: '0.5rem' }}>
@@ -1182,10 +1182,10 @@ export default function DataPendidikanPage() {
                 <tbody>
                   {modalData.length > 0 ? (
                     modalData.map((s, idx) => (
-                      <tr key={idx} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                      <tr key={idx} style={{ borderBottom: '1px solid #f3f0e7' }}>
                         <td style={{ padding: '0.75rem', color: '#64748b' }}>{idx + 1}</td>
-                        <td style={{ padding: '0.75rem', color: '#3b82f6', fontWeight: '500' }}>{s.nisn}</td>
-                        <td style={{ padding: '0.75rem', color: '#334155' }}>{s.nama_peserta_didik}</td>
+                        <td style={{ padding: '0.75rem', color: '#b91c1c', fontWeight: '500' }}>{s.nisn}</td>
+                        <td style={{ padding: '0.75rem', color: '#450a0a' }}>{s.nama_peserta_didik}</td>
                         <td style={{ padding: '0.75rem', color: '#64748b' }}>{s.jenis_kelamin}</td>
                         <td style={{ padding: '0.75rem', color: '#64748b' }}>{s.kelas}</td>
                       </tr>

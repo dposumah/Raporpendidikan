@@ -153,12 +153,12 @@ export default function CapaianDaerahPage() {
 
 
   const getLabelColor = (label) => {
-    if (!label) return '#f1f5f9';
+    if (!label) return '#f3f0e7';
     const l = label.toLowerCase();
     if (l.includes('baik') || l.includes('maju') || l.includes('tinggi')) return '#dcfce7';
     if (l.includes('sedang') || l.includes('berkembang')) return '#fef08a';
     if (l.includes('kurang') || l.includes('rendah') || l.includes('dasar')) return '#fee2e2';
-    return '#f1f5f9';
+    return '#f3f0e7';
   };
 
   const getLabelTextColor = (label) => {
@@ -173,7 +173,7 @@ export default function CapaianDaerahPage() {
   if (loading) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', flexDirection: 'column' }}>
-        <div style={{ width: '40px', height: '40px', border: '4px solid #f3f3f3', borderTop: '4px solid #3b82f6', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
+        <div style={{ width: '40px', height: '40px', border: '4px solid #f3f3f3', borderTop: '4px solid #b91c1c', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
         <p style={{ marginTop: '1rem', color: '#64748b' }}>Memuat data capaian daerah...</p>
         <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
       </div>
@@ -181,12 +181,12 @@ export default function CapaianDaerahPage() {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 60px)', background: '#f8fafc', overflow: 'hidden' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 60px)', background: '#fdfbf7', overflow: 'hidden' }}>
       
       <div style={{ padding: '1.5rem 2rem', background: 'white', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0 }}>
         <div>
-          <h1 style={{ margin: 0, color: '#0f172a', fontSize: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <Map size={24} color="#3b82f6" /> Capaian Daerah
+          <h1 style={{ margin: 0, color: '#450a0a', fontSize: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <Map size={24} color="#b91c1c" /> Capaian Daerah
           </h1>
           <p style={{ margin: '0.25rem 0 0 0', color: '#64748b', fontSize: '0.9rem' }}>
             Melihat rincian indikator pendidikan tingkat daerah per tahun
@@ -197,7 +197,7 @@ export default function CapaianDaerahPage() {
           <select 
             value={tahun} 
             onChange={(e) => setTahun(e.target.value)}
-            style={{ padding: '0.5rem 1rem', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none', background: '#f8fafc', fontWeight: '600' }}
+            style={{ padding: '0.5rem 1rem', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none', background: '#fdfbf7', fontWeight: '600' }}
           >
             <option value="">Pilih Tahun</option>
             {filterOptions.years.map(y => <option key={y} value={y}>{y}</option>)}
@@ -206,7 +206,7 @@ export default function CapaianDaerahPage() {
           <select 
             value={jenisSatuan} 
             onChange={(e) => setJenisSatuan(e.target.value)}
-            style={{ padding: '0.5rem 1rem', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none', background: '#f8fafc', fontWeight: '600' }}
+            style={{ padding: '0.5rem 1rem', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none', background: '#fdfbf7', fontWeight: '600' }}
             disabled={!tahun}
           >
             <option value="">Pilih Jenjang</option>
@@ -216,7 +216,7 @@ export default function CapaianDaerahPage() {
           <select 
             value={statusSatuan} 
             onChange={(e) => setStatusSatuan(e.target.value)}
-            style={{ padding: '0.5rem 1rem', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none', background: '#f8fafc', fontWeight: '600' }}
+            style={{ padding: '0.5rem 1rem', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none', background: '#fdfbf7', fontWeight: '600' }}
             disabled={!jenisSatuan}
           >
             <option value="">Pilih Status</option>
@@ -244,16 +244,16 @@ export default function CapaianDaerahPage() {
                   <div key={idx} style={{ border: '1px solid #e2e8f0', borderRadius: '8px', overflow: 'hidden', background: 'white', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
                     
                     {/* MAIN INDICATOR HEADER */}
-                    <div style={{ background: '#f1f5f9', padding: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    <div style={{ background: '#f3f0e7', padding: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                       <div style={{ flex: 1, paddingRight: '1rem' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
-                          <span style={{ background: '#2563eb', color: 'white', padding: '0.3rem 0.6rem', borderRadius: '6px', fontSize: '0.85rem', fontWeight: 'bold' }}>{kode}</span>
-                          <h4 style={{ margin: 0, color: '#0f172a', fontSize: '1.1rem', fontWeight: '700' }}>{title}</h4>
+                          <span style={{ background: '#991b1b', color: 'white', padding: '0.3rem 0.6rem', borderRadius: '6px', fontSize: '0.85rem', fontWeight: 'bold' }}>{kode}</span>
+                          <h4 style={{ margin: 0, color: '#450a0a', fontSize: '1.1rem', fontWeight: '700' }}>{title}</h4>
                         </div>
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '2rem', marginTop: '0.75rem' }}>
                           <div style={{ display: 'flex', flexDirection: 'column' }}>
                             <span style={{ color: '#64748b', fontSize: '0.75rem', fontWeight: '600', textTransform: 'uppercase' }}>Nilai / Capaian</span>
-                            <div style={{ color: '#1e293b', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: '500' }}>
+                            <div style={{ color: '#7f1d1d', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: '500' }}>
                               <span>{nilai_teks || '-'}</span>
                             </div>
                           </div>
@@ -261,7 +261,7 @@ export default function CapaianDaerahPage() {
                           {perbandingan_teks && (
                             <div style={{ display: 'flex', flexDirection: 'column' }}>
                               <span style={{ color: '#64748b', fontSize: '0.75rem', fontWeight: '600', textTransform: 'uppercase' }}>Perbandingan (Tahun Sebelumnya)</span>
-                              <div style={{ color: perbandingan_teks.toLowerCase().includes('turun') ? '#b91c1c' : (perbandingan_teks.toLowerCase().includes('naik') ? '#15803d' : '#1e293b'), fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.25rem', fontWeight: '500' }}>
+                              <div style={{ color: perbandingan_teks.toLowerCase().includes('turun') ? '#b91c1c' : (perbandingan_teks.toLowerCase().includes('naik') ? '#15803d' : '#7f1d1d'), fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.25rem', fontWeight: '500' }}>
                                 {perbandingan_teks.toLowerCase().includes('naik') ? <TrendingUp size={14} /> : (perbandingan_teks.toLowerCase().includes('turun') ? <TrendingDown size={14} /> : <Minus size={14} />)}
                                 <span>{perbandingan_teks}</span>
                               </div>
@@ -280,8 +280,8 @@ export default function CapaianDaerahPage() {
                         {sub.length > 0 && (
                           <button 
                             onClick={() => setSelectedDetail({ kode, title, sub })}
-                            style={{ background: 'white', border: '1px solid #cbd5e1', color: '#334155', padding: '0.4rem 0.75rem', borderRadius: '6px', fontSize: '0.8rem', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.25rem', transition: 'all 0.2s' }}
-                            onMouseOver={(e) => { e.currentTarget.style.background = '#f8fafc'; e.currentTarget.style.borderColor = '#94a3b8'; }}
+                            style={{ background: 'white', border: '1px solid #cbd5e1', color: '#450a0a', padding: '0.4rem 0.75rem', borderRadius: '6px', fontSize: '0.8rem', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.25rem', transition: 'all 0.2s' }}
+                            onMouseOver={(e) => { e.currentTarget.style.background = '#fdfbf7'; e.currentTarget.style.borderColor = '#94a3b8'; }}
                             onMouseOut={(e) => { e.currentTarget.style.background = 'white'; e.currentTarget.style.borderColor = '#cbd5e1'; }}
                           >
                             <Info size={14} /> Lihat Detail Sub
@@ -310,20 +310,20 @@ export default function CapaianDaerahPage() {
             <div style={{ padding: '1.5rem', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                  <span style={{ background: '#2563eb', color: 'white', padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 'bold' }}>{selectedDetail.kode}</span>
-                  <h3 style={{ margin: 0, color: '#0f172a', fontSize: '1.25rem' }}>Detail Sub-Indikator</h3>
+                  <span style={{ background: '#991b1b', color: 'white', padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 'bold' }}>{selectedDetail.kode}</span>
+                  <h3 style={{ margin: 0, color: '#450a0a', fontSize: '1.25rem' }}>Detail Sub-Indikator</h3>
                 </div>
                 <p style={{ margin: 0, color: '#64748b', fontSize: '0.95rem' }}>{selectedDetail.title}</p>
               </div>
               <button 
                 onClick={() => setSelectedDetail(null)}
-                style={{ background: '#f1f5f9', border: 'none', width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#64748b' }}
+                style={{ background: '#f3f0e7', border: 'none', width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#64748b' }}
               >
                 <X size={18} />
               </button>
             </div>
 
-            <div style={{ padding: '1.5rem', overflowY: 'auto', flex: 1, backgroundColor: '#f8fafc' }}>
+            <div style={{ padding: '1.5rem', overflowY: 'auto', flex: 1, backgroundColor: '#fdfbf7' }}>
               <div style={{ display: 'grid', gap: '1rem' }}>
                 {selectedDetail.sub.sort((a, b) => {
                   const aNum = parseInt((a.kode || '').split('.')[2] || 0);
@@ -333,8 +333,8 @@ export default function CapaianDaerahPage() {
                   <div key={sIdx} style={{ background: 'white', padding: '1.25rem', borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                        <span style={{ color: '#3b82f6', fontWeight: '700', fontSize: '0.9rem', backgroundColor: '#eff6ff', padding: '0.2rem 0.5rem', borderRadius: '4px' }}>{sub.kode}</span>
-                        <h5 style={{ margin: 0, color: '#1e293b', fontSize: '1rem', fontWeight: '600' }}>{sub.title}</h5>
+                        <span style={{ color: '#b91c1c', fontWeight: '700', fontSize: '0.9rem', backgroundColor: '#fef2f2', padding: '0.2rem 0.5rem', borderRadius: '4px' }}>{sub.kode}</span>
+                        <h5 style={{ margin: 0, color: '#7f1d1d', fontSize: '1rem', fontWeight: '600' }}>{sub.title}</h5>
                       </div>
                       {sub.label_capaian && (
                         <div style={{ background: getLabelColor(sub.label_capaian), color: getLabelTextColor(sub.label_capaian), padding: '0.3rem 0.6rem', borderRadius: '12px', fontSize: '0.75rem', fontWeight: '700' }}>
@@ -343,10 +343,10 @@ export default function CapaianDaerahPage() {
                       )}
                     </div>
                     
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem', background: '#f1f5f9', padding: '1rem', borderRadius: '6px' }}>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem', background: '#f3f0e7', padding: '1rem', borderRadius: '6px' }}>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', minWidth: '150px' }}>
                         <span style={{ color: '#64748b', fontSize: '0.8rem', fontWeight: '600', textTransform: 'uppercase' }}>Nilai Capaian</span>
-                        <div style={{ color: '#0f172a', fontSize: '0.95rem', fontWeight: '600' }}>
+                        <div style={{ color: '#450a0a', fontSize: '0.95rem', fontWeight: '600' }}>
                           {sub.nilai_teks || '-'}
                         </div>
                       </div>
@@ -354,7 +354,7 @@ export default function CapaianDaerahPage() {
                       {sub.perbandingan_teks && (
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', minWidth: '200px' }}>
                           <span style={{ color: '#64748b', fontSize: '0.8rem', fontWeight: '600', textTransform: 'uppercase' }}>Perbandingan (Tahun Sebelumnya)</span>
-                          <div style={{ color: sub.perbandingan_teks.toLowerCase().includes('turun') ? '#b91c1c' : (sub.perbandingan_teks.toLowerCase().includes('naik') ? '#15803d' : '#0f172a'), fontSize: '0.95rem', display: 'flex', alignItems: 'center', gap: '0.25rem', fontWeight: '600' }}>
+                          <div style={{ color: sub.perbandingan_teks.toLowerCase().includes('turun') ? '#b91c1c' : (sub.perbandingan_teks.toLowerCase().includes('naik') ? '#15803d' : '#450a0a'), fontSize: '0.95rem', display: 'flex', alignItems: 'center', gap: '0.25rem', fontWeight: '600' }}>
                             {sub.perbandingan_teks.toLowerCase().includes('naik') ? <TrendingUp size={16} /> : (sub.perbandingan_teks.toLowerCase().includes('turun') ? <TrendingDown size={16} /> : <Minus size={16} />)}
                             <span>{sub.perbandingan_teks}</span>
                           </div>

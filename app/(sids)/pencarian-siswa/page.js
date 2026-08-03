@@ -171,7 +171,7 @@ export default function DataPendidikanPage() {
         <label style={{ display: 'block', fontSize: '0.85rem', color: '#64748b', marginBottom: '0.5rem', fontWeight: '500' }}>{label}</label>
         <div 
           onClick={() => setIsOpen(!isOpen)}
-          style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #cbd5e1', color: value ? '#0f172a' : '#94a3b8', background: 'white', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+          style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #cbd5e1', color: value ? '#450a0a' : '#94a3b8', background: 'white', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
         >
           <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{value || placeholder}</span>
           <ChevronDown size={16} color="#64748b" style={{ transform: isOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
@@ -179,7 +179,7 @@ export default function DataPendidikanPage() {
         
         {isOpen && (
           <div style={{ position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 0, background: 'white', border: '1px solid #e2e8f0', borderRadius: '8px', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)', zIndex: 50, maxHeight: '250px', display: 'flex', flexDirection: 'column' }}>
-            <div style={{ padding: '0.5rem', borderBottom: '1px solid #f1f5f9' }}>
+            <div style={{ padding: '0.5rem', borderBottom: '1px solid #f3f0e7' }}>
               <input 
                 type="text" 
                 autoFocus
@@ -192,9 +192,9 @@ export default function DataPendidikanPage() {
             <div style={{ overflowY: 'auto', flex: 1 }}>
               <div 
                 onClick={() => { onChange(''); setIsOpen(false); setSearchTerm(''); }}
-                style={{ padding: '0.5rem 1rem', cursor: 'pointer', fontSize: '0.9rem', color: '#64748b', background: !value ? '#f1f5f9' : 'transparent' }}
-                onMouseEnter={e => e.currentTarget.style.background = '#f8fafc'}
-                onMouseLeave={e => e.currentTarget.style.background = !value ? '#f1f5f9' : 'transparent'}
+                style={{ padding: '0.5rem 1rem', cursor: 'pointer', fontSize: '0.9rem', color: '#64748b', background: !value ? '#f3f0e7' : 'transparent' }}
+                onMouseEnter={e => e.currentTarget.style.background = '#fdfbf7'}
+                onMouseLeave={e => e.currentTarget.style.background = !value ? '#f3f0e7' : 'transparent'}
               >
                 {placeholder} (Semua)
               </div>
@@ -202,9 +202,9 @@ export default function DataPendidikanPage() {
                 <div 
                   key={opt}
                   onClick={() => { onChange(opt); setIsOpen(false); setSearchTerm(''); }}
-                  style={{ padding: '0.5rem 1rem', cursor: 'pointer', fontSize: '0.9rem', color: '#0f172a', background: value === opt ? '#e0f2fe' : 'transparent' }}
-                  onMouseEnter={e => e.currentTarget.style.background = value === opt ? '#e0f2fe' : '#f8fafc'}
-                  onMouseLeave={e => e.currentTarget.style.background = value === opt ? '#e0f2fe' : 'transparent'}
+                  style={{ padding: '0.5rem 1rem', cursor: 'pointer', fontSize: '0.9rem', color: '#450a0a', background: value === opt ? '#fee2e2' : 'transparent' }}
+                  onMouseEnter={e => e.currentTarget.style.background = value === opt ? '#fee2e2' : '#fdfbf7'}
+                  onMouseLeave={e => e.currentTarget.style.background = value === opt ? '#fee2e2' : 'transparent'}
                 >
                   {opt}
                 </div>
@@ -473,7 +473,7 @@ export default function DataPendidikanPage() {
     const paddingLeft = depth * 24 + 16;
     
     return (
-      <div style={{ borderBottom: '1px solid #f1f5f9' }}>
+      <div style={{ borderBottom: '1px solid #f3f0e7' }}>
         <div 
           onClick={() => isLeaf ? setSelectedSekolah(label) : setOpen(!open)}
           style={{ 
@@ -481,15 +481,15 @@ export default function DataPendidikanPage() {
             gridTemplateColumns: 'minmax(250px, 2fr) 1fr 1fr 1fr', 
             gap: '1rem', 
             padding: '1rem', 
-            background: depth === 0 ? '#f8fafc' : depth === 1 ? '#ffffff' : '#fcfcfc',
+            background: depth === 0 ? '#fdfbf7' : depth === 1 ? '#ffffff' : '#fcfcfc',
             cursor: 'pointer',
             alignItems: 'center',
             transition: 'background 0.2s',
             fontWeight: depth === 0 ? '700' : depth === 1 ? '600' : '500',
-            color: depth === 0 ? '#0f172a' : '#334155'
+            color: depth === 0 ? '#450a0a' : '#450a0a'
           }}
-          onMouseEnter={e => !isLeaf && (e.currentTarget.style.background = '#f1f5f9')}
-          onMouseLeave={e => !isLeaf && (e.currentTarget.style.background = depth === 0 ? '#f8fafc' : depth === 1 ? '#ffffff' : '#fcfcfc')}
+          onMouseEnter={e => !isLeaf && (e.currentTarget.style.background = '#f3f0e7')}
+          onMouseLeave={e => !isLeaf && (e.currentTarget.style.background = depth === 0 ? '#fdfbf7' : depth === 1 ? '#ffffff' : '#fcfcfc')}
         >
           <div style={{ display: 'flex', alignItems: 'center', paddingLeft: `${paddingLeft}px` }}>
             {!isLeaf ? (
@@ -502,7 +502,7 @@ export default function DataPendidikanPage() {
             {label}
           </div>
           <div style={{ textAlign: 'center' }}>
-            <span style={{ background: '#e0f2fe', color: '#0369a1', padding: '0.25rem 0.75rem', borderRadius: '999px', fontSize: '0.85rem' }}>
+            <span style={{ background: '#fee2e2', color: '#991b1b', padding: '0.25rem 0.75rem', borderRadius: '999px', fontSize: '0.85rem' }}>
               {aggTotal.toLocaleString('id-ID')} Siswa
             </span>
           </div>
@@ -522,16 +522,16 @@ export default function DataPendidikanPage() {
   };
 
   return (
-    <div style={{ backgroundColor: '#f8fafc', minHeight: 'calc(100vh - 75px)', padding: '2rem' }}>
+    <div style={{ backgroundColor: '#fdfbf7', minHeight: 'calc(100vh - 75px)', padding: '2rem' }}>
       <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
         
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
           <div>
-            <h1 style={{ fontSize: '1.8rem', fontWeight: '700', color: '#0f172a', margin: 0 }}>Pencarian Siswa</h1>
+            <h1 style={{ fontSize: '1.8rem', fontWeight: '700', color: '#450a0a', margin: 0 }}>Pencarian Siswa</h1>
           </div>
           <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-            <Link href="/admin-siswa" style={{ textDecoration: 'none', background: 'white', color: '#0f172a', border: '1px solid #cbd5e1', padding: '0.5rem 1rem', borderRadius: '8px', fontSize: '0.85rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '0.5rem', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
+            <Link href="/admin-siswa" style={{ textDecoration: 'none', background: 'white', color: '#450a0a', border: '1px solid #cbd5e1', padding: '0.5rem 1rem', borderRadius: '8px', fontSize: '0.85rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '0.5rem', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
               Unggah Data Excel
             </Link>
             <div style={{ background: '#fef3c7', color: '#d97706', padding: '0.5rem 1rem', borderRadius: '8px', fontSize: '0.85rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -546,14 +546,14 @@ export default function DataPendidikanPage() {
             {/* Filters and Search */}
             <div style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', marginBottom: '2rem' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '1.5rem' }}>
-                <div style={{ background: '#f1f5f9', padding: '0.5rem', borderRadius: '8px', color: '#64748b' }}><Filter size={20} /></div>
-                <h3 style={{ margin: 0, fontSize: '1.1rem', color: '#0f172a' }}>Pencarian Cepat & Filter</h3>
+                <div style={{ background: '#f3f0e7', padding: '0.5rem', borderRadius: '8px', color: '#64748b' }}><Filter size={20} /></div>
+                <h3 style={{ margin: 0, fontSize: '1.1rem', color: '#450a0a' }}>Pencarian Cepat & Filter</h3>
               </div>
               
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem', marginBottom: '1.5rem' }}>
                 <div>
                   <label style={{ display: 'block', fontSize: '0.85rem', color: '#64748b', marginBottom: '0.5rem', fontWeight: '500' }}>Jenjang</label>
-                  <select value={jenjang} onChange={e => setJenjang(e.target.value)} style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #cbd5e1', color: '#334155', outline: 'none' }}>
+                  <select value={jenjang} onChange={e => setJenjang(e.target.value)} style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #cbd5e1', color: '#450a0a', outline: 'none' }}>
                     <option value="">Semua Jenjang</option>
                     {jenjangOptions.map(j => (
                       <option key={j} value={j}>{j}</option>
@@ -562,7 +562,7 @@ export default function DataPendidikanPage() {
                 </div>
                 <div>
                   <label style={{ display: 'block', fontSize: '0.85rem', color: '#64748b', marginBottom: '0.5rem', fontWeight: '500' }}>Kecamatan</label>
-                  <select value={kecamatanFilter} onChange={e => setKecamatanFilter(e.target.value)} style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #cbd5e1', color: '#334155', outline: 'none' }}>
+                  <select value={kecamatanFilter} onChange={e => setKecamatanFilter(e.target.value)} style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #cbd5e1', color: '#450a0a', outline: 'none' }}>
                     <option value="">Semua Kecamatan</option>
                     {kecamatanOptions.map(k => (
                       <option key={k} value={k}>{k}</option>
@@ -602,7 +602,7 @@ export default function DataPendidikanPage() {
                     onBlur={(e) => e.target.style.borderColor = '#cbd5e1'}
                   />
                 </div>
-                <button type="submit" style={{ background: '#0284c7', color: 'white', border: 'none', borderRadius: '8px', padding: '0 1.5rem', fontWeight: '600', cursor: 'pointer', transition: 'background 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.background = '#0369a1'} onMouseLeave={(e) => e.currentTarget.style.background = '#0284c7'}>
+                <button type="submit" style={{ background: '#0284c7', color: 'white', border: 'none', borderRadius: '8px', padding: '0 1.5rem', fontWeight: '600', cursor: 'pointer', transition: 'background 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.background = '#991b1b'} onMouseLeave={(e) => e.currentTarget.style.background = '#0284c7'}>
                   Cari Data
                 </button>
               </form>
@@ -613,7 +613,7 @@ export default function DataPendidikanPage() {
               <div style={{ overflowX: 'auto' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '800px' }}>
                   <thead>
-                    <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
+                    <tr style={{ background: '#fdfbf7', borderBottom: '1px solid #e2e8f0' }}>
                       <th style={{ padding: '1rem 1.5rem', color: '#475569', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase' }}>Nama Siswa</th>
                       <th style={{ padding: '1rem 1.5rem', color: '#475569', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase' }}>NISN</th>
                       <th style={{ padding: '1rem 1.5rem', color: '#475569', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase' }}>Sekolah</th>
@@ -629,19 +629,19 @@ export default function DataPendidikanPage() {
                     ) : (
                       filteredData.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage).map((row) => {
                         return (
-                          <tr key={row.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                          <tr key={row.id} style={{ borderBottom: '1px solid #f3f0e7' }}>
                             <td style={{ padding: '1rem 1.5rem' }}>
-                              <div style={{ fontWeight: '600', color: '#0f172a' }}>{row.nama_peserta_didik}</div>
+                              <div style={{ fontWeight: '600', color: '#450a0a' }}>{row.nama_peserta_didik}</div>
                             </td>
-                            <td style={{ padding: '1rem 1.5rem', color: '#334155' }}>{row.nisn || '-'}</td>
-                            <td style={{ padding: '1rem 1.5rem', color: '#334155' }}>{row.nama_sekolah || '-'}</td>
-                            <td style={{ padding: '1rem 1.5rem', color: '#334155' }}>{row.kelas} {row.nama_rombel ? `- ${row.nama_rombel}` : ''}</td>
+                            <td style={{ padding: '1rem 1.5rem', color: '#450a0a' }}>{row.nisn || '-'}</td>
+                            <td style={{ padding: '1rem 1.5rem', color: '#450a0a' }}>{row.nama_sekolah || '-'}</td>
+                            <td style={{ padding: '1rem 1.5rem', color: '#450a0a' }}>{row.kelas} {row.nama_rombel ? `- ${row.nama_rombel}` : ''}</td>
                             <td style={{ padding: '1rem 1.5rem' }}>
                               <button 
                                 onClick={() => setSelectedSiswa(row)}
-                                style={{ background: '#f8fafc', border: '1px solid #cbd5e1', padding: '0.5rem 1rem', borderRadius: '6px', fontSize: '0.85rem', fontWeight: '600', color: '#0284c7', cursor: 'pointer', transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: '0.25rem' }}
+                                style={{ background: '#fdfbf7', border: '1px solid #cbd5e1', padding: '0.5rem 1rem', borderRadius: '6px', fontSize: '0.85rem', fontWeight: '600', color: '#0284c7', cursor: 'pointer', transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: '0.25rem' }}
                                 onMouseEnter={e => { e.currentTarget.style.background = '#0284c7'; e.currentTarget.style.color = 'white'; e.currentTarget.style.borderColor = '#0284c7'; }}
-                                onMouseLeave={e => { e.currentTarget.style.background = '#f8fafc'; e.currentTarget.style.color = '#0284c7'; e.currentTarget.style.borderColor = '#cbd5e1'; }}
+                                onMouseLeave={e => { e.currentTarget.style.background = '#fdfbf7'; e.currentTarget.style.color = '#0284c7'; e.currentTarget.style.borderColor = '#cbd5e1'; }}
                               >
                                 Lihat Detail
                               </button>
@@ -656,22 +656,22 @@ export default function DataPendidikanPage() {
               
               {/* Pagination Controls */}
               {filteredData.length > 0 && (
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 1.5rem', background: '#f8fafc', borderTop: '1px solid #e2e8f0' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 1.5rem', background: '#fdfbf7', borderTop: '1px solid #e2e8f0' }}>
                   <div style={{ color: '#64748b', fontSize: '0.9rem' }}>
-                    Menampilkan <strong style={{ color: '#0f172a' }}>{((currentPage - 1) * rowsPerPage) + 1}</strong> hingga <strong style={{ color: '#0f172a' }}>{Math.min(currentPage * rowsPerPage, filteredData.length)}</strong> dari <strong style={{ color: '#0f172a' }}>{filteredData.length.toLocaleString('id-ID')}</strong> data
+                    Menampilkan <strong style={{ color: '#450a0a' }}>{((currentPage - 1) * rowsPerPage) + 1}</strong> hingga <strong style={{ color: '#450a0a' }}>{Math.min(currentPage * rowsPerPage, filteredData.length)}</strong> dari <strong style={{ color: '#450a0a' }}>{filteredData.length.toLocaleString('id-ID')}</strong> data
                   </div>
                   <div style={{ display: 'flex', gap: '0.5rem' }}>
                     <button 
                       onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                       disabled={currentPage === 1}
-                      style={{ background: 'white', border: '1px solid #cbd5e1', padding: '0.5rem 1rem', borderRadius: '6px', color: currentPage === 1 ? '#94a3b8' : '#334155', cursor: currentPage === 1 ? 'not-allowed' : 'pointer', fontWeight: '500' }}
+                      style={{ background: 'white', border: '1px solid #cbd5e1', padding: '0.5rem 1rem', borderRadius: '6px', color: currentPage === 1 ? '#94a3b8' : '#450a0a', cursor: currentPage === 1 ? 'not-allowed' : 'pointer', fontWeight: '500' }}
                     >
                       Sebelumnya
                     </button>
                     <button 
                       onClick={() => setCurrentPage(p => Math.min(Math.ceil(filteredData.length / rowsPerPage), p + 1))}
                       disabled={currentPage >= Math.ceil(filteredData.length / rowsPerPage)}
-                      style={{ background: 'white', border: '1px solid #cbd5e1', padding: '0.5rem 1rem', borderRadius: '6px', color: currentPage >= Math.ceil(filteredData.length / rowsPerPage) ? '#94a3b8' : '#334155', cursor: currentPage >= Math.ceil(filteredData.length / rowsPerPage) ? 'not-allowed' : 'pointer', fontWeight: '500' }}
+                      style={{ background: 'white', border: '1px solid #cbd5e1', padding: '0.5rem 1rem', borderRadius: '6px', color: currentPage >= Math.ceil(filteredData.length / rowsPerPage) ? '#94a3b8' : '#450a0a', cursor: currentPage >= Math.ceil(filteredData.length / rowsPerPage) ? 'not-allowed' : 'pointer', fontWeight: '500' }}
                     >
                       Berikutnya
                     </button>
@@ -683,22 +683,22 @@ export default function DataPendidikanPage() {
         {/* Modal Full Detail Siswa (60+ Columns) */}
         {selectedSiswa && (
           <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.7)', backdropFilter: 'blur(4px)', zIndex: 1000, display: 'flex', justifyContent: 'flex-end', animation: 'fadeIn 0.3s ease' }}>
-            <div style={{ width: '100%', maxWidth: '850px', background: '#f8fafc', height: '100%', overflowY: 'auto', boxShadow: '-10px 0 25px rgba(0,0,0,0.2)', position: 'relative', animation: 'slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1)' }}>
+            <div style={{ width: '100%', maxWidth: '850px', background: '#fdfbf7', height: '100%', overflowY: 'auto', boxShadow: '-10px 0 25px rgba(0,0,0,0.2)', position: 'relative', animation: 'slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1)' }}>
               
               <div style={{ position: 'sticky', top: 0, background: 'white', padding: '1.5rem 2rem', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', zIndex: 10 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                  <div style={{ background: '#e0f2fe', width: '50px', height: '50px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#0284c7' }}>
+                  <div style={{ background: '#fee2e2', width: '50px', height: '50px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#0284c7' }}>
                     <User size={24} />
                   </div>
                   <div>
-                    <h2 style={{ margin: 0, fontSize: '1.5rem', color: '#0f172a' }}>{selectedSiswa.nama_peserta_didik}</h2>
+                    <h2 style={{ margin: 0, fontSize: '1.5rem', color: '#450a0a' }}>{selectedSiswa.nama_peserta_didik}</h2>
                     <div style={{ color: '#64748b', fontSize: '0.9rem', display: 'flex', gap: '1rem', marginTop: '0.25rem' }}>
                       <span>NISN: {selectedSiswa.nisn || '-'}</span>
                       <span>NIK: {selectedSiswa.nik || '-'}</span>
                     </div>
                   </div>
                 </div>
-                <button onClick={() => setSelectedSiswa(null)} style={{ background: '#f1f5f9', border: 'none', width: '40px', height: '40px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#64748b' }}>
+                <button onClick={() => setSelectedSiswa(null)} style={{ background: '#f3f0e7', border: 'none', width: '40px', height: '40px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#64748b' }}>
                   <X size={20} />
                 </button>
               </div>
@@ -706,79 +706,79 @@ export default function DataPendidikanPage() {
               <div style={{ padding: '2rem' }}>
                 {/* Section 1: Akademik & Sekolah */}
                 <div style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', marginBottom: '1.5rem' }}>
-                  <h3 style={{ fontSize: '1.1rem', color: '#0f172a', margin: '0 0 1rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem', borderBottom: '1px solid #f1f5f9', paddingBottom: '0.75rem' }}><School size={18} color="#0284c7"/> Data Akademik & Sekolah Asal</h3>
+                  <h3 style={{ fontSize: '1.1rem', color: '#450a0a', margin: '0 0 1rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem', borderBottom: '1px solid #f3f0e7', paddingBottom: '0.75rem' }}><School size={18} color="#0284c7"/> Data Akademik & Sekolah Asal</h3>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
-                    <div><div style={{ color: '#64748b', fontSize: '0.85rem' }}>Nama Sekolah</div><div style={{ fontWeight: '600', color: '#334155' }}>{selectedSiswa.nama_sekolah || '-'}</div></div>
-                    <div><div style={{ color: '#64748b', fontSize: '0.85rem' }}>NPSN</div><div style={{ fontWeight: '600', color: '#334155' }}>{selectedSiswa.npsn || '-'}</div></div>
-                    <div><div style={{ color: '#64748b', fontSize: '0.85rem' }}>Jenjang</div><div style={{ fontWeight: '600', color: '#334155' }}>{selectedSiswa.jenjang || '-'}</div></div>
-                    <div><div style={{ color: '#64748b', fontSize: '0.85rem' }}>Kelas</div><div style={{ fontWeight: '600', color: '#334155' }}>{selectedSiswa.kelas || '-'}</div></div>
-                    <div><div style={{ color: '#64748b', fontSize: '0.85rem' }}>Jurusan</div><div style={{ fontWeight: '600', color: '#334155' }}>{selectedSiswa.nama_jurusan || '-'}</div></div>
-                    <div><div style={{ color: '#64748b', fontSize: '0.85rem' }}>Rombel</div><div style={{ fontWeight: '600', color: '#334155' }}>{selectedSiswa.nama_rombel || '-'}</div></div>
-                    <div><div style={{ color: '#64748b', fontSize: '0.85rem' }}>Semester</div><div style={{ fontWeight: '600', color: '#334155' }}>{selectedSiswa.semester || '-'}</div></div>
+                    <div><div style={{ color: '#64748b', fontSize: '0.85rem' }}>Nama Sekolah</div><div style={{ fontWeight: '600', color: '#450a0a' }}>{selectedSiswa.nama_sekolah || '-'}</div></div>
+                    <div><div style={{ color: '#64748b', fontSize: '0.85rem' }}>NPSN</div><div style={{ fontWeight: '600', color: '#450a0a' }}>{selectedSiswa.npsn || '-'}</div></div>
+                    <div><div style={{ color: '#64748b', fontSize: '0.85rem' }}>Jenjang</div><div style={{ fontWeight: '600', color: '#450a0a' }}>{selectedSiswa.jenjang || '-'}</div></div>
+                    <div><div style={{ color: '#64748b', fontSize: '0.85rem' }}>Kelas</div><div style={{ fontWeight: '600', color: '#450a0a' }}>{selectedSiswa.kelas || '-'}</div></div>
+                    <div><div style={{ color: '#64748b', fontSize: '0.85rem' }}>Jurusan</div><div style={{ fontWeight: '600', color: '#450a0a' }}>{selectedSiswa.nama_jurusan || '-'}</div></div>
+                    <div><div style={{ color: '#64748b', fontSize: '0.85rem' }}>Rombel</div><div style={{ fontWeight: '600', color: '#450a0a' }}>{selectedSiswa.nama_rombel || '-'}</div></div>
+                    <div><div style={{ color: '#64748b', fontSize: '0.85rem' }}>Semester</div><div style={{ fontWeight: '600', color: '#450a0a' }}>{selectedSiswa.semester || '-'}</div></div>
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginTop: '1rem' }}>
-                    <div style={{ gridColumn: '1 / -1' }}><div style={{ color: '#64748b', fontSize: '0.85rem' }}>Alamat Sekolah</div><div style={{ fontWeight: '600', color: '#334155' }}>{selectedSiswa.alamat_sekolah || '-'}</div></div>
-                    <div><div style={{ color: '#64748b', fontSize: '0.85rem' }}>Provinsi Sekolah</div><div style={{ fontWeight: '600', color: '#334155' }}>{selectedSiswa.sekolah_provinsi || '-'}</div></div>
-                    <div><div style={{ color: '#64748b', fontSize: '0.85rem' }}>Kabupaten Sekolah</div><div style={{ fontWeight: '600', color: '#334155' }}>{selectedSiswa.sekolah_kabupaten || '-'}</div></div>
-                    <div><div style={{ color: '#64748b', fontSize: '0.85rem' }}>Kecamatan Sekolah</div><div style={{ fontWeight: '600', color: '#334155' }}>{selectedSiswa.sekolah_kecamatan || '-'}</div></div>
-                    <div><div style={{ color: '#64748b', fontSize: '0.85rem' }}>Kelurahan Sekolah</div><div style={{ fontWeight: '600', color: '#334155' }}>{selectedSiswa.sekolah_desa_kelurahan || '-'}</div></div>
-                    <div><div style={{ color: '#64748b', fontSize: '0.85rem' }}>Dusun Sekolah</div><div style={{ fontWeight: '600', color: '#334155' }}>{selectedSiswa.sekolah_dusun || '-'}</div></div>
-                    <div><div style={{ color: '#64748b', fontSize: '0.85rem' }}>Kode Pos Sekolah</div><div style={{ fontWeight: '600', color: '#334155' }}>{selectedSiswa.sekolah_kode_pos || '-'}</div></div>
+                    <div style={{ gridColumn: '1 / -1' }}><div style={{ color: '#64748b', fontSize: '0.85rem' }}>Alamat Sekolah</div><div style={{ fontWeight: '600', color: '#450a0a' }}>{selectedSiswa.alamat_sekolah || '-'}</div></div>
+                    <div><div style={{ color: '#64748b', fontSize: '0.85rem' }}>Provinsi Sekolah</div><div style={{ fontWeight: '600', color: '#450a0a' }}>{selectedSiswa.sekolah_provinsi || '-'}</div></div>
+                    <div><div style={{ color: '#64748b', fontSize: '0.85rem' }}>Kabupaten Sekolah</div><div style={{ fontWeight: '600', color: '#450a0a' }}>{selectedSiswa.sekolah_kabupaten || '-'}</div></div>
+                    <div><div style={{ color: '#64748b', fontSize: '0.85rem' }}>Kecamatan Sekolah</div><div style={{ fontWeight: '600', color: '#450a0a' }}>{selectedSiswa.sekolah_kecamatan || '-'}</div></div>
+                    <div><div style={{ color: '#64748b', fontSize: '0.85rem' }}>Kelurahan Sekolah</div><div style={{ fontWeight: '600', color: '#450a0a' }}>{selectedSiswa.sekolah_desa_kelurahan || '-'}</div></div>
+                    <div><div style={{ color: '#64748b', fontSize: '0.85rem' }}>Dusun Sekolah</div><div style={{ fontWeight: '600', color: '#450a0a' }}>{selectedSiswa.sekolah_dusun || '-'}</div></div>
+                    <div><div style={{ color: '#64748b', fontSize: '0.85rem' }}>Kode Pos Sekolah</div><div style={{ fontWeight: '600', color: '#450a0a' }}>{selectedSiswa.sekolah_kode_pos || '-'}</div></div>
                   </div>
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
                   {/* Section 2: Profil Pribadi & Fisik */}
                   <div style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-                    <h3 style={{ fontSize: '1.1rem', color: '#0f172a', margin: '0 0 1rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem', borderBottom: '1px solid #f1f5f9', paddingBottom: '0.75rem' }}><FileText size={18} color="#0284c7"/> Identitas & Fisik</h3>
+                    <h3 style={{ fontSize: '1.1rem', color: '#450a0a', margin: '0 0 1rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem', borderBottom: '1px solid #f3f0e7', paddingBottom: '0.75rem' }}><FileText size={18} color="#0284c7"/> Identitas & Fisik</h3>
                     <div style={{ display: 'grid', gap: '0.75rem' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Jenis Kelamin</span> <strong style={{ color: '#334155' }}>{selectedSiswa.jenis_kelamin || '-'}</strong></div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Tempat Lahir</span> <strong style={{ color: '#334155' }}>{selectedSiswa.tempat_lahir || '-'}</strong></div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Tanggal Lahir</span> <strong style={{ color: '#334155' }}>{selectedSiswa.tanggal_lahir || '-'}</strong></div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>No. Akta Lahir</span> <strong style={{ color: '#334155' }}>{selectedSiswa.no_akta_lahir || '-'}</strong></div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Agama</span> <strong style={{ color: '#334155' }}>{selectedSiswa.agama || '-'}</strong></div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Kebutuhan Khusus</span> <strong style={{ color: '#334155' }}>{selectedSiswa.kebutuhan_khusus || '-'}</strong></div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Anak Ke-</span> <strong style={{ color: '#334155' }}>{selectedSiswa.anak_ke || '-'}</strong></div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Jml Saudara Kandung</span> <strong style={{ color: '#334155' }}>{selectedSiswa.jumlah_saudara_kandung || '-'}</strong></div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Tinggi Badan</span> <strong style={{ color: '#334155' }}>{selectedSiswa.tinggi_badan ? `${selectedSiswa.tinggi_badan} cm` : '-'}</strong></div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Berat Badan</span> <strong style={{ color: '#334155' }}>{selectedSiswa.berat_badan ? `${selectedSiswa.berat_badan} kg` : '-'}</strong></div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Lingkar Kepala</span> <strong style={{ color: '#334155' }}>{selectedSiswa.lingkar_kepala ? `${selectedSiswa.lingkar_kepala} cm` : '-'}</strong></div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Jenis Kelamin</span> <strong style={{ color: '#450a0a' }}>{selectedSiswa.jenis_kelamin || '-'}</strong></div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Tempat Lahir</span> <strong style={{ color: '#450a0a' }}>{selectedSiswa.tempat_lahir || '-'}</strong></div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Tanggal Lahir</span> <strong style={{ color: '#450a0a' }}>{selectedSiswa.tanggal_lahir || '-'}</strong></div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>No. Akta Lahir</span> <strong style={{ color: '#450a0a' }}>{selectedSiswa.no_akta_lahir || '-'}</strong></div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Agama</span> <strong style={{ color: '#450a0a' }}>{selectedSiswa.agama || '-'}</strong></div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Kebutuhan Khusus</span> <strong style={{ color: '#450a0a' }}>{selectedSiswa.kebutuhan_khusus || '-'}</strong></div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Anak Ke-</span> <strong style={{ color: '#450a0a' }}>{selectedSiswa.anak_ke || '-'}</strong></div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Jml Saudara Kandung</span> <strong style={{ color: '#450a0a' }}>{selectedSiswa.jumlah_saudara_kandung || '-'}</strong></div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Tinggi Badan</span> <strong style={{ color: '#450a0a' }}>{selectedSiswa.tinggi_badan ? `${selectedSiswa.tinggi_badan} cm` : '-'}</strong></div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Berat Badan</span> <strong style={{ color: '#450a0a' }}>{selectedSiswa.berat_badan ? `${selectedSiswa.berat_badan} kg` : '-'}</strong></div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Lingkar Kepala</span> <strong style={{ color: '#450a0a' }}>{selectedSiswa.lingkar_kepala ? `${selectedSiswa.lingkar_kepala} cm` : '-'}</strong></div>
                     </div>
                   </div>
 
                   {/* Section 3: Kontak & Transportasi */}
                   <div style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-                    <h3 style={{ fontSize: '1.1rem', color: '#0f172a', margin: '0 0 1rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem', borderBottom: '1px solid #f1f5f9', paddingBottom: '0.75rem' }}><MapPin size={18} color="#0284c7"/> Kontak & Domisili</h3>
+                    <h3 style={{ fontSize: '1.1rem', color: '#450a0a', margin: '0 0 1rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem', borderBottom: '1px solid #f3f0e7', paddingBottom: '0.75rem' }}><MapPin size={18} color="#0284c7"/> Kontak & Domisili</h3>
                     <div style={{ display: 'grid', gap: '0.75rem' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>No. HP / Telepon</span> <strong style={{ color: '#334155' }}>{selectedSiswa.nomor_telp || '-'}</strong></div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Email</span> <strong style={{ color: '#334155', wordBreak: 'break-all', marginLeft: '1rem', textAlign: 'right' }}>{selectedSiswa.email || '-'}</strong></div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Alamat Jalan</span> <strong style={{ color: '#334155', textAlign: 'right', marginLeft: '1rem' }}>{selectedSiswa.alamat_siswa || '-'}</strong></div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Dusun</span> <strong style={{ color: '#334155' }}>{selectedSiswa.dusun_siswa || '-'}</strong></div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Kelurahan / Desa</span> <strong style={{ color: '#334155' }}>{selectedSiswa.kelurahan_siswa || '-'}</strong></div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Kecamatan</span> <strong style={{ color: '#334155' }}>{selectedSiswa.kecamatan_siswa || '-'}</strong></div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Kabupaten / Kota</span> <strong style={{ color: '#334155' }}>{selectedSiswa.kabupaten_siswa || '-'}</strong></div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Provinsi</span> <strong style={{ color: '#334155' }}>{selectedSiswa.provinsi_siswa || '-'}</strong></div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Kode Pos</span> <strong style={{ color: '#334155' }}>{selectedSiswa.kode_pos_siswa || '-'}</strong></div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Jenis Tinggal</span> <strong style={{ color: '#334155' }}>{selectedSiswa.jenis_tinggal || '-'}</strong></div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Alat Transportasi</span> <strong style={{ color: '#334155' }}>{selectedSiswa.alat_transportasi || '-'}</strong></div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>No. HP / Telepon</span> <strong style={{ color: '#450a0a' }}>{selectedSiswa.nomor_telp || '-'}</strong></div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Email</span> <strong style={{ color: '#450a0a', wordBreak: 'break-all', marginLeft: '1rem', textAlign: 'right' }}>{selectedSiswa.email || '-'}</strong></div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Alamat Jalan</span> <strong style={{ color: '#450a0a', textAlign: 'right', marginLeft: '1rem' }}>{selectedSiswa.alamat_siswa || '-'}</strong></div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Dusun</span> <strong style={{ color: '#450a0a' }}>{selectedSiswa.dusun_siswa || '-'}</strong></div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Kelurahan / Desa</span> <strong style={{ color: '#450a0a' }}>{selectedSiswa.kelurahan_siswa || '-'}</strong></div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Kecamatan</span> <strong style={{ color: '#450a0a' }}>{selectedSiswa.kecamatan_siswa || '-'}</strong></div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Kabupaten / Kota</span> <strong style={{ color: '#450a0a' }}>{selectedSiswa.kabupaten_siswa || '-'}</strong></div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Provinsi</span> <strong style={{ color: '#450a0a' }}>{selectedSiswa.provinsi_siswa || '-'}</strong></div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Kode Pos</span> <strong style={{ color: '#450a0a' }}>{selectedSiswa.kode_pos_siswa || '-'}</strong></div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Jenis Tinggal</span> <strong style={{ color: '#450a0a' }}>{selectedSiswa.jenis_tinggal || '-'}</strong></div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Alat Transportasi</span> <strong style={{ color: '#450a0a' }}>{selectedSiswa.alat_transportasi || '-'}</strong></div>
                     </div>
                   </div>
                 </div>
 
                 {/* Section 4: Data Keluarga (Ortu & Wali) */}
                 <div style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', marginBottom: '1.5rem' }}>
-                  <h3 style={{ fontSize: '1.1rem', color: '#0f172a', margin: '0 0 1rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem', borderBottom: '1px solid #f1f5f9', paddingBottom: '0.75rem' }}><FamilyIcon size={18} color="#0284c7"/> Informasi Keluarga & Orang Tua</h3>
+                  <h3 style={{ fontSize: '1.1rem', color: '#450a0a', margin: '0 0 1rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem', borderBottom: '1px solid #f3f0e7', paddingBottom: '0.75rem' }}><FamilyIcon size={18} color="#0284c7"/> Informasi Keluarga & Orang Tua</h3>
                   <div style={{ marginBottom: '1rem' }}>
                     <div style={{ display: 'flex', gap: '2rem' }}>
                       <span style={{ color: '#64748b' }}>Nomor Kartu Keluarga (KK):</span>
-                      <strong style={{ color: '#334155' }}>{selectedSiswa.no_kk || '-'}</strong>
+                      <strong style={{ color: '#450a0a' }}>{selectedSiswa.no_kk || '-'}</strong>
                     </div>
                   </div>
                   
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1.5rem' }}>
                     {/* Ayah */}
-                    <div style={{ background: '#f8fafc', padding: '1rem', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                      <h4 style={{ margin: '0 0 0.75rem 0', color: '#0f172a', fontSize: '0.95rem', borderBottom: '1px solid #cbd5e1', paddingBottom: '0.5rem' }}>Data Ayah</h4>
+                    <div style={{ background: '#fdfbf7', padding: '1rem', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                      <h4 style={{ margin: '0 0 0.75rem 0', color: '#450a0a', fontSize: '0.95rem', borderBottom: '1px solid #cbd5e1', paddingBottom: '0.5rem' }}>Data Ayah</h4>
                       <div style={{ display: 'grid', gap: '0.5rem', fontSize: '0.9rem' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Nama</span> <strong>{selectedSiswa.nama_ayah || '-'}</strong></div>
                         <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>NIK</span> <strong>{selectedSiswa.nik_ayah || '-'}</strong></div>
@@ -789,8 +789,8 @@ export default function DataPendidikanPage() {
                       </div>
                     </div>
                     {/* Ibu */}
-                    <div style={{ background: '#f8fafc', padding: '1rem', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                      <h4 style={{ margin: '0 0 0.75rem 0', color: '#0f172a', fontSize: '0.95rem', borderBottom: '1px solid #cbd5e1', paddingBottom: '0.5rem' }}>Data Ibu Kandung</h4>
+                    <div style={{ background: '#fdfbf7', padding: '1rem', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                      <h4 style={{ margin: '0 0 0.75rem 0', color: '#450a0a', fontSize: '0.95rem', borderBottom: '1px solid #cbd5e1', paddingBottom: '0.5rem' }}>Data Ibu Kandung</h4>
                       <div style={{ display: 'grid', gap: '0.5rem', fontSize: '0.9rem' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Nama</span> <strong>{selectedSiswa.nama_ibu_kandung || '-'}</strong></div>
                         <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>NIK</span> <strong>{selectedSiswa.nik_ibu || '-'}</strong></div>
@@ -801,8 +801,8 @@ export default function DataPendidikanPage() {
                       </div>
                     </div>
                     {/* Wali */}
-                    <div style={{ background: '#f8fafc', padding: '1rem', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                      <h4 style={{ margin: '0 0 0.75rem 0', color: '#0f172a', fontSize: '0.95rem', borderBottom: '1px solid #cbd5e1', paddingBottom: '0.5rem' }}>Data Wali</h4>
+                    <div style={{ background: '#fdfbf7', padding: '1rem', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                      <h4 style={{ margin: '0 0 0.75rem 0', color: '#450a0a', fontSize: '0.95rem', borderBottom: '1px solid #cbd5e1', paddingBottom: '0.5rem' }}>Data Wali</h4>
                       <div style={{ display: 'grid', gap: '0.5rem', fontSize: '0.9rem' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Nama</span> <strong>{selectedSiswa.nama_wali || '-'}</strong></div>
                         <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Pekerjaan</span> <strong>{selectedSiswa.pekerjaan_wali || '-'}</strong></div>
@@ -815,32 +815,32 @@ export default function DataPendidikanPage() {
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
                   {/* Section 5: Kesejahteraan (PIP/KIP) */}
                   <div style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-                    <h3 style={{ fontSize: '1.1rem', color: '#0f172a', margin: '0 0 1rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem', borderBottom: '1px solid #f1f5f9', paddingBottom: '0.75rem' }}><Briefcase size={18} color="#0284c7"/> Kesejahteraan Sosial (PIP & KIP)</h3>
+                    <h3 style={{ fontSize: '1.1rem', color: '#450a0a', margin: '0 0 1rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem', borderBottom: '1px solid #f3f0e7', paddingBottom: '0.75rem' }}><Briefcase size={18} color="#0284c7"/> Kesejahteraan Sosial (PIP & KIP)</h3>
                     <div style={{ display: 'grid', gap: '0.75rem' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}><span style={{ color: '#64748b' }}>Status Layak PIP</span> 
-                        {selectedSiswa.layak_pip ? <span style={{ background: '#dcfce7', color: '#166534', padding: '0.2rem 0.6rem', borderRadius: '4px', fontSize: '0.8rem', fontWeight: '600' }}>Layak PIP</span> : <span style={{ background: '#f1f5f9', color: '#475569', padding: '0.2rem 0.6rem', borderRadius: '4px', fontSize: '0.8rem', fontWeight: '600' }}>Tidak Layak</span>}
+                        {selectedSiswa.layak_pip ? <span style={{ background: '#dcfce7', color: '#166534', padding: '0.2rem 0.6rem', borderRadius: '4px', fontSize: '0.8rem', fontWeight: '600' }}>Layak PIP</span> : <span style={{ background: '#f3f0e7', color: '#475569', padding: '0.2rem 0.6rem', borderRadius: '4px', fontSize: '0.8rem', fontWeight: '600' }}>Tidak Layak</span>}
                       </div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Alasan Layak PIP</span> <strong style={{ color: '#334155', textAlign: 'right', maxWidth: '150px' }}>{selectedSiswa.alasan_layak_pip || '-'}</strong></div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Alasan Layak PIP</span> <strong style={{ color: '#450a0a', textAlign: 'right', maxWidth: '150px' }}>{selectedSiswa.alasan_layak_pip || '-'}</strong></div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}><span style={{ color: '#64748b' }}>Penerima KIP</span> 
-                        {selectedSiswa.penerima_kip ? <span style={{ background: '#dcfce7', color: '#166534', padding: '0.2rem 0.6rem', borderRadius: '4px', fontSize: '0.8rem', fontWeight: '600' }}>Ya (Penerima)</span> : <span style={{ background: '#f1f5f9', color: '#475569', padding: '0.2rem 0.6rem', borderRadius: '4px', fontSize: '0.8rem', fontWeight: '600' }}>Bukan Penerima</span>}
+                        {selectedSiswa.penerima_kip ? <span style={{ background: '#dcfce7', color: '#166534', padding: '0.2rem 0.6rem', borderRadius: '4px', fontSize: '0.8rem', fontWeight: '600' }}>Ya (Penerima)</span> : <span style={{ background: '#f3f0e7', color: '#475569', padding: '0.2rem 0.6rem', borderRadius: '4px', fontSize: '0.8rem', fontWeight: '600' }}>Bukan Penerima</span>}
                       </div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>No. KIP</span> <strong style={{ color: '#334155' }}>{selectedSiswa.no_kip || '-'}</strong></div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Nama Tertera di KIP</span> <strong style={{ color: '#334155' }}>{selectedSiswa.nama_kip || '-'}</strong></div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>No. KIP</span> <strong style={{ color: '#450a0a' }}>{selectedSiswa.no_kip || '-'}</strong></div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748b' }}>Nama Tertera di KIP</span> <strong style={{ color: '#450a0a' }}>{selectedSiswa.nama_kip || '-'}</strong></div>
                     </div>
                   </div>
 
                   {/* Section 6: Lokasi & Peta (Koordinat) */}
                   <div style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-                    <h3 style={{ fontSize: '1.1rem', color: '#0f172a', margin: '0 0 1rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem', borderBottom: '1px solid #f1f5f9', paddingBottom: '0.75rem' }}><MapPin size={18} color="#0284c7"/> Peta Koordinat Domisili</h3>
+                    <h3 style={{ fontSize: '1.1rem', color: '#450a0a', margin: '0 0 1rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem', borderBottom: '1px solid #f3f0e7', paddingBottom: '0.75rem' }}><MapPin size={18} color="#0284c7"/> Peta Koordinat Domisili</h3>
                     
                     <div style={{ display: 'flex', gap: '2rem', flexDirection: 'column', height: '100%' }}>
-                      <div style={{ display: 'grid', gap: '0.5rem', color: '#334155', fontSize: '0.95rem' }}>
+                      <div style={{ display: 'grid', gap: '0.5rem', color: '#450a0a', fontSize: '0.95rem' }}>
                         <div><strong>Lintang (Latitude):</strong> {selectedSiswa.lintang || '-'}</div>
                         <div><strong>Bujur (Longitude):</strong> {selectedSiswa.bujur || '-'}</div>
                       </div>
 
                       {selectedSiswa.lintang && selectedSiswa.bujur ? (
-                        <div style={{ width: '100%', flex: 1, minHeight: '180px', borderRadius: '8px', overflow: 'hidden', border: '1px solid #e2e8f0', background: '#f1f5f9' }}>
+                        <div style={{ width: '100%', flex: 1, minHeight: '180px', borderRadius: '8px', overflow: 'hidden', border: '1px solid #e2e8f0', background: '#f3f0e7' }}>
                           <iframe 
                             width="100%" 
                             height="100%" 
@@ -852,7 +852,7 @@ export default function DataPendidikanPage() {
                           ></iframe>
                         </div>
                       ) : (
-                        <div style={{ width: '100%', flex: 1, minHeight: '180px', padding: '2rem', borderRadius: '8px', border: '1px dashed #cbd5e1', background: '#f8fafc', color: '#64748b', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+                        <div style={{ width: '100%', flex: 1, minHeight: '180px', padding: '2rem', borderRadius: '8px', border: '1px dashed #cbd5e1', background: '#fdfbf7', color: '#64748b', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
                           <MapPin size={32} color="#cbd5e1"/>
                           <span style={{ fontSize: '0.9rem' }}>Koordinat (Lintang/Bujur) kosong.<br/>Mini Map Google tidak dapat dirender.</span>
                         </div>

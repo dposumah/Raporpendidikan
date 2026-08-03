@@ -98,9 +98,9 @@ export default function PencarianGuruPage() {
 
   if (loading) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#f8fafc' }}>
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#fdfbf7' }}>
         <div style={{ textAlign: 'center' }}>
-          <div className="animate-spin" style={{ width: '40px', height: '40px', border: '4px solid #e2e8f0', borderTopColor: '#4f46e5', borderRadius: '50%', margin: '0 auto 1rem auto' }}></div>
+          <div className="animate-spin" style={{ width: '40px', height: '40px', border: '4px solid #e2e8f0', borderTopColor: '#991b1b', borderRadius: '50%', margin: '0 auto 1rem auto' }}></div>
           <p style={{ color: '#64748b', fontWeight: '500' }}>Memuat Data Pencarian Guru...</p>
         </div>
       </div>
@@ -108,13 +108,13 @@ export default function PencarianGuruPage() {
   }
 
   return (
-    <div style={{ backgroundColor: '#f8fafc', minHeight: 'calc(100vh - 75px)', padding: '2rem' }}>
+    <div style={{ backgroundColor: '#fdfbf7', minHeight: 'calc(100vh - 75px)', padding: '2rem' }}>
       <div style={{ display: 'flex', gap: '2rem', maxWidth: '1400px', margin: '0 auto' }}>
         
         {/* LEFT SIDEBAR: FILTERS */}
         <div style={{ width: '300px', flexShrink: 0 }}>
           <div style={{ backgroundColor: 'white', padding: '1.5rem', borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', position: 'sticky', top: '100px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem', color: '#0f172a', borderBottom: '1px solid #e2e8f0', paddingBottom: '1rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem', color: '#450a0a', borderBottom: '1px solid #e2e8f0', paddingBottom: '1rem' }}>
               <Filter size={20} />
               <h2 style={{ margin: 0, fontSize: '1.1rem', fontWeight: '600' }}>Filter Pencarian</h2>
             </div>
@@ -122,7 +122,7 @@ export default function PencarianGuruPage() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               <div>
                 <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#64748b', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Jenjang</label>
-                <select value={jenjang} onChange={(e) => setJenjang(e.target.value)} style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none', backgroundColor: '#f8fafc', color: '#0f172a', fontSize: '0.95rem' }}>
+                <select value={jenjang} onChange={(e) => setJenjang(e.target.value)} style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none', backgroundColor: '#fdfbf7', color: '#450a0a', fontSize: '0.95rem' }}>
                   <option value="">Semua Jenjang</option>
                   {availableFilters.jenjang.map(j => <option key={j} value={j}>{j}</option>)}
                 </select>
@@ -130,7 +130,7 @@ export default function PencarianGuruPage() {
               
               <div>
                 <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#64748b', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Kecamatan</label>
-                <select value={kecamatan} onChange={(e) => setKecamatan(e.target.value)} style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none', backgroundColor: '#f8fafc', color: '#0f172a', fontSize: '0.95rem' }}>
+                <select value={kecamatan} onChange={(e) => setKecamatan(e.target.value)} style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none', backgroundColor: '#fdfbf7', color: '#450a0a', fontSize: '0.95rem' }}>
                   <option value="">Semua Kecamatan</option>
                   {availableFilters.kecamatan.map(k => <option key={k} value={k}>{k}</option>)}
                 </select>
@@ -138,7 +138,7 @@ export default function PencarianGuruPage() {
               
               <div>
                 <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#64748b', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Sekolah (Tempat Tugas)</label>
-                <select value={sekolah} onChange={(e) => setSekolah(e.target.value)} style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none', backgroundColor: '#f8fafc', color: '#0f172a', fontSize: '0.95rem' }}>
+                <select value={sekolah} onChange={(e) => setSekolah(e.target.value)} style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none', backgroundColor: '#fdfbf7', color: '#450a0a', fontSize: '0.95rem' }}>
                   <option value="">Semua Sekolah</option>
                   {availableFilters.sekolah.map(s => <option key={s} value={s}>{s}</option>)}
                 </select>
@@ -146,9 +146,9 @@ export default function PencarianGuruPage() {
               
               <button 
                 onClick={() => { setJenjang(''); setKecamatan(''); setSekolah(''); }}
-                style={{ marginTop: '1rem', padding: '0.75rem', backgroundColor: '#f1f5f9', color: '#475569', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer', transition: 'background 0.2s' }}
+                style={{ marginTop: '1rem', padding: '0.75rem', backgroundColor: '#f3f0e7', color: '#475569', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer', transition: 'background 0.2s' }}
                 onMouseEnter={e => e.currentTarget.style.backgroundColor = '#e2e8f0'}
-                onMouseLeave={e => e.currentTarget.style.backgroundColor = '#f1f5f9'}
+                onMouseLeave={e => e.currentTarget.style.backgroundColor = '#f3f0e7'}
               >
                 Reset Filter
               </button>
@@ -161,7 +161,7 @@ export default function PencarianGuruPage() {
           
           {/* Header */}
           <div style={{ marginBottom: '2rem' }}>
-            <h1 style={{ margin: 0, fontSize: '1.75rem', color: '#0f172a', fontWeight: 'bold' }}>Pencarian Data Guru</h1>
+            <h1 style={{ margin: 0, fontSize: '1.75rem', color: '#450a0a', fontWeight: 'bold' }}>Pencarian Data Guru</h1>
             <p style={{ margin: '0.25rem 0 0 0', color: '#64748b', fontSize: '0.95rem' }}>Cari profil lengkap guru berdasarkan Nama, NIK, NUPTK, atau Sekolah.</p>
           </div>
 
@@ -174,10 +174,10 @@ export default function PencarianGuruPage() {
                 placeholder="Ketik Nama, NIK, NUPTK, atau Tempat Tugas..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                style={{ width: '100%', padding: '0.875rem 1rem 0.875rem 2.75rem', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none', fontSize: '1rem', color: '#0f172a' }}
+                style={{ width: '100%', padding: '0.875rem 1rem 0.875rem 2.75rem', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none', fontSize: '1rem', color: '#450a0a' }}
               />
             </div>
-            <div style={{ padding: '0.875rem 1.5rem', backgroundColor: '#f1f5f9', color: '#475569', borderRadius: '8px', fontWeight: '600', fontSize: '0.9rem' }}>
+            <div style={{ padding: '0.875rem 1.5rem', backgroundColor: '#f3f0e7', color: '#475569', borderRadius: '8px', fontWeight: '600', fontSize: '0.9rem' }}>
               {filteredData.length} Ditemukan
             </div>
           </div>
@@ -187,7 +187,7 @@ export default function PencarianGuruPage() {
             <div style={{ overflowX: 'auto' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
                 <thead>
-                  <tr style={{ backgroundColor: '#f8fafc', borderBottom: '2px solid #e2e8f0' }}>
+                  <tr style={{ backgroundColor: '#fdfbf7', borderBottom: '2px solid #e2e8f0' }}>
                     <th style={{ padding: '1rem 1.5rem', color: '#475569', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase' }}>No</th>
                     <th style={{ padding: '1rem 1.5rem', color: '#475569', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase' }}>Nama</th>
                     <th style={{ padding: '1rem 1.5rem', color: '#475569', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase' }}>NUPTK</th>
@@ -198,19 +198,19 @@ export default function PencarianGuruPage() {
                 </thead>
                 <tbody>
                   {currentData.length > 0 ? currentData.map((guru, index) => (
-                    <tr key={guru.id || index} style={{ borderBottom: '1px solid #e2e8f0', transition: 'background 0.2s' }} onMouseEnter={e => e.currentTarget.style.backgroundColor = '#f8fafc'} onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}>
+                    <tr key={guru.id || index} style={{ borderBottom: '1px solid #e2e8f0', transition: 'background 0.2s' }} onMouseEnter={e => e.currentTarget.style.backgroundColor = '#fdfbf7'} onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}>
                       <td style={{ padding: '1rem 1.5rem', color: '#64748b', fontSize: '0.9rem' }}>{startIndex + index + 1}</td>
                       <td style={{ padding: '1rem 1.5rem' }}>
-                        <div style={{ fontWeight: '600', color: '#0f172a' }}>{guru.nama}</div>
+                        <div style={{ fontWeight: '600', color: '#450a0a' }}>{guru.nama}</div>
                         <div style={{ fontSize: '0.8rem', color: '#64748b' }}>NIK: {guru.nik?.startsWith('TMP_') ? '-' : guru.nik}</div>
                       </td>
-                      <td style={{ padding: '1rem 1.5rem', color: '#334155', fontSize: '0.9rem' }}>{guru.nuptk || '-'}</td>
+                      <td style={{ padding: '1rem 1.5rem', color: '#450a0a', fontSize: '0.9rem' }}>{guru.nuptk || '-'}</td>
                       <td style={{ padding: '1rem 1.5rem' }}>
-                        <span style={{ backgroundColor: '#e0e7ff', color: '#4f46e5', padding: '0.25rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: '600' }}>
+                        <span style={{ backgroundColor: '#e0e7ff', color: '#991b1b', padding: '0.25rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: '600' }}>
                           {guru.status_kepegawaian || 'Tidak Diketahui'}
                         </span>
                       </td>
-                      <td style={{ padding: '1rem 1.5rem', color: '#334155', fontSize: '0.9rem' }}>
+                      <td style={{ padding: '1rem 1.5rem', color: '#450a0a', fontSize: '0.9rem' }}>
                         {guru.tempat_tugas}
                       </td>
                       <td style={{ padding: '1rem 1.5rem', textAlign: 'center' }}>
@@ -236,16 +236,16 @@ export default function PencarianGuruPage() {
             
             {/* Pagination Controls */}
             {totalPages > 1 && (
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 1.5rem', backgroundColor: '#f8fafc', borderTop: '1px solid #e2e8f0' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 1.5rem', backgroundColor: '#fdfbf7', borderTop: '1px solid #e2e8f0' }}>
                 <div style={{ color: '#64748b', fontSize: '0.9rem' }}>
-                  Menampilkan <span style={{ fontWeight: '600', color: '#0f172a' }}>{startIndex + 1}</span> - <span style={{ fontWeight: '600', color: '#0f172a' }}>{Math.min(startIndex + rowsPerPage, filteredData.length)}</span> dari <span style={{ fontWeight: '600', color: '#0f172a' }}>{filteredData.length}</span> data
+                  Menampilkan <span style={{ fontWeight: '600', color: '#450a0a' }}>{startIndex + 1}</span> - <span style={{ fontWeight: '600', color: '#450a0a' }}>{Math.min(startIndex + rowsPerPage, filteredData.length)}</span> dari <span style={{ fontWeight: '600', color: '#450a0a' }}>{filteredData.length}</span> data
                 </div>
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
-                  <button onClick={handlePrevPage} disabled={currentPage === 1} style={{ padding: '0.5rem 1rem', border: '1px solid #cbd5e1', borderRadius: '6px', backgroundColor: currentPage === 1 ? '#f1f5f9' : 'white', color: currentPage === 1 ? '#94a3b8' : '#334155', cursor: currentPage === 1 ? 'not-allowed' : 'pointer' }}>
+                  <button onClick={handlePrevPage} disabled={currentPage === 1} style={{ padding: '0.5rem 1rem', border: '1px solid #cbd5e1', borderRadius: '6px', backgroundColor: currentPage === 1 ? '#f3f0e7' : 'white', color: currentPage === 1 ? '#94a3b8' : '#450a0a', cursor: currentPage === 1 ? 'not-allowed' : 'pointer' }}>
                     Sebelumnya
                   </button>
-                  <div style={{ padding: '0.5rem 1rem', fontWeight: '600', color: '#0f172a' }}>{currentPage} / {totalPages}</div>
-                  <button onClick={handleNextPage} disabled={currentPage === totalPages} style={{ padding: '0.5rem 1rem', border: '1px solid #cbd5e1', borderRadius: '6px', backgroundColor: currentPage === totalPages ? '#f1f5f9' : 'white', color: currentPage === totalPages ? '#94a3b8' : '#334155', cursor: currentPage === totalPages ? 'not-allowed' : 'pointer' }}>
+                  <div style={{ padding: '0.5rem 1rem', fontWeight: '600', color: '#450a0a' }}>{currentPage} / {totalPages}</div>
+                  <button onClick={handleNextPage} disabled={currentPage === totalPages} style={{ padding: '0.5rem 1rem', border: '1px solid #cbd5e1', borderRadius: '6px', backgroundColor: currentPage === totalPages ? '#f3f0e7' : 'white', color: currentPage === totalPages ? '#94a3b8' : '#450a0a', cursor: currentPage === totalPages ? 'not-allowed' : 'pointer' }}>
                     Selanjutnya
                   </button>
                 </div>
@@ -263,15 +263,15 @@ export default function PencarianGuruPage() {
             
             <div style={{ position: 'sticky', top: 0, backgroundColor: 'white', padding: '1.5rem 2rem', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', zIndex: 10 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                <div style={{ width: '48px', height: '48px', borderRadius: '50%', backgroundColor: '#e0e7ff', display: 'flex', justifyContent: 'center', alignItems: 'center', color: '#4f46e5' }}>
+                <div style={{ width: '48px', height: '48px', borderRadius: '50%', backgroundColor: '#e0e7ff', display: 'flex', justifyContent: 'center', alignItems: 'center', color: '#991b1b' }}>
                   <User size={24} />
                 </div>
                 <div>
-                  <h2 style={{ margin: 0, fontSize: '1.25rem', color: '#0f172a', fontWeight: 'bold' }}>Profil Guru</h2>
+                  <h2 style={{ margin: 0, fontSize: '1.25rem', color: '#450a0a', fontWeight: 'bold' }}>Profil Guru</h2>
                   <p style={{ margin: 0, color: '#64748b', fontSize: '0.9rem' }}>Detail Informasi & Kualifikasi</p>
                 </div>
               </div>
-              <button onClick={() => setSelectedGuru(null)} style={{ background: '#f1f5f9', border: 'none', borderRadius: '50%', width: '36px', height: '36px', display: 'flex', justifyContent: 'center', alignItems: 'center', cursor: 'pointer', color: '#64748b', transition: 'background 0.2s' }} onMouseEnter={e => e.currentTarget.style.backgroundColor = '#e2e8f0'} onMouseLeave={e => e.currentTarget.style.backgroundColor = '#f1f5f9'}>
+              <button onClick={() => setSelectedGuru(null)} style={{ background: '#f3f0e7', border: 'none', borderRadius: '50%', width: '36px', height: '36px', display: 'flex', justifyContent: 'center', alignItems: 'center', cursor: 'pointer', color: '#64748b', transition: 'background 0.2s' }} onMouseEnter={e => e.currentTarget.style.backgroundColor = '#e2e8f0'} onMouseLeave={e => e.currentTarget.style.backgroundColor = '#f3f0e7'}>
                 <X size={20} />
               </button>
             </div>
@@ -279,15 +279,15 @@ export default function PencarianGuruPage() {
             <div style={{ padding: '2rem' }}>
               {/* Header Info */}
               <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-                <h1 style={{ margin: '0 0 0.5rem 0', fontSize: '1.75rem', color: '#0f172a', fontWeight: 'bold' }}>{selectedGuru.nama}</h1>
+                <h1 style={{ margin: '0 0 0.5rem 0', fontSize: '1.75rem', color: '#450a0a', fontWeight: 'bold' }}>{selectedGuru.nama}</h1>
                 <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', flexWrap: 'wrap' }}>
-                  <span style={{ backgroundColor: '#f1f5f9', padding: '0.25rem 0.75rem', borderRadius: '16px', fontSize: '0.85rem', color: '#475569', fontWeight: '500' }}>
+                  <span style={{ backgroundColor: '#f3f0e7', padding: '0.25rem 0.75rem', borderRadius: '16px', fontSize: '0.85rem', color: '#475569', fontWeight: '500' }}>
                     NUPTK: {selectedGuru.nuptk || '-'}
                   </span>
-                  <span style={{ backgroundColor: '#f1f5f9', padding: '0.25rem 0.75rem', borderRadius: '16px', fontSize: '0.85rem', color: '#475569', fontWeight: '500' }}>
+                  <span style={{ backgroundColor: '#f3f0e7', padding: '0.25rem 0.75rem', borderRadius: '16px', fontSize: '0.85rem', color: '#475569', fontWeight: '500' }}>
                     NIK: {selectedGuru.nik?.startsWith('TMP_') ? 'Belum Tersedia' : selectedGuru.nik}
                   </span>
-                  <span style={{ backgroundColor: '#e0e7ff', padding: '0.25rem 0.75rem', borderRadius: '16px', fontSize: '0.85rem', color: '#4f46e5', fontWeight: '600' }}>
+                  <span style={{ backgroundColor: '#e0e7ff', padding: '0.25rem 0.75rem', borderRadius: '16px', fontSize: '0.85rem', color: '#991b1b', fontWeight: '600' }}>
                     {selectedGuru.status_kepegawaian || 'Status Tidak Diketahui'}
                   </span>
                 </div>
@@ -297,9 +297,9 @@ export default function PencarianGuruPage() {
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
                 
                 {/* Data Pribadi */}
-                <div style={{ backgroundColor: '#f8fafc', padding: '1.5rem', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-                  <h3 style={{ margin: '0 0 1rem 0', color: '#0f172a', fontSize: '1.05rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <User size={18} color="#4f46e5" /> Data Pribadi
+                <div style={{ backgroundColor: '#fdfbf7', padding: '1.5rem', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                  <h3 style={{ margin: '0 0 1rem 0', color: '#450a0a', fontSize: '1.05rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <User size={18} color="#991b1b" /> Data Pribadi
                   </h3>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                     <DetailRow label="Jenis Kelamin" value={selectedGuru.jenis_kelamin} />
@@ -311,8 +311,8 @@ export default function PencarianGuruPage() {
                 </div>
 
                 {/* Data Tugas */}
-                <div style={{ backgroundColor: '#f8fafc', padding: '1.5rem', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-                  <h3 style={{ margin: '0 0 1rem 0', color: '#0f172a', fontSize: '1.05rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <div style={{ backgroundColor: '#fdfbf7', padding: '1.5rem', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                  <h3 style={{ margin: '0 0 1rem 0', color: '#450a0a', fontSize: '1.05rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     <MapPin size={18} color="#10b981" /> Lokasi Tugas
                   </h3>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
@@ -325,8 +325,8 @@ export default function PencarianGuruPage() {
                 </div>
 
                 {/* Kualifikasi & Sertifikasi */}
-                <div style={{ backgroundColor: '#f8fafc', padding: '1.5rem', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-                  <h3 style={{ margin: '0 0 1rem 0', color: '#0f172a', fontSize: '1.05rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <div style={{ backgroundColor: '#fdfbf7', padding: '1.5rem', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                  <h3 style={{ margin: '0 0 1rem 0', color: '#450a0a', fontSize: '1.05rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     <GraduationCap size={18} color="#0ea5e9" /> Pendidikan & Sertifikasi
                   </h3>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
@@ -337,8 +337,8 @@ export default function PencarianGuruPage() {
                 </div>
 
                 {/* Kepegawaian & Kinerja */}
-                <div style={{ backgroundColor: '#f8fafc', padding: '1.5rem', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-                  <h3 style={{ margin: '0 0 1rem 0', color: '#0f172a', fontSize: '1.05rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <div style={{ backgroundColor: '#fdfbf7', padding: '1.5rem', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                  <h3 style={{ margin: '0 0 1rem 0', color: '#450a0a', fontSize: '1.05rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     <Briefcase size={18} color="#f59e0b" /> Jabatan & Kepegawaian
                   </h3>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
@@ -369,7 +369,7 @@ function DetailRow({ label, value }) {
   return (
     <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px dashed #cbd5e1', paddingBottom: '0.25rem' }}>
       <span style={{ color: '#64748b', fontSize: '0.85rem' }}>{label}</span>
-      <span style={{ color: '#0f172a', fontSize: '0.85rem', fontWeight: '500', textAlign: 'right', maxWidth: '60%' }}>{value || '-'}</span>
+      <span style={{ color: '#450a0a', fontSize: '0.85rem', fontWeight: '500', textAlign: 'right', maxWidth: '60%' }}>{value || '-'}</span>
     </div>
   );
 }

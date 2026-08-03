@@ -72,7 +72,7 @@ export default function GlosariumPage() {
         {glosariumList.map((item) => (
           <div key={item.kode} className="card" style={{ marginBottom: '1rem' }}>
             <h3 style={{ color: 'var(--primary-color)', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <span style={{ backgroundColor: '#eff6ff', padding: '0.2rem 0.5rem', borderRadius: '6px', fontSize: '0.9rem', color: '#1d4ed8' }}>
+              <span style={{ backgroundColor: '#fef2f2', padding: '0.2rem 0.5rem', borderRadius: '6px', fontSize: '0.9rem', color: '#1d4ed8' }}>
                 {item.kode}
               </span>
               {item.nama}

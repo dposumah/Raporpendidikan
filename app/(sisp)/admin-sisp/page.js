@@ -92,19 +92,19 @@ export default function AdminSispPage() {
   };
 
   return (
-    <div style={{ backgroundColor: '#f8fafc', minHeight: 'calc(100vh - 75px)', padding: '2rem' }}>
+    <div style={{ backgroundColor: '#fdfbf7', minHeight: 'calc(100vh - 75px)', padding: '2rem' }}>
       <div style={{ maxWidth: '800px', margin: '0 auto', backgroundColor: 'white', borderRadius: '16px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)', padding: '2rem' }}>
         
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-          <div style={{ display: 'inline-flex', justifyContent: 'center', alignItems: 'center', width: '64px', height: '64px', backgroundColor: '#e0e7ff', borderRadius: '50%', color: '#4f46e5', marginBottom: '1rem' }}>
+          <div style={{ display: 'inline-flex', justifyContent: 'center', alignItems: 'center', width: '64px', height: '64px', backgroundColor: '#e0e7ff', borderRadius: '50%', color: '#991b1b', marginBottom: '1rem' }}>
             <Upload size={32} />
           </div>
-          <h1 style={{ margin: '0 0 0.5rem 0', fontSize: '1.8rem', color: '#0f172a' }}>Unggah Data Satuan Pendidikan (SISP)</h1>
+          <h1 style={{ margin: '0 0 0.5rem 0', fontSize: '1.8rem', color: '#450a0a' }}>Unggah Data Satuan Pendidikan (SISP)</h1>
           <p style={{ margin: 0, color: '#64748b' }}>Impor data sekolah dari file Excel.</p>
         </div>
 
         <div style={{ marginBottom: '1.5rem' }}>
-          <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: '600', color: '#334155' }}>
+          <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: '600', color: '#450a0a' }}>
             Periode Data <span style={{ color: '#ef4444' }}>*</span>
           </label>
           <input
@@ -124,13 +124,13 @@ export default function AdminSispPage() {
             borderRadius: '12px', 
             padding: '3rem 2rem', 
             textAlign: 'center',
-            backgroundColor: '#f8fafc',
+            backgroundColor: '#fdfbf7',
             cursor: 'pointer',
             transition: 'all 0.2s',
             marginBottom: '1.5rem',
             position: 'relative'
           }}
-          onMouseEnter={(e) => e.currentTarget.style.borderColor = '#4f46e5'}
+          onMouseEnter={(e) => e.currentTarget.style.borderColor = '#991b1b'}
           onMouseLeave={(e) => e.currentTarget.style.borderColor = '#cbd5e1'}
         >
           <input 
@@ -141,7 +141,7 @@ export default function AdminSispPage() {
             disabled={loading}
           />
           <FileText size={48} color="#94a3b8" style={{ margin: '0 auto 1rem auto' }} />
-          <h3 style={{ margin: '0 0 0.5rem 0', color: '#334155', fontSize: '1.2rem' }}>
+          <h3 style={{ margin: '0 0 0.5rem 0', color: '#450a0a', fontSize: '1.2rem' }}>
             {file ? file.name : 'Pilih atau Tarik File Excel Ke Sini'}
           </h3>
           <p style={{ margin: 0, color: '#94a3b8', fontSize: '0.9rem' }}>Format yang didukung: .xlsx, .xls</p>
@@ -156,8 +156,8 @@ export default function AdminSispPage() {
             display: 'flex', 
             alignItems: 'center', 
             gap: '0.75rem',
-            backgroundColor: message.type === 'error' ? '#fef2f2' : message.type === 'success' ? '#f0fdf4' : '#eff6ff',
-            color: message.type === 'error' ? '#ef4444' : message.type === 'success' ? '#10b981' : '#3b82f6',
+            backgroundColor: message.type === 'error' ? '#fef2f2' : message.type === 'success' ? '#f0fdf4' : '#fef2f2',
+            color: message.type === 'error' ? '#ef4444' : message.type === 'success' ? '#10b981' : '#b91c1c',
             border: `1px solid ${message.type === 'error' ? '#fecaca' : message.type === 'success' ? '#bbf7d0' : '#bfdbfe'}`
           }}>
             {message.type === 'error' ? <AlertCircle size={20} /> : message.type === 'success' ? <CheckCircle size={20} /> : <RefreshCw size={20} className="animate-spin" />}
@@ -172,7 +172,7 @@ export default function AdminSispPage() {
           style={{ 
             width: '100%', 
             padding: '1rem', 
-            backgroundColor: !file || loading ? '#94a3b8' : '#4f46e5', 
+            backgroundColor: !file || loading ? '#94a3b8' : '#991b1b', 
             color: 'white', 
             border: 'none', 
             borderRadius: '8px', 
@@ -196,10 +196,10 @@ export default function AdminSispPage() {
         {/* Preview */}
         {preview.length > 0 && (
           <div style={{ marginTop: '2rem' }}>
-            <h3 style={{ margin: '0 0 1rem 0', color: '#334155', fontSize: '1.1rem' }}>Pratinjau Data SISP (5 baris pertama)</h3>
+            <h3 style={{ margin: '0 0 1rem 0', color: '#450a0a', fontSize: '1.1rem' }}>Pratinjau Data SISP (5 baris pertama)</h3>
             <div style={{ overflowX: 'auto', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.85rem' }}>
-                <thead style={{ backgroundColor: '#f8fafc' }}>
+                <thead style={{ backgroundColor: '#fdfbf7' }}>
                   <tr>
                     <th style={{ padding: '0.75rem', borderBottom: '1px solid #e2e8f0' }}>Nama Satuan Pendidikan</th>
                     <th style={{ padding: '0.75rem', borderBottom: '1px solid #e2e8f0' }}>NPSN</th>

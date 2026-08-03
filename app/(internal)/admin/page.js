@@ -176,7 +176,7 @@ export default function AdminPage() {
           style={{
             display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.75rem 1.5rem',
             border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: '600',
-            backgroundColor: activeTab === 'upload' ? 'var(--primary-color)' : '#f1f5f9',
+            backgroundColor: activeTab === 'upload' ? 'var(--primary-color)' : '#f3f0e7',
             color: activeTab === 'upload' ? 'white' : 'var(--text-main)',
             transition: 'all 0.2s'
           }}
@@ -189,7 +189,7 @@ export default function AdminPage() {
           style={{
             display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.75rem 1.5rem',
             border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: '600',
-            backgroundColor: activeTab === 'spm' ? 'var(--primary-color)' : '#f1f5f9',
+            backgroundColor: activeTab === 'spm' ? 'var(--primary-color)' : '#f3f0e7',
             color: activeTab === 'spm' ? 'white' : 'var(--text-main)',
             transition: 'all 0.2s'
           }}
@@ -202,7 +202,7 @@ export default function AdminPage() {
           style={{
             display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.75rem 1.5rem',
             border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: '600',
-            backgroundColor: activeTab === 'upload_sekolah' ? 'var(--primary-color)' : '#f1f5f9',
+            backgroundColor: activeTab === 'upload_sekolah' ? 'var(--primary-color)' : '#f3f0e7',
             color: activeTab === 'upload_sekolah' ? 'white' : 'var(--text-main)',
             transition: 'all 0.2s'
           }}
@@ -215,7 +215,7 @@ export default function AdminPage() {
           style={{
             display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.75rem 1.5rem',
             border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: '600',
-            backgroundColor: activeTab === 'pembenahan' ? 'var(--primary-color)' : '#f1f5f9',
+            backgroundColor: activeTab === 'pembenahan' ? 'var(--primary-color)' : '#f3f0e7',
             color: activeTab === 'pembenahan' ? 'white' : 'var(--text-main)',
             transition: 'all 0.2s'
           }}

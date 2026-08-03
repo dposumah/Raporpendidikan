@@ -39,7 +39,7 @@ export default function LoginPage() {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+      background: 'linear-gradient(135deg, #450a0a 0%, #7f1d1d 100%)',
       padding: '1rem',
       position: 'relative'
     }}>
@@ -84,7 +84,7 @@ export default function LoginPage() {
                   background: 'rgba(0, 0, 0, 0.2)', border: '1px solid rgba(255,255,255,0.1)',
                   color: 'white', fontSize: '1rem', outline: 'none', transition: 'border-color 0.2s'
                 }}
-                onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                onFocus={(e) => e.target.style.borderColor = '#b91c1c'}
                 onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
                 placeholder="admin@tomohon.go.id"
               />
@@ -107,7 +107,7 @@ export default function LoginPage() {
                   background: 'rgba(0, 0, 0, 0.2)', border: '1px solid rgba(255,255,255,0.1)',
                   color: 'white', fontSize: '1rem', outline: 'none', transition: 'border-color 0.2s'
                 }}
-                onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                onFocus={(e) => e.target.style.borderColor = '#b91c1c'}
                 onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
                 placeholder="••••••••"
               />
@@ -121,7 +121,7 @@ export default function LoginPage() {
               marginTop: '0.5rem',
               width: '100%',
               padding: '0.875rem',
-              background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+              background: 'linear-gradient(135deg, #b91c1c 0%, #991b1b 100%)',
               color: 'white',
               border: 'none',
               borderRadius: '8px',

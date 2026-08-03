@@ -103,7 +103,7 @@ export default function PembenahanPage() {
   if (loading) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', flexDirection: 'column' }}>
-        <div style={{ width: '40px', height: '40px', border: '4px solid #f3f3f3', borderTop: '4px solid #3b82f6', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
+        <div style={{ width: '40px', height: '40px', border: '4px solid #f3f3f3', borderTop: '4px solid #b91c1c', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
         <p style={{ marginTop: '1rem', color: '#64748b' }}>Memuat data referensi pembenahan...</p>
         <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
       </div>
@@ -113,8 +113,8 @@ export default function PembenahanPage() {
   return (
     <div style={{ padding: '2rem', maxWidth: '1400px', margin: '0 auto' }}>
       <div style={{ marginBottom: '2rem' }}>
-        <h1 style={{ margin: '0 0 0.5rem 0', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <BookOpen size={28} color="#3b82f6" /> Akar Masalah & Pembenahan
+        <h1 style={{ margin: '0 0 0.5rem 0', color: '#450a0a', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <BookOpen size={28} color="#b91c1c" /> Akar Masalah & Pembenahan
         </h1>
         <p style={{ margin: 0, color: '#64748b' }}>Referensi langkah Identifikasi, Refleksi, dan Benahi untuk setiap Indikator Prioritas daerah Anda.</p>
       </div>
@@ -180,13 +180,13 @@ export default function PembenahanPage() {
               {/* ACCORDION HEADER */}
               <div 
                 onClick={() => toggleCard(group.indikator_prioritas)}
-                style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', background: isExpanded ? '#f8fafc' : 'white', transition: 'background 0.2s' }}
+                style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', background: isExpanded ? '#fdfbf7' : 'white', transition: 'background 0.2s' }}
               >
                 <div style={{ flex: 1, paddingRight: '2rem' }}>
-                  <div style={{ display: 'inline-block', background: '#e0e7ff', color: '#4f46e5', padding: '0.2rem 0.6rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>
+                  <div style={{ display: 'inline-block', background: '#e0e7ff', color: '#991b1b', padding: '0.2rem 0.6rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>
                     {group.kelompok_indikator}
                   </div>
-                  <h2 style={{ margin: '0 0 0.5rem 0', color: '#0f172a', fontSize: '1.25rem' }}>{group.indikator_prioritas}</h2>
+                  <h2 style={{ margin: '0 0 0.5rem 0', color: '#450a0a', fontSize: '1.25rem' }}>{group.indikator_prioritas}</h2>
                   <p style={{ margin: 0, color: '#64748b', fontSize: '0.9rem' }}>{group.indikator_kinerja_urusan}</p>
                 </div>
                 <div style={{ color: '#94a3b8' }}>
@@ -196,7 +196,7 @@ export default function PembenahanPage() {
 
               {/* ACCORDION BODY */}
               {isExpanded && (
-                <div style={{ padding: '0 1.5rem 1.5rem 1.5rem', borderTop: '1px solid #e2e8f0', background: '#f8fafc' }}>
+                <div style={{ padding: '0 1.5rem 1.5rem 1.5rem', borderTop: '1px solid #e2e8f0', background: '#fdfbf7' }}>
                   
                   {group.items.map((item, itemIdx) => (
                     <div key={itemIdx} style={{ marginTop: '1.5rem', display: 'flex', gap: '1.5rem', flexWrap: 'wrap' }}>
@@ -210,7 +210,7 @@ export default function PembenahanPage() {
                         <div style={{ padding: '1rem' }}>
                           <div style={{ marginBottom: '1rem' }}>
                             <span style={{ display: 'block', fontSize: '0.75rem', color: '#94a3b8', fontWeight: '600', marginBottom: '0.25rem' }}>NO. {item.no_indikator_akar_masalah}</span>
-                            <h4 style={{ margin: 0, color: '#1e293b', fontSize: '1rem' }}>{item.indikator_akar_masalah}</h4>
+                            <h4 style={{ margin: 0, color: '#7f1d1d', fontSize: '1rem' }}>{item.indikator_akar_masalah}</h4>
                           </div>
                           <div style={{ background: '#fef2f2', padding: '0.75rem', borderRadius: '6px', fontSize: '0.9rem', color: '#7f1d1d' }}>
                             <strong>Mengapa menjadi akar masalah?</strong><br/>
@@ -233,7 +233,7 @@ export default function PembenahanPage() {
                           {item.jenjang && <span style={{ marginLeft: 'auto', background: '#166534', color: 'white', padding: '0.1rem 0.5rem', borderRadius: '12px', fontSize: '0.7rem' }}>{item.jenjang}</span>}
                         </div>
                         <div style={{ padding: '1rem' }}>
-                          <h4 style={{ margin: '0 0 0.5rem 0', color: '#1e293b', fontSize: '1.05rem', display: 'flex', alignItems: 'flex-start', gap: '0.5rem' }}>
+                          <h4 style={{ margin: '0 0 0.5rem 0', color: '#7f1d1d', fontSize: '1.05rem', display: 'flex', alignItems: 'flex-start', gap: '0.5rem' }}>
                             <Lightbulb size={18} color="#eab308" style={{ flexShrink: 0, marginTop: '0.1rem' }} />
                             <span>{item.nomenklatur_kegiatan}</span>
                           </h4>

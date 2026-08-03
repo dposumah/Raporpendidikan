@@ -9,12 +9,12 @@ export default function SispLayout({ children }) {
   const pathname = usePathname();
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: '#f8fafc' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: '#fdfbf7' }}>
       
       {/* Top Navbar specifically for SISP */}
-      <div style={{ backgroundColor: '#1e293b', color: 'white', padding: '0 2rem', height: '75px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)', position: 'sticky', top: 0, zIndex: 1000 }}>
+      <div style={{ backgroundColor: '#7f1d1d', color: 'white', padding: '0 2rem', height: '75px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)', position: 'sticky', top: 0, zIndex: 1000 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <div style={{ backgroundColor: '#3b82f6', padding: '0.5rem', borderRadius: '8px' }}>
+          <div style={{ backgroundColor: '#b91c1c', padding: '0.5rem', borderRadius: '8px' }}>
             <School size={24} color="white" />
           </div>
           <div>
@@ -37,29 +37,29 @@ export default function SispLayout({ children }) {
             <Home size={18} /> Portal Utama
           </Link>
           
-          <div style={{ width: '1px', height: '24px', backgroundColor: '#334155' }}></div>
+          <div style={{ width: '1px', height: '24px', backgroundColor: '#450a0a' }}></div>
           
           <nav style={{ display: 'flex', gap: '1rem' }}>
             <Link href="/dashboard-sisp" style={{
-              color: pathname === '/dashboard-sisp' ? '#38bdf8' : 'white',
+              color: pathname === '/dashboard-sisp' ? '#fca5a5' : 'white',
               textDecoration: 'none',
               fontSize: '0.95rem',
               fontWeight: '500',
               padding: '0.5rem',
-              borderBottom: pathname === '/dashboard-sisp' ? '2px solid #38bdf8' : '2px solid transparent',
+              borderBottom: pathname === '/dashboard-sisp' ? '2px solid #fca5a5' : '2px solid transparent',
               transition: 'all 0.2s'
-            }} onMouseEnter={e => e.currentTarget.style.borderBottomColor = '#38bdf8'} onMouseLeave={e => e.currentTarget.style.borderBottomColor = pathname === '/dashboard-sisp' ? '#38bdf8' : 'transparent'}>
+            }} onMouseEnter={e => e.currentTarget.style.borderBottomColor = '#fca5a5'} onMouseLeave={e => e.currentTarget.style.borderBottomColor = pathname === '/dashboard-sisp' ? '#fca5a5' : 'transparent'}>
               Dashboard Sekolah
             </Link>
             <Link href="/admin-sisp" style={{
-              color: pathname === '/admin-sisp' ? '#38bdf8' : 'white',
+              color: pathname === '/admin-sisp' ? '#fca5a5' : 'white',
               textDecoration: 'none',
               fontSize: '0.95rem',
               fontWeight: '500',
               padding: '0.5rem',
-              borderBottom: pathname === '/admin-sisp' ? '2px solid #38bdf8' : '2px solid transparent',
+              borderBottom: pathname === '/admin-sisp' ? '2px solid #fca5a5' : '2px solid transparent',
               transition: 'all 0.2s'
-            }} onMouseEnter={e => e.currentTarget.style.borderBottomColor = '#38bdf8'} onMouseLeave={e => e.currentTarget.style.borderBottomColor = pathname === '/admin-sisp' ? '#38bdf8' : 'transparent'}>
+            }} onMouseEnter={e => e.currentTarget.style.borderBottomColor = '#fca5a5'} onMouseLeave={e => e.currentTarget.style.borderBottomColor = pathname === '/admin-sisp' ? '#fca5a5' : 'transparent'}>
               Admin Upload (SISP)
             </Link>
           </nav>

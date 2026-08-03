@@ -352,7 +352,7 @@ export default function DashboardPage() {
                     border: 'none',
                     borderRadius: '8px',
                     cursor: 'pointer',
-                    backgroundColor: selectedIndikator === 'SPM' ? 'var(--primary-color)' : '#f8fafc',
+                    backgroundColor: selectedIndikator === 'SPM' ? 'var(--primary-color)' : '#fdfbf7',
                     color: selectedIndikator === 'SPM' ? 'white' : 'var(--text-main)',
                     fontWeight: selectedIndikator === 'SPM' ? '600' : '500',
                     transition: 'all 0.2s',
@@ -395,7 +395,7 @@ export default function DashboardPage() {
                       border: 'none',
                       borderRadius: '8px',
                       cursor: 'pointer',
-                      backgroundColor: selectedIndikator === ind.kode ? 'var(--primary-color)' : '#f8fafc',
+                      backgroundColor: selectedIndikator === ind.kode ? 'var(--primary-color)' : '#fdfbf7',
                       color: selectedIndikator === ind.kode ? 'white' : 'var(--text-main)',
                       fontWeight: selectedIndikator === ind.kode ? '600' : '500',
                       transition: 'all 0.2s',
@@ -406,7 +406,7 @@ export default function DashboardPage() {
                     {ind.nama}
                   </button>
                 )) : (
-                  <div style={{ padding: '1rem', textAlign: 'center', color: 'var(--text-muted)', backgroundColor: '#f8fafc', borderRadius: '8px' }}>
+                  <div style={{ padding: '1rem', textAlign: 'center', color: 'var(--text-muted)', backgroundColor: '#fdfbf7', borderRadius: '8px' }}>
                     Tidak ada data indikator
                   </div>
                 )}
@@ -448,7 +448,7 @@ export default function DashboardPage() {
                     return (
                       <div style={{ marginBottom: '2.5rem' }}>
                         <div style={{ 
-                          background: 'linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)', 
+                          background: 'linear-gradient(135deg, #1e40af 0%, #b91c1c 100%)', 
                           borderRadius: '16px', 
                           padding: '2.5rem 2rem', 
                           color: 'white',
@@ -509,7 +509,7 @@ export default function DashboardPage() {
                         <XAxis dataKey="tahun" tick={{ fill: '#64748b', fontSize: 12 }} tickLine={false} axisLine={{ stroke: '#cbd5e1' }} />
                         <YAxis tick={{ fill: '#64748b', fontSize: 12 }} tickLine={false} axisLine={{ stroke: '#cbd5e1' }} />
                         <RechartsTooltip 
-                          cursor={{ fill: '#f8fafc' }}
+                          cursor={{ fill: '#fdfbf7' }}
                           content={({ active, payload, label }) => {
                             if (active && payload && payload.length) {
                               const data = payload[0].payload;
@@ -523,9 +523,9 @@ export default function DashboardPage() {
                                         padding: '0.15rem 0.4rem', 
                                         borderRadius: '4px', 
                                         backgroundColor: data.label_capaian.toLowerCase().includes('tuntas') || data.label_capaian.toLowerCase().includes('baik') ? '#dcfce7' : 
-                                                         data.label_capaian.toLowerCase().includes('belum') || data.label_capaian.toLowerCase().includes('kurang') ? '#fee2e2' : '#f1f5f9',
+                                                         data.label_capaian.toLowerCase().includes('belum') || data.label_capaian.toLowerCase().includes('kurang') ? '#fee2e2' : '#f3f0e7',
                                         color: data.label_capaian.toLowerCase().includes('tuntas') || data.label_capaian.toLowerCase().includes('baik') ? '#166534' : 
-                                               data.label_capaian.toLowerCase().includes('belum') || data.label_capaian.toLowerCase().includes('kurang') ? '#991b1b' : '#334155',
+                                               data.label_capaian.toLowerCase().includes('belum') || data.label_capaian.toLowerCase().includes('kurang') ? '#991b1b' : '#450a0a',
                                       }}>{data.label_capaian}</span>
                                     </div>
                                   )}
@@ -537,7 +537,7 @@ export default function DashboardPage() {
                         />
                         <Bar 
                           dataKey="nilai_capaian" 
-                          fill="#3b82f6" 
+                          fill="#b91c1c" 
                           radius={[6, 6, 0, 0]} 
                           barSize={50}
                         />
@@ -545,7 +545,7 @@ export default function DashboardPage() {
                     </ResponsiveContainer>
                   </div>
                   
-                  <div style={{ padding: '1.5rem', backgroundColor: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                  <div style={{ padding: '1.5rem', backgroundColor: '#fdfbf7', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
                     <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0, marginBottom: '1rem', color: 'var(--text-main)', fontSize: '1.1rem' }}>
                       <TrendingUp size={18} color="var(--primary-color)" />
                       Rincian Histori Capaian
@@ -562,7 +562,7 @@ export default function DashboardPage() {
                     </thead>
                     <tbody>
                       {spmData.map((row) => (
-                        <tr key={row.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                        <tr key={row.id} style={{ borderBottom: '1px solid #f3f0e7' }}>
                           <td style={{ padding: '1rem 0.5rem', fontWeight: '600' }}>{row.tahun}</td>
                           <td style={{ padding: '1rem 0.5rem', color: 'var(--primary-color)', fontWeight: '500' }}>{row.indeks_spm}</td>
                           <td style={{ padding: '1rem 0.5rem' }}>{row.nilai_capaian}</td>
@@ -571,9 +571,9 @@ export default function DashboardPage() {
                               padding: '0.3rem 0.75rem', 
                               borderRadius: '6px', 
                               backgroundColor: row.label_capaian?.toLowerCase().includes('tuntas') || row.label_capaian?.toLowerCase().includes('baik') ? '#dcfce7' : 
-                                               row.label_capaian?.toLowerCase().includes('belum') || row.label_capaian?.toLowerCase().includes('kurang') ? '#fee2e2' : '#f1f5f9',
+                                               row.label_capaian?.toLowerCase().includes('belum') || row.label_capaian?.toLowerCase().includes('kurang') ? '#fee2e2' : '#f3f0e7',
                               color: row.label_capaian?.toLowerCase().includes('tuntas') || row.label_capaian?.toLowerCase().includes('baik') ? '#166534' : 
-                                     row.label_capaian?.toLowerCase().includes('belum') || row.label_capaian?.toLowerCase().includes('kurang') ? '#991b1b' : '#334155',
+                                     row.label_capaian?.toLowerCase().includes('belum') || row.label_capaian?.toLowerCase().includes('kurang') ? '#991b1b' : '#450a0a',
                               fontSize: '0.85rem',
                               fontWeight: '600'
                             }}>
@@ -600,7 +600,7 @@ export default function DashboardPage() {
               <BarChart3 size={20} color="var(--primary-color)" />
               Grafik Progress Capaian
             </h3>
-            <div style={{ display: 'flex', gap: '0.5rem', backgroundColor: '#f1f5f9', padding: '0.25rem', borderRadius: '8px' }}>
+            <div style={{ display: 'flex', gap: '0.5rem', backgroundColor: '#f3f0e7', padding: '0.25rem', borderRadius: '8px' }}>
               <button 
                 onClick={() => setChartType('bar')}
                 style={{
@@ -647,7 +647,7 @@ export default function DashboardPage() {
                           <XAxis dataKey="tahun" tick={{ fill: '#64748b', fontSize: 11 }} tickLine={false} axisLine={{ stroke: '#cbd5e1' }} />
                           <YAxis tick={{ fill: '#64748b', fontSize: 11 }} tickLine={false} axisLine={{ stroke: '#cbd5e1' }} />
                           <RechartsTooltip 
-                            cursor={{ fill: '#f8fafc' }}
+                            cursor={{ fill: '#fdfbf7' }}
                             contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)', fontSize: '0.85rem' }}
                             formatter={(value, name, props) => {
                               const lbl = props.payload.labels ? props.payload.labels[status] : '';
@@ -694,7 +694,7 @@ export default function DashboardPage() {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
               {selectedData.length > 0 ? selectedData.map((row) => (
                 <div key={row.tahun} className="card" style={{ padding: '1.25rem' }}>
-                  <h4 style={{ margin: '0 0 1rem 0', color: 'var(--primary-color)', borderBottom: '2px solid #f1f5f9', paddingBottom: '0.5rem' }}>
+                  <h4 style={{ margin: '0 0 1rem 0', color: 'var(--primary-color)', borderBottom: '2px solid #f3f0e7', paddingBottom: '0.5rem' }}>
                     Tahun {row.tahun}
                   </h4>
                   <div style={{ overflowX: 'auto' }}>
@@ -711,7 +711,7 @@ export default function DashboardPage() {
                           if (row[status] === undefined) return null;
                           const label = row.labels[status];
                           return (
-                            <tr key={status} style={{ borderBottom: '1px solid #f8fafc' }}>
+                            <tr key={status} style={{ borderBottom: '1px solid #fdfbf7' }}>
                               <td style={{ padding: '0.75rem 0.5rem', fontWeight: '500' }}>{status}</td>
                               <td style={{ padding: '0.75rem 0.5rem' }}>{row.nilai_teks[status]}</td>
                               <td style={{ padding: '0.75rem 0.5rem' }}>
@@ -719,9 +719,9 @@ export default function DashboardPage() {
                                   padding: '0.2rem 0.5rem', 
                                   borderRadius: '4px', 
                                   backgroundColor: label?.toLowerCase().includes('baik') || label?.toLowerCase().includes('atas') ? '#dcfce7' : 
-                                                   label?.toLowerCase().includes('kurang') || label?.toLowerCase().includes('bawah') ? '#fee2e2' : '#f1f5f9',
+                                                   label?.toLowerCase().includes('kurang') || label?.toLowerCase().includes('bawah') ? '#fee2e2' : '#f3f0e7',
                                   color: label?.toLowerCase().includes('baik') || label?.toLowerCase().includes('atas') ? '#166534' : 
-                                         label?.toLowerCase().includes('kurang') || label?.toLowerCase().includes('bawah') ? '#991b1b' : '#334155',
+                                         label?.toLowerCase().includes('kurang') || label?.toLowerCase().includes('bawah') ? '#991b1b' : '#450a0a',
                                   fontSize: '0.8rem',
                                   fontWeight: '500'
                                 }}>
@@ -791,7 +791,7 @@ export default function DashboardPage() {
                   {exportSelectedJenis.length === jenisList.length ? 'Batal Pilih Semua' : 'Pilih Semua'}
                 </button>
               </div>
-              <div style={{ border: '1px solid var(--border-color)', borderRadius: '8px', padding: '0.5rem', maxHeight: '150px', overflowY: 'auto', backgroundColor: '#f8fafc' }}>
+              <div style={{ border: '1px solid var(--border-color)', borderRadius: '8px', padding: '0.5rem', maxHeight: '150px', overflowY: 'auto', backgroundColor: '#fdfbf7' }}>
                 {jenisList.map(jenis => (
                   <label key={jenis} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', padding: '0.5rem', cursor: 'pointer', borderBottom: '1px solid #e2e8f0', borderRadius: '4px', transition: 'background-color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'white'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
                     <input 
@@ -822,7 +822,7 @@ export default function DashboardPage() {
                   {exportSelectedIndicators.length === allAvailableIndicators.length ? 'Batal Pilih Semua' : 'Pilih Semua'}
                 </button>
               </div>
-              <div style={{ border: '1px solid var(--border-color)', borderRadius: '8px', padding: '0.5rem', maxHeight: '200px', overflowY: 'auto', backgroundColor: '#f8fafc' }}>
+              <div style={{ border: '1px solid var(--border-color)', borderRadius: '8px', padding: '0.5rem', maxHeight: '200px', overflowY: 'auto', backgroundColor: '#fdfbf7' }}>
                 {allAvailableIndicators.map(ind => (
                   <label key={ind.kode} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', padding: '0.5rem', cursor: 'pointer', borderBottom: '1px solid #e2e8f0', borderRadius: '4px', transition: 'background-color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'white'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
                     <input 

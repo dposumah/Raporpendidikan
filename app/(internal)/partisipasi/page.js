@@ -220,7 +220,7 @@ export default function PartisipasiPage() {
                   border: 'none',
                   borderRadius: '8px',
                   cursor: 'pointer',
-                  backgroundColor: activeMenu === 'APS' ? 'var(--primary-color)' : '#f8fafc',
+                  backgroundColor: activeMenu === 'APS' ? 'var(--primary-color)' : '#fdfbf7',
                   color: activeMenu === 'APS' ? 'white' : 'var(--text-main)',
                   fontWeight: activeMenu === 'APS' ? '600' : '500',
                   transition: 'all 0.2s',
@@ -238,7 +238,7 @@ export default function PartisipasiPage() {
                   border: 'none',
                   borderRadius: '8px',
                   cursor: 'pointer',
-                  backgroundColor: activeMenu === 'APK/APM' ? 'var(--primary-color)' : '#f8fafc',
+                  backgroundColor: activeMenu === 'APK/APM' ? 'var(--primary-color)' : '#fdfbf7',
                   color: activeMenu === 'APK/APM' ? 'white' : 'var(--text-main)',
                   fontWeight: activeMenu === 'APK/APM' ? '600' : '500',
                   transition: 'all 0.2s',
@@ -281,7 +281,7 @@ export default function PartisipasiPage() {
                 
                 <div style={{ flex: 1, position: 'relative' }}>
                   {!hasData ? (
-                    <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', backgroundColor: '#f8fafc', borderRadius: '8px' }}>
+                    <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', backgroundColor: '#fdfbf7', borderRadius: '8px' }}>
                       Data belum tersedia
                     </div>
                   ) : (
@@ -291,7 +291,7 @@ export default function PartisipasiPage() {
                         <XAxis dataKey="tahun" tick={{ fill: '#64748b', fontSize: 12 }} tickLine={false} axisLine={{ stroke: '#cbd5e1' }} />
                         <YAxis tick={{ fill: '#64748b', fontSize: 12 }} tickLine={false} axisLine={{ stroke: '#cbd5e1' }} />
                         <RechartsTooltip 
-                          cursor={{ fill: '#f8fafc' }}
+                          cursor={{ fill: '#fdfbf7' }}
                           content={({ active, payload, label }) => {
                             if (active && payload && payload.length) {
                               const data = payload[0].payload;
@@ -305,9 +305,9 @@ export default function PartisipasiPage() {
                                         padding: '0.15rem 0.4rem', 
                                         borderRadius: '4px', 
                                         backgroundColor: data.label_capaian.toLowerCase().includes('baik') || data.label_capaian.toLowerCase().includes('atas') ? '#dcfce7' : 
-                                                         data.label_capaian.toLowerCase().includes('kurang') || data.label_capaian.toLowerCase().includes('bawah') ? '#fee2e2' : '#f1f5f9',
+                                                         data.label_capaian.toLowerCase().includes('kurang') || data.label_capaian.toLowerCase().includes('bawah') ? '#fee2e2' : '#f3f0e7',
                                         color: data.label_capaian.toLowerCase().includes('baik') || data.label_capaian.toLowerCase().includes('atas') ? '#166534' : 
-                                               data.label_capaian.toLowerCase().includes('kurang') || data.label_capaian.toLowerCase().includes('bawah') ? '#991b1b' : '#334155',
+                                               data.label_capaian.toLowerCase().includes('kurang') || data.label_capaian.toLowerCase().includes('bawah') ? '#991b1b' : '#450a0a',
                                       }}>{data.label_capaian}</span>
                                     </div>
                                   )}
@@ -359,9 +359,9 @@ export default function PartisipasiPage() {
           }} onClick={(e) => e.stopPropagation()}>
             <button 
               onClick={() => setSelectedChart(null)}
-              style={{ position: 'absolute', top: '1.25rem', right: '1.25rem', background: '#f1f5f9', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', borderRadius: '50%', width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background-color 0.2s' }}
+              style={{ position: 'absolute', top: '1.25rem', right: '1.25rem', background: '#f3f0e7', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', borderRadius: '50%', width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background-color 0.2s' }}
               onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#e2e8f0'}
-              onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#f1f5f9'}
+              onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#f3f0e7'}
             >
               <X size={20} />
             </button>
@@ -379,7 +379,7 @@ export default function PartisipasiPage() {
                 </thead>
                 <tbody>
                   {selectedChart.data.map((row) => (
-                    <tr key={row.tahun} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                    <tr key={row.tahun} style={{ borderBottom: '1px solid #f3f0e7' }}>
                       <td style={{ padding: '1rem 0.5rem', fontWeight: '600', color: 'var(--text-main)' }}>{row.tahun}</td>
                       <td style={{ padding: '1rem 0.5rem', color: 'var(--text-main)' }}>{row.nilai_teks}</td>
                       <td style={{ padding: '1rem 0.5rem' }}>
@@ -387,9 +387,9 @@ export default function PartisipasiPage() {
                           padding: '0.3rem 0.75rem', 
                           borderRadius: '6px', 
                           backgroundColor: row.label_capaian?.toLowerCase().includes('baik') || row.label_capaian?.toLowerCase().includes('atas') ? '#dcfce7' : 
-                                           row.label_capaian?.toLowerCase().includes('kurang') || row.label_capaian?.toLowerCase().includes('bawah') ? '#fee2e2' : '#f1f5f9',
+                                           row.label_capaian?.toLowerCase().includes('kurang') || row.label_capaian?.toLowerCase().includes('bawah') ? '#fee2e2' : '#f3f0e7',
                           color: row.label_capaian?.toLowerCase().includes('baik') || row.label_capaian?.toLowerCase().includes('atas') ? '#166534' : 
-                                 row.label_capaian?.toLowerCase().includes('kurang') || row.label_capaian?.toLowerCase().includes('bawah') ? '#991b1b' : '#334155',
+                                 row.label_capaian?.toLowerCase().includes('kurang') || row.label_capaian?.toLowerCase().includes('bawah') ? '#991b1b' : '#450a0a',
                           fontSize: '0.85rem',
                           fontWeight: '600'
                         }}>

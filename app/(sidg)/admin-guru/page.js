@@ -58,15 +58,15 @@ export default function AdminGuruPage() {
   };
 
   return (
-    <div style={{ backgroundColor: '#f8fafc', minHeight: 'calc(100vh - 75px)', padding: '2rem' }}>
+    <div style={{ backgroundColor: '#fdfbf7', minHeight: 'calc(100vh - 75px)', padding: '2rem' }}>
       <div style={{ maxWidth: '800px', margin: '0 auto' }}>
         
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
-          <div style={{ padding: '0.75rem', backgroundColor: '#e0e7ff', borderRadius: '12px', color: '#4f46e5' }}>
+          <div style={{ padding: '0.75rem', backgroundColor: '#e0e7ff', borderRadius: '12px', color: '#991b1b' }}>
             <Database size={28} />
           </div>
           <div>
-            <h1 style={{ margin: 0, fontSize: '1.75rem', color: '#0f172a', fontWeight: 'bold' }}>Unggah Data Guru (SIDG)</h1>
+            <h1 style={{ margin: 0, fontSize: '1.75rem', color: '#450a0a', fontWeight: 'bold' }}>Unggah Data Guru (SIDG)</h1>
             <p style={{ margin: '0.25rem 0 0 0', color: '#64748b', fontSize: '0.95rem' }}>Impor data guru dari file Excel berformat standar Dapodik/Simpatika.</p>
           </div>
         </div>
@@ -89,7 +89,7 @@ export default function AdminGuruPage() {
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             <div>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: '600', color: '#334155' }}>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: '600', color: '#450a0a' }}>
                 Periode Data <span style={{ color: '#ef4444' }}>*</span>
               </label>
               <input
@@ -103,7 +103,7 @@ export default function AdminGuruPage() {
             </div>
 
             <div>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: '600', color: '#334155' }}>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: '600', color: '#450a0a' }}>
                 File Excel (.xlsx) <span style={{ color: '#ef4444' }}>*</span>
               </label>
               
@@ -112,7 +112,7 @@ export default function AdminGuruPage() {
                 borderRadius: '12px', 
                 padding: '2.5rem 1rem', 
                 textAlign: 'center',
-                backgroundColor: '#f8fafc',
+                backgroundColor: '#fdfbf7',
                 cursor: loading ? 'not-allowed' : 'pointer',
                 transition: 'all 0.2s ease',
                 position: 'relative'
@@ -125,9 +125,9 @@ export default function AdminGuruPage() {
                   style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0, cursor: loading ? 'not-allowed' : 'pointer' }}
                 />
                 
-                <UploadCloud size={48} color={file ? '#4f46e5' : '#94a3b8'} style={{ margin: '0 auto 1rem auto' }} />
+                <UploadCloud size={48} color={file ? '#991b1b' : '#94a3b8'} style={{ margin: '0 auto 1rem auto' }} />
                 
-                <h3 style={{ margin: '0 0 0.5rem 0', color: '#1e293b', fontSize: '1.1rem' }}>
+                <h3 style={{ margin: '0 0 0.5rem 0', color: '#7f1d1d', fontSize: '1.1rem' }}>
                   {file ? file.name : 'Pilih atau Tarik file Excel ke sini'}
                 </h3>
                 <p style={{ margin: 0, color: '#64748b', fontSize: '0.85rem' }}>
@@ -147,7 +147,7 @@ export default function AdminGuruPage() {
                   justifyContent: 'center',
                   gap: '0.5rem',
                   padding: '0.875rem 1.5rem',
-                  backgroundColor: (loading || !file || !periode) ? '#94a3b8' : '#4f46e5',
+                  backgroundColor: (loading || !file || !periode) ? '#94a3b8' : '#991b1b',
                   color: 'white',
                   border: 'none',
                   borderRadius: '8px',

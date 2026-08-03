@@ -216,7 +216,7 @@ export default function AdminSiswaPage() {
   };
 
   return (
-    <div style={{ backgroundColor: '#f8fafc', minHeight: 'calc(100vh - 75px)', padding: '2rem' }}>
+    <div style={{ backgroundColor: '#fdfbf7', minHeight: 'calc(100vh - 75px)', padding: '2rem' }}>
       <div style={{ maxWidth: '800px', margin: '0 auto' }}>
         
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
@@ -224,7 +224,7 @@ export default function AdminSiswaPage() {
             <Database size={28} />
           </div>
           <div>
-            <h1 style={{ fontSize: '1.8rem', fontWeight: '700', color: '#0f172a', margin: 0 }}>Unggah Data Siswa (SIDS)</h1>
+            <h1 style={{ fontSize: '1.8rem', fontWeight: '700', color: '#450a0a', margin: 0 }}>Unggah Data Siswa (SIDS)</h1>
             <p style={{ color: '#64748b', fontSize: '0.95rem', marginTop: '0.25rem' }}>Upload file Excel berisi data induk siswa untuk diperbarui ke database terpusat.</p>
           </div>
         </div>
@@ -243,9 +243,9 @@ export default function AdminSiswaPage() {
           )}
 
           {/* PANDUAN KOLOM */}
-          <div style={{ background: '#f8fafc', padding: '1rem', borderRadius: '8px', marginBottom: '1.5rem', border: '1px solid #e2e8f0' }}>
-            <h4 style={{ margin: '0 0 0.5rem 0', fontSize: '0.9rem', color: '#334155', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <AlertCircle size={16} color="#3b82f6"/> Panduan Struktur Excel
+          <div style={{ background: '#fdfbf7', padding: '1rem', borderRadius: '8px', marginBottom: '1.5rem', border: '1px solid #e2e8f0' }}>
+            <h4 style={{ margin: '0 0 0.5rem 0', fontSize: '0.9rem', color: '#450a0a', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <AlertCircle size={16} color="#b91c1c"/> Panduan Struktur Excel
             </h4>
             <p style={{ margin: 0, fontSize: '0.85rem', color: '#64748b', lineHeight: '1.5' }}>
               Pastikan baris pertama (header) pada file Excel Anda memiliki judul kolom berikut (tidak harus berurutan, namun <strong>NISN</strong> dan <strong>NIK</strong> wajib ada):<br/>
@@ -254,7 +254,7 @@ export default function AdminSiswaPage() {
           </div>
 
           <div style={{ marginBottom: '1.5rem' }}>
-            <label style={{ display: 'block', fontWeight: '500', color: '#334155', marginBottom: '0.5rem' }}>Periode (Tahun Ajaran & Semester) <span style={{color: 'red'}}>*</span></label>
+            <label style={{ display: 'block', fontWeight: '500', color: '#450a0a', marginBottom: '0.5rem' }}>Periode (Tahun Ajaran & Semester) <span style={{color: 'red'}}>*</span></label>
             <input 
               type="text" 
               placeholder="Contoh: Genap 2025/2026"
@@ -280,13 +280,13 @@ export default function AdminSiswaPage() {
               borderRadius: '12px', 
               padding: '3rem 2rem', 
               textAlign: 'center',
-              background: '#f8fafc',
+              background: '#fdfbf7',
               marginBottom: '1.5rem',
               transition: 'border-color 0.2s'
             }}
           >
             <UploadCloud size={48} color="#94a3b8" style={{ margin: '0 auto 1rem' }} />
-            <h3 style={{ fontSize: '1.1rem', color: '#334155', fontWeight: '600', marginBottom: '0.5rem' }}>Pilih File Excel Data Siswa</h3>
+            <h3 style={{ fontSize: '1.1rem', color: '#450a0a', fontWeight: '600', marginBottom: '0.5rem' }}>Pilih File Excel Data Siswa</h3>
             <p style={{ color: '#64748b', fontSize: '0.9rem', marginBottom: '1.5rem' }}>Format yang didukung: .xlsx, .xls</p>
             
             <input 
@@ -299,7 +299,7 @@ export default function AdminSiswaPage() {
             <label 
               htmlFor="file-upload"
               style={{ 
-                background: 'white', border: '1px solid #cbd5e1', color: '#334155', 
+                background: 'white', border: '1px solid #cbd5e1', color: '#450a0a', 
                 padding: '0.6rem 1.25rem', borderRadius: '8px', fontWeight: '500', 
                 cursor: 'pointer', display: 'inline-block', transition: 'all 0.2s' 
               }}

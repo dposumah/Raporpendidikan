@@ -61,7 +61,7 @@ export default function RaporSekolahPage() {
     if (lower.includes('baik')) return '#dcfce7'; // green
     if (lower.includes('sedang')) return '#fef08a'; // yellow
     if (lower.includes('kurang')) return '#fee2e2'; // red
-    return '#f1f5f9'; // default
+    return '#f3f0e7'; // default
   };
 
   const getLabelTextColor = (label) => {
@@ -74,11 +74,11 @@ export default function RaporSekolahPage() {
   };
 
   return (
-    <div style={{ backgroundColor: '#f8fafc', minHeight: 'calc(100vh - 75px)', padding: '2rem' }}>
+    <div style={{ backgroundColor: '#fdfbf7', minHeight: 'calc(100vh - 75px)', padding: '2rem' }}>
       
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
         <div>
-          <h1 style={{ fontSize: '1.8rem', fontWeight: '700', color: '#0f172a', margin: 0 }}>Rapor Capaian Per Sekolah</h1>
+          <h1 style={{ fontSize: '1.8rem', fontWeight: '700', color: '#450a0a', margin: 0 }}>Rapor Capaian Per Sekolah</h1>
           <p style={{ color: '#64748b', fontSize: '0.95rem', marginTop: '0.25rem', marginBottom: 0 }}>Analisis Rapor Pendidikan tingkat satuan pendidikan</p>
         </div>
         
@@ -88,7 +88,7 @@ export default function RaporSekolahPage() {
             value={tahun} 
             onChange={(e) => setTahun(e.target.value)}
             style={{ 
-              padding: '0.4rem', borderRadius: '6px', border: '1px solid #cbd5e1', color: '#0f172a', background: 'white', fontWeight: 'bold', fontSize: '0.9rem', outline: 'none'
+              padding: '0.4rem', borderRadius: '6px', border: '1px solid #cbd5e1', color: '#450a0a', background: 'white', fontWeight: 'bold', fontSize: '0.9rem', outline: 'none'
             }}
           >
             <option value="2026">2026</option>
@@ -124,20 +124,20 @@ export default function RaporSekolahPage() {
                   key={s.id} 
                   onClick={() => setSelectedSekolah(s)}
                   style={{ 
-                    padding: '1rem 1.25rem', borderBottom: '1px solid #f1f5f9', cursor: 'pointer',
-                    background: selectedSekolah?.id === s.id ? '#eff6ff' : 'transparent',
-                    borderLeft: selectedSekolah?.id === s.id ? '4px solid #3b82f6' : '4px solid transparent',
+                    padding: '1rem 1.25rem', borderBottom: '1px solid #f3f0e7', cursor: 'pointer',
+                    background: selectedSekolah?.id === s.id ? '#fef2f2' : 'transparent',
+                    borderLeft: selectedSekolah?.id === s.id ? '4px solid #b91c1c' : '4px solid transparent',
                     transition: 'all 0.2s'
                   }}
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                     <div>
-                      <h4 style={{ margin: '0 0 0.25rem 0', color: selectedSekolah?.id === s.id ? '#1d4ed8' : '#0f172a', fontSize: '0.95rem' }}>{s.nama_sekolah}</h4>
+                      <h4 style={{ margin: '0 0 0.25rem 0', color: selectedSekolah?.id === s.id ? '#1d4ed8' : '#450a0a', fontSize: '0.95rem' }}>{s.nama_sekolah}</h4>
                       <p style={{ margin: 0, color: '#64748b', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
                         <School size={12}/> NPSN: {s.npsn}
                       </p>
                     </div>
-                    <ChevronRight size={18} color={selectedSekolah?.id === s.id ? '#3b82f6' : '#cbd5e1'} />
+                    <ChevronRight size={18} color={selectedSekolah?.id === s.id ? '#b91c1c' : '#cbd5e1'} />
                   </div>
                 </div>
               ))
@@ -151,24 +151,24 @@ export default function RaporSekolahPage() {
         <div style={{ flex: '2', background: 'white', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', height: 'calc(100vh - 180px)', display: 'flex', flexDirection: 'column' }}>
           {selectedSekolah ? (
             <>
-              <div style={{ padding: '1.5rem', borderBottom: '1px solid #e2e8f0', background: '#f8fafc', borderTopLeftRadius: '12px', borderTopRightRadius: '12px' }}>
+              <div style={{ padding: '1.5rem', borderBottom: '1px solid #e2e8f0', background: '#fdfbf7', borderTopLeftRadius: '12px', borderTopRightRadius: '12px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                   <div>
-                    <h2 style={{ margin: '0 0 0.5rem 0', color: '#0f172a', fontSize: '1.5rem' }}>{selectedSekolah.nama_sekolah}</h2>
+                    <h2 style={{ margin: '0 0 0.5rem 0', color: '#450a0a', fontSize: '1.5rem' }}>{selectedSekolah.nama_sekolah}</h2>
                     <div style={{ display: 'flex', gap: '1rem', color: '#64748b', fontSize: '0.9rem' }}>
                       <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}><School size={14}/> {selectedSekolah.jenis_sekolah} ({selectedSekolah.status_sekolah})</span>
                       <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}><MapPin size={14}/> {selectedSekolah.kecamatan}, {selectedSekolah.kabupaten_kota}</span>
                     </div>
                   </div>
-                  <div style={{ background: '#e0f2fe', color: '#0369a1', padding: '0.5rem 1rem', borderRadius: '20px', fontSize: '0.85rem', fontWeight: '600' }}>
+                  <div style={{ background: '#fee2e2', color: '#991b1b', padding: '0.5rem 1rem', borderRadius: '20px', fontSize: '0.85rem', fontWeight: '600' }}>
                     Tahun {selectedSekolah.tahun}
                   </div>
                 </div>
               </div>
 
               <div style={{ flex: 1, overflowY: 'auto', padding: '1.5rem' }}>
-                <h3 style={{ margin: '0 0 1rem 0', color: '#334155', fontSize: '1.1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <Activity size={20} color="#3b82f6" /> Capaian Indikator
+                <h3 style={{ margin: '0 0 1rem 0', color: '#450a0a', fontSize: '1.1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <Activity size={20} color="#b91c1c" /> Capaian Indikator
                 </h3>
                 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -225,17 +225,17 @@ export default function RaporSekolahPage() {
                       return (
                         <div key={idx} style={{ border: '1px solid #e2e8f0', borderRadius: '8px', overflow: 'hidden', marginBottom: '1.5rem', background: 'white' }}>
                           
-                          <div style={{ background: '#f1f5f9', padding: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                          <div style={{ background: '#f3f0e7', padding: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                             <div style={{ flex: 1, paddingRight: '1rem' }}>
                               <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
-                                <span style={{ background: '#2563eb', color: 'white', padding: '0.3rem 0.6rem', borderRadius: '6px', fontSize: '0.85rem', fontWeight: 'bold' }}>{kode}</span>
-                                <h4 style={{ margin: 0, color: '#0f172a', fontSize: '1.1rem', fontWeight: '700' }}>{title}</h4>
+                                <span style={{ background: '#991b1b', color: 'white', padding: '0.3rem 0.6rem', borderRadius: '6px', fontSize: '0.85rem', fontWeight: 'bold' }}>{kode}</span>
+                                <h4 style={{ margin: 0, color: '#450a0a', fontSize: '1.1rem', fontWeight: '700' }}>{title}</h4>
                               </div>
                               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem', marginTop: '0.75rem' }}>
                                 {Object.entries(fields).filter(([k]) => !k.includes('Label Capaian')).map(([k, v], i) => (
                                   <div key={i} style={{ display: 'flex', flexDirection: 'column' }}>
                                     <span style={{ color: '#64748b', fontSize: '0.75rem', fontWeight: '600', textTransform: 'uppercase' }}>{k}</span>
-                                    <div style={{ color: '#1e293b', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: '500' }}>
+                                    <div style={{ color: '#7f1d1d', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: '500' }}>
                                       {k.toLowerCase().includes('perubahan') && renderTrendIcon(v)}
                                       <span>{v || '-'}</span>
                                     </div>
@@ -254,8 +254,8 @@ export default function RaporSekolahPage() {
                               {group.sub.length > 0 && (
                                 <button 
                                   onClick={() => setSelectedDetail({ kode, title, sub: group.sub })}
-                                  style={{ background: 'white', border: '1px solid #cbd5e1', color: '#334155', padding: '0.4rem 0.75rem', borderRadius: '6px', fontSize: '0.8rem', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.25rem', transition: 'all 0.2s' }}
-                                  onMouseOver={(e) => { e.currentTarget.style.background = '#f8fafc'; e.currentTarget.style.borderColor = '#94a3b8'; }}
+                                  style={{ background: 'white', border: '1px solid #cbd5e1', color: '#450a0a', padding: '0.4rem 0.75rem', borderRadius: '6px', fontSize: '0.8rem', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.25rem', transition: 'all 0.2s' }}
+                                  onMouseOver={(e) => { e.currentTarget.style.background = '#fdfbf7'; e.currentTarget.style.borderColor = '#94a3b8'; }}
                                   onMouseOut={(e) => { e.currentTarget.style.background = 'white'; e.currentTarget.style.borderColor = '#cbd5e1'; }}
                                 >
                                   <Info size={14} /> Lihat Detail Sub
@@ -289,20 +289,20 @@ export default function RaporSekolahPage() {
             <div style={{ padding: '1.5rem', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                  <span style={{ background: '#2563eb', color: 'white', padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 'bold' }}>{selectedDetail.kode}</span>
-                  <h3 style={{ margin: 0, color: '#0f172a', fontSize: '1.25rem' }}>Detail Sub-Indikator</h3>
+                  <span style={{ background: '#991b1b', color: 'white', padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 'bold' }}>{selectedDetail.kode}</span>
+                  <h3 style={{ margin: 0, color: '#450a0a', fontSize: '1.25rem' }}>Detail Sub-Indikator</h3>
                 </div>
                 <p style={{ margin: 0, color: '#64748b', fontSize: '0.95rem' }}>{selectedDetail.title}</p>
               </div>
               <button 
                 onClick={() => setSelectedDetail(null)}
-                style={{ background: '#f1f5f9', border: 'none', width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#64748b' }}
+                style={{ background: '#f3f0e7', border: 'none', width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#64748b' }}
               >
                 <X size={18} />
               </button>
             </div>
 
-            <div style={{ padding: '1.5rem', overflowY: 'auto', flex: 1, backgroundColor: '#f8fafc' }}>
+            <div style={{ padding: '1.5rem', overflowY: 'auto', flex: 1, backgroundColor: '#fdfbf7' }}>
               <div style={{ display: 'grid', gap: '1rem' }}>
                 {selectedDetail.sub.sort((a, b) => {
                   const aNum = parseInt(a.kode.split('.')[2] || 0);
@@ -311,14 +311,14 @@ export default function RaporSekolahPage() {
                 }).map((sub, sIdx) => (
                   <div key={sIdx} style={{ background: 'white', padding: '1.25rem', borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
-                      <span style={{ color: '#3b82f6', fontWeight: '700', fontSize: '0.9rem', backgroundColor: '#eff6ff', padding: '0.2rem 0.5rem', borderRadius: '4px' }}>{sub.kode}</span>
-                      <h5 style={{ margin: 0, color: '#1e293b', fontSize: '1rem', fontWeight: '600' }}>{sub.title}</h5>
+                      <span style={{ color: '#b91c1c', fontWeight: '700', fontSize: '0.9rem', backgroundColor: '#fef2f2', padding: '0.2rem 0.5rem', borderRadius: '4px' }}>{sub.kode}</span>
+                      <h5 style={{ margin: 0, color: '#7f1d1d', fontSize: '1rem', fontWeight: '600' }}>{sub.title}</h5>
                     </div>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
                       {Object.entries(sub.fields).map(([k, v], i) => (
                         <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
                           <span style={{ color: '#64748b', fontSize: '0.8rem', fontWeight: '500' }}>{k}</span>
-                          <div style={{ color: '#0f172a', fontSize: '0.95rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: '600' }}>
+                          <div style={{ color: '#450a0a', fontSize: '0.95rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: '600' }}>
                             {k.toLowerCase().includes('perubahan') && renderTrendIcon(v)}
                             <span>{v || '-'}</span>
                           </div>

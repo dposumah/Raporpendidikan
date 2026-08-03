@@ -116,9 +116,9 @@ export default function DetailSekolahPage() {
 
   if (loading) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#f8fafc' }}>
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#fdfbf7' }}>
         <div style={{ textAlign: 'center' }}>
-          <div className="animate-spin" style={{ width: '40px', height: '40px', border: '4px solid #e2e8f0', borderTopColor: '#4f46e5', borderRadius: '50%', margin: '0 auto 1rem auto' }}></div>
+          <div className="animate-spin" style={{ width: '40px', height: '40px', border: '4px solid #e2e8f0', borderTopColor: '#991b1b', borderRadius: '50%', margin: '0 auto 1rem auto' }}></div>
           <p style={{ color: '#64748b', fontWeight: '500' }}>Memuat Profil Satuan Pendidikan...</p>
         </div>
       </div>
@@ -128,9 +128,9 @@ export default function DetailSekolahPage() {
   if (!sekolah) {
     return (
       <div style={{ padding: '4rem', textAlign: 'center' }}>
-        <h2 style={{ color: '#0f172a' }}>Data sekolah tidak ditemukan</h2>
+        <h2 style={{ color: '#450a0a' }}>Data sekolah tidak ditemukan</h2>
         <p style={{ color: '#64748b', marginBottom: '2rem' }}>NPSN: {npsn}</p>
-        <button onClick={() => router.back()} style={{ padding: '0.75rem 1.5rem', backgroundColor: '#4f46e5', color: 'white', borderRadius: '8px', border: 'none', cursor: 'pointer' }}>
+        <button onClick={() => router.back()} style={{ padding: '0.75rem 1.5rem', backgroundColor: '#991b1b', color: 'white', borderRadius: '8px', border: 'none', cursor: 'pointer' }}>
           Kembali
         </button>
       </div>
@@ -138,7 +138,7 @@ export default function DetailSekolahPage() {
   }
 
   return (
-    <div style={{ backgroundColor: '#f8fafc', minHeight: 'calc(100vh - 75px)', padding: '2rem' }}>
+    <div style={{ backgroundColor: '#fdfbf7', minHeight: 'calc(100vh - 75px)', padding: '2rem' }}>
       <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
         
         {/* Navigation */}
@@ -151,13 +151,13 @@ export default function DetailSekolahPage() {
 
         {/* HEADER SECTION */}
         <div style={{ backgroundColor: 'white', padding: '2rem', borderRadius: '16px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)', marginBottom: '2rem', display: 'flex', gap: '2rem', alignItems: 'flex-start' }}>
-          <div style={{ width: '80px', height: '80px', borderRadius: '16px', backgroundColor: '#e0e7ff', display: 'flex', justifyContent: 'center', alignItems: 'center', color: '#4f46e5', flexShrink: 0 }}>
+          <div style={{ width: '80px', height: '80px', borderRadius: '16px', backgroundColor: '#e0e7ff', display: 'flex', justifyContent: 'center', alignItems: 'center', color: '#991b1b', flexShrink: 0 }}>
             <School size={40} />
           </div>
           <div style={{ flex: 1 }}>
             <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap', marginBottom: '0.5rem' }}>
-              <h1 style={{ margin: 0, fontSize: '2rem', color: '#0f172a', fontWeight: 'bold' }}>{sekolah.nama_satuan_pendidikan}</h1>
-              <span style={{ backgroundColor: '#f1f5f9', padding: '0.25rem 0.75rem', borderRadius: '16px', fontSize: '0.9rem', color: '#475569', fontWeight: '600' }}>NPSN: {sekolah.npsn}</span>
+              <h1 style={{ margin: 0, fontSize: '2rem', color: '#450a0a', fontWeight: 'bold' }}>{sekolah.nama_satuan_pendidikan}</h1>
+              <span style={{ backgroundColor: '#f3f0e7', padding: '0.25rem 0.75rem', borderRadius: '16px', fontSize: '0.9rem', color: '#475569', fontWeight: '600' }}>NPSN: {sekolah.npsn}</span>
               <span style={{ backgroundColor: '#dcfce7', color: '#10b981', padding: '0.25rem 0.75rem', borderRadius: '16px', fontSize: '0.9rem', fontWeight: '600' }}>{sekolah.status_sekolah}</span>
             </div>
             <p style={{ margin: '0 0 1rem 0', color: '#64748b', fontSize: '1.05rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -166,18 +166,18 @@ export default function DetailSekolahPage() {
             <div style={{ display: 'flex', gap: '2rem' }}>
               <div>
                 <span style={{ display: 'block', color: '#64748b', fontSize: '0.85rem', textTransform: 'uppercase', fontWeight: '600' }}>Bentuk Pendidikan</span>
-                <span style={{ color: '#0f172a', fontWeight: '600', fontSize: '1.1rem' }}>{sekolah.bentuk_pendidikan}</span>
+                <span style={{ color: '#450a0a', fontWeight: '600', fontSize: '1.1rem' }}>{sekolah.bentuk_pendidikan}</span>
               </div>
               <div>
                 <span style={{ display: 'block', color: '#64748b', fontSize: '0.85rem', textTransform: 'uppercase', fontWeight: '600' }}>Akreditasi</span>
-                <span style={{ color: '#0f172a', fontWeight: '600', fontSize: '1.1rem' }}>{sekolah.akreditasi || '-'} <span style={{fontSize:'0.85rem', color:'#94a3b8', fontWeight:'normal'}}>({sekolah.tmt_akreditasi || '-'})</span></span>
+                <span style={{ color: '#450a0a', fontWeight: '600', fontSize: '1.1rem' }}>{sekolah.akreditasi || '-'} <span style={{fontSize:'0.85rem', color:'#94a3b8', fontWeight:'normal'}}>({sekolah.tmt_akreditasi || '-'})</span></span>
               </div>
               <div>
                 <span style={{ display: 'block', color: '#64748b', fontSize: '0.85rem', textTransform: 'uppercase', fontWeight: '600' }}>Kepala Sekolah</span>
                 {loadingStats ? (
                   <div className="animate-pulse" style={{ height: '24px', width: '150px', backgroundColor: '#e2e8f0', borderRadius: '4px', marginTop: '0.25rem' }}></div>
                 ) : (
-                  <span style={{ color: '#0f172a', fontWeight: '600', fontSize: '1.1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <span style={{ color: '#450a0a', fontWeight: '600', fontSize: '1.1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     <Briefcase size={16} color="#64748b" /> {kepalaSekolah}
                   </span>
                 )}
@@ -196,7 +196,7 @@ export default function DetailSekolahPage() {
                 {loadingStats ? (
                   <div className="animate-pulse" style={{ height: '36px', width: '100px', backgroundColor: '#e2e8f0', borderRadius: '4px', marginTop: '0.5rem' }}></div>
                 ) : (
-                  <h3 style={{ margin: '0.5rem 0 0 0', color: '#0f172a', fontSize: '2rem', fontWeight: 'bold' }}>{totalSiswa.toLocaleString()} <span style={{fontSize:'1rem', color:'#64748b', fontWeight:'normal'}}>Siswa</span></h3>
+                  <h3 style={{ margin: '0.5rem 0 0 0', color: '#450a0a', fontSize: '2rem', fontWeight: 'bold' }}>{totalSiswa.toLocaleString()} <span style={{fontSize:'1rem', color:'#64748b', fontWeight:'normal'}}>Siswa</span></h3>
                 )}
               </div>
               <div style={{ backgroundColor: '#dcfce7', padding: '0.75rem', borderRadius: '12px', color: '#10b981' }}><Users size={28} /></div>
@@ -211,7 +211,7 @@ export default function DetailSekolahPage() {
                 {loadingStats ? (
                   <div className="animate-pulse" style={{ height: '36px', width: '100px', backgroundColor: '#e2e8f0', borderRadius: '4px', marginTop: '0.5rem' }}></div>
                 ) : (
-                  <h3 style={{ margin: '0.5rem 0 0 0', color: '#0f172a', fontSize: '2rem', fontWeight: 'bold' }}>{totalRombelCalc.toLocaleString()} <span style={{fontSize:'1rem', color:'#64748b', fontWeight:'normal'}}>Rombel</span></h3>
+                  <h3 style={{ margin: '0.5rem 0 0 0', color: '#450a0a', fontSize: '2rem', fontWeight: 'bold' }}>{totalRombelCalc.toLocaleString()} <span style={{fontSize:'1rem', color:'#64748b', fontWeight:'normal'}}>Rombel</span></h3>
                 )}
               </div>
               <div style={{ backgroundColor: '#fef3c7', padding: '0.75rem', borderRadius: '12px', color: '#f59e0b' }}><Layers size={28} /></div>
@@ -228,22 +228,22 @@ export default function DetailSekolahPage() {
             <p style={{ margin: '1rem 0 0 0', fontSize: '0.8rem', color: '#94a3b8' }}>*Data rombel aktif berdasarkan peserta didik (SIDS)</p>
           </div>
 
-          <div style={{ backgroundColor: 'white', padding: '1.5rem', borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', borderLeft: '4px solid #4f46e5' }}>
+          <div style={{ backgroundColor: 'white', padding: '1.5rem', borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', borderLeft: '4px solid #991b1b' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
               <div>
                 <p style={{ margin: 0, color: '#64748b', fontSize: '0.85rem', fontWeight: '600', textTransform: 'uppercase' }}>Total Guru Bertugas</p>
                 {loadingStats ? (
                   <div className="animate-pulse" style={{ height: '36px', width: '100px', backgroundColor: '#e2e8f0', borderRadius: '4px', marginTop: '0.5rem' }}></div>
                 ) : (
-                  <h3 style={{ margin: '0.5rem 0 0 0', color: '#0f172a', fontSize: '2rem', fontWeight: 'bold' }}>{totalGuru.toLocaleString()} <span style={{fontSize:'1rem', color:'#64748b', fontWeight:'normal'}}>Guru</span></h3>
+                  <h3 style={{ margin: '0.5rem 0 0 0', color: '#450a0a', fontSize: '2rem', fontWeight: 'bold' }}>{totalGuru.toLocaleString()} <span style={{fontSize:'1rem', color:'#64748b', fontWeight:'normal'}}>Guru</span></h3>
                 )}
               </div>
-              <div style={{ backgroundColor: '#e0e7ff', padding: '0.75rem', borderRadius: '12px', color: '#4f46e5' }}><UserCheck size={28} /></div>
+              <div style={{ backgroundColor: '#e0e7ff', padding: '0.75rem', borderRadius: '12px', color: '#991b1b' }}><UserCheck size={28} /></div>
             </div>
             
             <button 
               onClick={() => setShowGuruModal(true)}
-              style={{ marginTop: '1rem', padding: '0.5rem 1rem', background: '#e0e7ff', color: '#4f46e5', border: '1px solid #c7d2fe', borderRadius: '8px', fontSize: '0.85rem', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', transition: 'background 0.2s' }}
+              style={{ marginTop: '1rem', padding: '0.5rem 1rem', background: '#e0e7ff', color: '#991b1b', border: '1px solid #c7d2fe', borderRadius: '8px', fontSize: '0.85rem', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', transition: 'background 0.2s' }}
               onMouseEnter={e => e.currentTarget.style.background = '#c7d2fe'}
               onMouseLeave={e => e.currentTarget.style.background = '#e0e7ff'}
             >
@@ -259,7 +259,7 @@ export default function DetailSekolahPage() {
           
           {/* MAP */}
           <div style={{ backgroundColor: 'white', padding: '1.5rem', borderRadius: '16px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
-            <h3 style={{ margin: '0 0 1rem 0', color: '#0f172a', fontSize: '1.25rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <h3 style={{ margin: '0 0 1rem 0', color: '#450a0a', fontSize: '1.25rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <MapPin color="#ef4444" /> Lokasi Sekolah
             </h3>
             <div style={{ height: '350px', borderRadius: '12px', overflow: 'hidden' }}>
@@ -273,7 +273,7 @@ export default function DetailSekolahPage() {
 
           {/* SARANA PRASARANA UTAMA */}
           <div style={{ backgroundColor: 'white', padding: '1.5rem', borderRadius: '16px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', display: 'flex', flexDirection: 'column' }}>
-            <h3 style={{ margin: '0 0 1.5rem 0', color: '#0f172a', fontSize: '1.25rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <h3 style={{ margin: '0 0 1.5rem 0', color: '#450a0a', fontSize: '1.25rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <CheckSquare color="#f59e0b" /> Ringkasan Fasilitas
             </h3>
             
@@ -295,7 +295,7 @@ export default function DetailSekolahPage() {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
           
           <div style={{ backgroundColor: 'white', padding: '1.5rem', borderRadius: '16px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
-            <h3 style={{ margin: '0 0 1rem 0', color: '#0f172a', fontSize: '1.1rem', fontWeight: 'bold' }}>Kondisi Ruang Kelas</h3>
+            <h3 style={{ margin: '0 0 1rem 0', color: '#450a0a', fontSize: '1.1rem', fontWeight: 'bold' }}>Kondisi Ruang Kelas</h3>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
               <tbody>
                 <CondRow label="Baik" val={sekolah.ruang_kelas_baik} color="#10b981" />
@@ -308,10 +308,10 @@ export default function DetailSekolahPage() {
           </div>
 
           <div style={{ backgroundColor: 'white', padding: '1.5rem', borderRadius: '16px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
-            <h3 style={{ margin: '0 0 1rem 0', color: '#0f172a', fontSize: '1.1rem', fontWeight: 'bold' }}>Kondisi Fasilitas Sanitasi (WC)</h3>
+            <h3 style={{ margin: '0 0 1rem 0', color: '#450a0a', fontSize: '1.1rem', fontWeight: 'bold' }}>Kondisi Fasilitas Sanitasi (WC)</h3>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
               <tbody>
-                <CondRow label="WC Siswa Laki-laki (Total)" val={sekolah.jumlah_wc_siswa_laki} color="#4f46e5" />
+                <CondRow label="WC Siswa Laki-laki (Total)" val={sekolah.jumlah_wc_siswa_laki} color="#991b1b" />
                 <CondRow label="WC Siswa Perempuan (Total)" val={sekolah.jumlah_wc_siswa_perempuan} color="#ec4899" />
                 <CondRow label="WC Guru Laki-laki (Total)" val={sekolah.jumlah_wc_guru_laki} color="#0ea5e9" />
                 <CondRow label="WC Guru Perempuan (Total)" val={sekolah.jumlah_wc_guru_perempuan} color="#8b5cf6" />
@@ -324,11 +324,11 @@ export default function DetailSekolahPage() {
         {/* RAPOR PENDIDIKAN SECTION */}
         <div style={{ marginTop: '2rem', backgroundColor: 'white', padding: '1.5rem', borderRadius: '16px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-            <h3 style={{ margin: 0, color: '#0f172a', fontSize: '1.25rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Activity color="#3b82f6" /> Capaian Rapor Pendidikan
+            <h3 style={{ margin: 0, color: '#450a0a', fontSize: '1.25rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Activity color="#b91c1c" /> Capaian Rapor Pendidikan
             </h3>
             {raporSekolah && (
-              <span style={{ backgroundColor: '#e0f2fe', color: '#0369a1', padding: '0.25rem 0.75rem', borderRadius: '16px', fontSize: '0.85rem', fontWeight: '600' }}>
+              <span style={{ backgroundColor: '#fee2e2', color: '#991b1b', padding: '0.25rem 0.75rem', borderRadius: '16px', fontSize: '0.85rem', fontWeight: '600' }}>
                 Tahun {raporSekolah.tahun}
               </span>
             )}
@@ -341,7 +341,7 @@ export default function DetailSekolahPage() {
           ) : raporSekolah && raporSekolah.indikator ? (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
               {(() => {
-                const targetIndicators = [
+                let targetIndicators = [
                   'kemampuan literasi', 
                   'kemampuan numerasi', 
                   'karakter', 
@@ -349,6 +349,19 @@ export default function DetailSekolahPage() {
                   'iklim keamanan', 
                   'iklim kebinekaan'
                 ];
+
+                const isTK = sekolah && sekolah.bentuk_pendidikan && (sekolah.bentuk_pendidikan.toLowerCase() === 'tk' || sekolah.bentuk_pendidikan.toLowerCase().includes('paud') || sekolah.bentuk_pendidikan.toLowerCase() === 'kb');
+                
+                if (isTK) {
+                  targetIndicators = [
+                    'perencanaan untuk proses pembelajaran',
+                    'proses belajar yang sesuai',
+                    'membangun kemampuan fondasi',
+                    'iklim keamanan',
+                    'iklim inklusivitas',
+                    'layanan holistik'
+                  ];
+                }
                 const extracted = [];
 
                 Object.entries(raporSekolah.indikator).forEach(([key, fields]) => {
@@ -378,15 +391,15 @@ export default function DetailSekolahPage() {
                   }
 
                   return (
-                    <div key={idx} style={{ border: '1px solid #e2e8f0', borderRadius: '12px', padding: '1.25rem', backgroundColor: '#f8fafc' }}>
-                      <h4 style={{ margin: '0 0 1rem 0', color: '#0f172a', fontSize: '1rem', fontWeight: 'bold', minHeight: '2.5rem' }}>{ind.key}</h4>
+                    <div key={idx} style={{ border: '1px solid #e2e8f0', borderRadius: '12px', padding: '1.25rem', backgroundColor: '#fdfbf7' }}>
+                      <h4 style={{ margin: '0 0 1rem 0', color: '#450a0a', fontSize: '1rem', fontWeight: 'bold', minHeight: '2.5rem' }}>{ind.key}</h4>
                       <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
                         {labelCapaian ? (
                           <div style={{ backgroundColor: labelColor, color: labelText, padding: '0.5rem 1rem', borderRadius: '8px', fontSize: '0.9rem', fontWeight: '700', border: `1px solid ${labelText}30` }}>
                             {labelCapaian}
                           </div>
                         ) : (
-                          <div style={{ backgroundColor: '#f1f5f9', color: '#64748b', padding: '0.5rem 1rem', borderRadius: '8px', fontSize: '0.9rem', fontWeight: '600' }}>
+                          <div style={{ backgroundColor: '#f3f0e7', color: '#64748b', padding: '0.5rem 1rem', borderRadius: '8px', fontSize: '0.9rem', fontWeight: '600' }}>
                             Data Tidak Tersedia
                           </div>
                         )}
@@ -397,7 +410,7 @@ export default function DetailSekolahPage() {
               })()}
             </div>
           ) : (
-            <div style={{ padding: '2rem', textAlign: 'center', color: '#64748b', backgroundColor: '#f8fafc', borderRadius: '12px', border: '1px dashed #cbd5e1' }}>
+            <div style={{ padding: '2rem', textAlign: 'center', color: '#64748b', backgroundColor: '#fdfbf7', borderRadius: '12px', border: '1px dashed #cbd5e1' }}>
               Tidak ada data Rapor Pendidikan untuk sekolah ini.
             </div>
           )}
@@ -411,13 +424,13 @@ export default function DetailSekolahPage() {
           <div style={{ backgroundColor: 'white', borderRadius: '16px', width: '100%', maxWidth: '600px', maxHeight: '85vh', display: 'flex', flexDirection: 'column', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)' }}>
             <div style={{ padding: '1.5rem', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
-                <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 'bold', color: '#0f172a' }}>Data Rombel & Jumlah Siswa</h3>
+                <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 'bold', color: '#450a0a' }}>Data Rombel & Jumlah Siswa</h3>
                 <p style={{ margin: '0.25rem 0 0 0', color: '#64748b', fontSize: '0.9rem' }}>{sekolah.nama_satuan_pendidikan}</p>
               </div>
               <button 
                 onClick={() => setShowRombelModal(false)}
                 style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8', padding: '0.5rem' }}
-                onMouseEnter={e => e.currentTarget.style.color = '#0f172a'}
+                onMouseEnter={e => e.currentTarget.style.color = '#450a0a'}
                 onMouseLeave={e => e.currentTarget.style.color = '#94a3b8'}
               >
                 <X size={24} />
@@ -430,14 +443,14 @@ export default function DetailSekolahPage() {
               ) : (
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1rem' }}>
                   {daftarRombel.map((rombel, i) => (
-                    <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem', border: '1px solid #e2e8f0', borderRadius: '12px', background: '#f8fafc' }}>
+                    <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem', border: '1px solid #e2e8f0', borderRadius: '12px', background: '#fdfbf7' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                         <div style={{ width: '36px', height: '36px', borderRadius: '8px', background: '#fef3c7', color: '#f59e0b', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                           <Layers size={18} />
                         </div>
-                        <h4 style={{ margin: 0, fontSize: '1rem', fontWeight: '600', color: '#0f172a' }}>{rombel.nama}</h4>
+                        <h4 style={{ margin: 0, fontSize: '1rem', fontWeight: '600', color: '#450a0a' }}>{rombel.nama}</h4>
                       </div>
-                      <div style={{ background: '#e0f2fe', color: '#0284c7', padding: '0.25rem 0.75rem', borderRadius: '16px', fontSize: '0.85rem', fontWeight: 'bold' }}>
+                      <div style={{ background: '#fee2e2', color: '#0284c7', padding: '0.25rem 0.75rem', borderRadius: '16px', fontSize: '0.85rem', fontWeight: 'bold' }}>
                         {rombel.jumlah} Siswa
                       </div>
                     </div>
@@ -455,13 +468,13 @@ export default function DetailSekolahPage() {
           <div style={{ backgroundColor: 'white', borderRadius: '16px', width: '100%', maxWidth: '600px', maxHeight: '85vh', display: 'flex', flexDirection: 'column', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)' }}>
             <div style={{ padding: '1.5rem', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
-                <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 'bold', color: '#0f172a' }}>Daftar Guru Bertugas</h3>
+                <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 'bold', color: '#450a0a' }}>Daftar Guru Bertugas</h3>
                 <p style={{ margin: '0.25rem 0 0 0', color: '#64748b', fontSize: '0.9rem' }}>{sekolah.nama_satuan_pendidikan}</p>
               </div>
               <button 
                 onClick={() => setShowGuruModal(false)}
                 style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8', padding: '0.5rem' }}
-                onMouseEnter={e => e.currentTarget.style.color = '#0f172a'}
+                onMouseEnter={e => e.currentTarget.style.color = '#450a0a'}
                 onMouseLeave={e => e.currentTarget.style.color = '#94a3b8'}
               >
                 <X size={24} />
@@ -474,12 +487,12 @@ export default function DetailSekolahPage() {
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                   {daftarGuru.map((guru, i) => (
-                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1rem', border: '1px solid #e2e8f0', borderRadius: '12px', background: '#f8fafc' }}>
-                      <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#e0e7ff', color: '#4f46e5', display: 'flex', justifyContent: 'center', alignItems: 'center', fontWeight: 'bold', flexShrink: 0 }}>
+                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1rem', border: '1px solid #e2e8f0', borderRadius: '12px', background: '#fdfbf7' }}>
+                      <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#e0e7ff', color: '#991b1b', display: 'flex', justifyContent: 'center', alignItems: 'center', fontWeight: 'bold', flexShrink: 0 }}>
                         {guru.nama ? guru.nama.charAt(0).toUpperCase() : '?'}
                       </div>
                       <div>
-                        <h4 style={{ margin: 0, fontSize: '1rem', fontWeight: '600', color: '#0f172a' }}>{guru.nama || '-'}</h4>
+                        <h4 style={{ margin: 0, fontSize: '1rem', fontWeight: '600', color: '#450a0a' }}>{guru.nama || '-'}</h4>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.25rem', color: '#64748b', fontSize: '0.85rem' }}>
                           <Briefcase size={14} />
                           <span>{guru.jabatan_ptk || 'Tidak ada jabatan'}</span>
@@ -502,7 +515,7 @@ function FacilityRow({ label, value }) {
   return (
     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
       <span style={{ color: '#475569', fontWeight: '500' }}>{label}</span>
-      <span style={{ backgroundColor: '#f1f5f9', padding: '0.25rem 0.75rem', borderRadius: '16px', color: '#0f172a', fontWeight: 'bold' }}>{value || 0}</span>
+      <span style={{ backgroundColor: '#f3f0e7', padding: '0.25rem 0.75rem', borderRadius: '16px', color: '#450a0a', fontWeight: 'bold' }}>{value || 0}</span>
     </div>
   );
 }
@@ -516,7 +529,7 @@ function CondRow({ label, val, color }) {
           {label}
         </div>
       </td>
-      <td style={{ padding: '0.75rem 0', textAlign: 'right', fontWeight: 'bold', color: '#0f172a' }}>{val || 0}</td>
+      <td style={{ padding: '0.75rem 0', textAlign: 'right', fontWeight: 'bold', color: '#450a0a' }}>{val || 0}</td>
     </tr>
   );
 }

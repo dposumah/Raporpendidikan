@@ -270,7 +270,7 @@ export default function DataPendidikanPage() {
         <label style={{ display: 'block', fontSize: '0.85rem', color: '#64748b', marginBottom: '0.5rem', fontWeight: '500' }}>{label}</label>
         <div 
           onClick={() => setIsOpen(!isOpen)}
-          style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #cbd5e1', color: value ? '#0f172a' : '#94a3b8', background: 'white', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+          style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #cbd5e1', color: value ? '#450a0a' : '#94a3b8', background: 'white', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
         >
           <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{value || placeholder}</span>
           <ChevronDown size={16} color="#64748b" style={{ transform: isOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
@@ -278,7 +278,7 @@ export default function DataPendidikanPage() {
         
         {isOpen && (
           <div style={{ position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 0, background: 'white', border: '1px solid #e2e8f0', borderRadius: '8px', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)', zIndex: 50, maxHeight: '250px', display: 'flex', flexDirection: 'column' }}>
-            <div style={{ padding: '0.5rem', borderBottom: '1px solid #f1f5f9' }}>
+            <div style={{ padding: '0.5rem', borderBottom: '1px solid #f3f0e7' }}>
               <input 
                 type="text" 
                 autoFocus
@@ -291,9 +291,9 @@ export default function DataPendidikanPage() {
             <div style={{ overflowY: 'auto', flex: 1 }}>
               <div 
                 onClick={() => { onChange(''); setIsOpen(false); setSearchTerm(''); }}
-                style={{ padding: '0.5rem 1rem', cursor: 'pointer', fontSize: '0.9rem', color: '#64748b', background: !value ? '#f1f5f9' : 'transparent' }}
-                onMouseEnter={e => e.currentTarget.style.background = '#f8fafc'}
-                onMouseLeave={e => e.currentTarget.style.background = !value ? '#f1f5f9' : 'transparent'}
+                style={{ padding: '0.5rem 1rem', cursor: 'pointer', fontSize: '0.9rem', color: '#64748b', background: !value ? '#f3f0e7' : 'transparent' }}
+                onMouseEnter={e => e.currentTarget.style.background = '#fdfbf7'}
+                onMouseLeave={e => e.currentTarget.style.background = !value ? '#f3f0e7' : 'transparent'}
               >
                 {placeholder} (Semua)
               </div>
@@ -301,9 +301,9 @@ export default function DataPendidikanPage() {
                 <div 
                   key={opt}
                   onClick={() => { onChange(opt); setIsOpen(false); setSearchTerm(''); }}
-                  style={{ padding: '0.5rem 1rem', cursor: 'pointer', fontSize: '0.9rem', color: '#0f172a', background: value === opt ? '#e0f2fe' : 'transparent' }}
-                  onMouseEnter={e => e.currentTarget.style.background = value === opt ? '#e0f2fe' : '#f8fafc'}
-                  onMouseLeave={e => e.currentTarget.style.background = value === opt ? '#e0f2fe' : 'transparent'}
+                  style={{ padding: '0.5rem 1rem', cursor: 'pointer', fontSize: '0.9rem', color: '#450a0a', background: value === opt ? '#fee2e2' : 'transparent' }}
+                  onMouseEnter={e => e.currentTarget.style.background = value === opt ? '#fee2e2' : '#fdfbf7'}
+                  onMouseLeave={e => e.currentTarget.style.background = value === opt ? '#fee2e2' : 'transparent'}
                 >
                   {opt}
                 </div>
@@ -572,7 +572,7 @@ export default function DataPendidikanPage() {
     const paddingLeft = depth * 24 + 16;
     
     return (
-      <div style={{ borderBottom: '1px solid #f1f5f9' }}>
+      <div style={{ borderBottom: '1px solid #f3f0e7' }}>
         <div 
           onClick={() => isLeaf ? setSelectedSekolah(label) : setOpen(!open)}
           style={{ 
@@ -580,15 +580,15 @@ export default function DataPendidikanPage() {
             gridTemplateColumns: 'minmax(250px, 2fr) 1fr 1fr 1fr', 
             gap: '1rem', 
             padding: '1rem', 
-            background: depth === 0 ? '#f8fafc' : depth === 1 ? '#ffffff' : '#fcfcfc',
+            background: depth === 0 ? '#fdfbf7' : depth === 1 ? '#ffffff' : '#fcfcfc',
             cursor: 'pointer',
             alignItems: 'center',
             transition: 'background 0.2s',
             fontWeight: depth === 0 ? '700' : depth === 1 ? '600' : '500',
-            color: depth === 0 ? '#0f172a' : '#334155'
+            color: depth === 0 ? '#450a0a' : '#450a0a'
           }}
-          onMouseEnter={e => !isLeaf && (e.currentTarget.style.background = '#f1f5f9')}
-          onMouseLeave={e => !isLeaf && (e.currentTarget.style.background = depth === 0 ? '#f8fafc' : depth === 1 ? '#ffffff' : '#fcfcfc')}
+          onMouseEnter={e => !isLeaf && (e.currentTarget.style.background = '#f3f0e7')}
+          onMouseLeave={e => !isLeaf && (e.currentTarget.style.background = depth === 0 ? '#fdfbf7' : depth === 1 ? '#ffffff' : '#fcfcfc')}
         >
           <div style={{ display: 'flex', alignItems: 'center', paddingLeft: `${paddingLeft}px` }}>
             {!isLeaf ? (
@@ -601,7 +601,7 @@ export default function DataPendidikanPage() {
             {label}
           </div>
           <div style={{ textAlign: 'center' }}>
-            <span style={{ background: '#e0f2fe', color: '#0369a1', padding: '0.25rem 0.75rem', borderRadius: '999px', fontSize: '0.85rem' }}>
+            <span style={{ background: '#fee2e2', color: '#991b1b', padding: '0.25rem 0.75rem', borderRadius: '999px', fontSize: '0.85rem' }}>
               {aggTotal.toLocaleString('id-ID')} Siswa
             </span>
           </div>
@@ -622,9 +622,9 @@ export default function DataPendidikanPage() {
 
   if (loading) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#f8fafc' }}>
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#fdfbf7' }}>
         <div style={{ textAlign: 'center' }}>
-          <div className="animate-spin" style={{ width: '40px', height: '40px', border: '4px solid #e2e8f0', borderTopColor: '#4f46e5', borderRadius: '50%', margin: '0 auto 1rem auto' }}></div>
+          <div className="animate-spin" style={{ width: '40px', height: '40px', border: '4px solid #e2e8f0', borderTopColor: '#991b1b', borderRadius: '50%', margin: '0 auto 1rem auto' }}></div>
           <p style={{ color: '#64748b', fontWeight: '500' }}>Memuat Data Siswa (SIDS)...</p>
         </div>
       </div>
@@ -632,20 +632,20 @@ export default function DataPendidikanPage() {
   }
 
   return (
-    <div style={{ backgroundColor: '#f8fafc', minHeight: 'calc(100vh - 75px)', padding: '2rem' }}>
+    <div style={{ backgroundColor: '#fdfbf7', minHeight: 'calc(100vh - 75px)', padding: '2rem' }}>
       <div style={{ maxWidth: '1400px', margin: '0 auto', display: 'flex', gap: '2rem', alignItems: 'flex-start' }}>
         
         {/* SIDEBAR FILTER */}
         <div style={{ width: '300px', flexShrink: 0, background: 'white', padding: '1.5rem', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', position: 'sticky', top: '2rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '1rem' }}>
-            <div style={{ background: '#f1f5f9', padding: '0.5rem', borderRadius: '8px', color: '#64748b' }}><Filter size={20} /></div>
-            <h3 style={{ margin: 0, fontSize: '1.1rem', color: '#0f172a' }}>Menu Filter</h3>
+            <div style={{ background: '#f3f0e7', padding: '0.5rem', borderRadius: '8px', color: '#64748b' }}><Filter size={20} /></div>
+            <h3 style={{ margin: 0, fontSize: '1.1rem', color: '#450a0a' }}>Menu Filter</h3>
           </div>
           
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
             <div>
               <label style={{ display: 'block', fontSize: '0.85rem', color: '#64748b', marginBottom: '0.5rem', fontWeight: '500' }}>Jenjang</label>
-              <select value={jenjang} onChange={e => setJenjang(e.target.value)} style={{ width: '100%', padding: '0.6rem', borderRadius: '8px', border: '1px solid #cbd5e1', color: '#334155', outline: 'none', fontSize: '0.9rem' }}>
+              <select value={jenjang} onChange={e => setJenjang(e.target.value)} style={{ width: '100%', padding: '0.6rem', borderRadius: '8px', border: '1px solid #cbd5e1', color: '#450a0a', outline: 'none', fontSize: '0.9rem' }}>
                 <option value="">Semua Jenjang</option>
                 {jenjangOptions.map(j => (
                   <option key={j} value={j}>{j}</option>
@@ -663,7 +663,7 @@ export default function DataPendidikanPage() {
             </div>
             <div>
               <label style={{ display: 'block', fontSize: '0.85rem', color: '#64748b', marginBottom: '0.5rem', fontWeight: '500' }}>Kelas</label>
-              <select value={kelas} onChange={e => setKelas(e.target.value)} style={{ width: '100%', padding: '0.6rem', borderRadius: '8px', border: '1px solid #cbd5e1', color: '#334155', outline: 'none', fontSize: '0.9rem' }}>
+              <select value={kelas} onChange={e => setKelas(e.target.value)} style={{ width: '100%', padding: '0.6rem', borderRadius: '8px', border: '1px solid #cbd5e1', color: '#450a0a', outline: 'none', fontSize: '0.9rem' }}>
                 <option value="">Semua Kelas</option>
                 {kelasOptions.map(k => (
                   <option key={k} value={k}>{k}</option>
@@ -672,7 +672,7 @@ export default function DataPendidikanPage() {
             </div>
             <div>
               <label style={{ display: 'block', fontSize: '0.85rem', color: '#64748b', marginBottom: '0.5rem', fontWeight: '500' }}>Status PIP</label>
-              <select value={statusPIP} onChange={e => setStatusPIP(e.target.value)} style={{ width: '100%', padding: '0.6rem', borderRadius: '8px', border: '1px solid #cbd5e1', color: '#334155', outline: 'none', fontSize: '0.9rem' }}>
+              <select value={statusPIP} onChange={e => setStatusPIP(e.target.value)} style={{ width: '100%', padding: '0.6rem', borderRadius: '8px', border: '1px solid #cbd5e1', color: '#450a0a', outline: 'none', fontSize: '0.9rem' }}>
                 <option value="">Semua Status</option>
                 <option value="layak">Layak PIP</option>
                 <option value="tidak_layak">Tidak Layak</option>
@@ -687,10 +687,10 @@ export default function DataPendidikanPage() {
           {/* Header Dashboard */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'white', padding: '1.5rem', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
             <div>
-              <h1 style={{ fontSize: '1.8rem', fontWeight: '700', color: '#0f172a', margin: 0 }}>Dashboard Analitik</h1>
+              <h1 style={{ fontSize: '1.8rem', fontWeight: '700', color: '#450a0a', margin: 0 }}>Dashboard Analitik</h1>
               <p style={{ color: '#64748b', fontSize: '0.95rem', marginTop: '0.25rem', marginBottom: 0 }}>Sistem Informasi Data Siswa (SIDS) - Tomohon</p>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', background: '#f8fafc', padding: '0.5rem 1rem', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', background: '#fdfbf7', padding: '0.5rem 1rem', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
               <label style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: '600' }}>Tahun Ajaran:</label>
               <select 
                 value={selectedPeriode} 
@@ -699,7 +699,7 @@ export default function DataPendidikanPage() {
                   padding: '0.4rem 2rem 0.4rem 0.5rem', 
                   borderRadius: '6px', 
                   border: '1px solid #cbd5e1', 
-                  color: '#0f172a', 
+                  color: '#450a0a', 
                   background: 'white', 
                   fontWeight: 'bold',
                   fontSize: '0.9rem',
@@ -725,14 +725,14 @@ export default function DataPendidikanPage() {
             
             {/* Baris 1: Utama */}
             <div>
-              <h4 style={{ margin: '0 0 0.75rem 0', color: '#334155', fontSize: '0.95rem', fontWeight: '600' }}>Rekap Utama</h4>
+              <h4 style={{ margin: '0 0 0.75rem 0', color: '#450a0a', fontSize: '0.95rem', fontWeight: '600' }}>Rekap Utama</h4>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem' }}>
                 {[
-                  { icon: <Users size={20} color="#3b82f6" />, title: 'Total Siswa', val: stats.totalSiswa, bg: '#eff6ff' },
+                  { icon: <Users size={20} color="#b91c1c" />, title: 'Total Siswa', val: stats.totalSiswa, bg: '#fef2f2' },
                   { icon: <Briefcase size={20} color="#16a34a" />, title: 'Layak PIP', val: stats.layakPIP, bg: '#dcfce7' },
                   { icon: <Briefcase size={20} color="#dc2626" />, title: 'Tidak Layak PIP', val: stats.tidakLayakPIP, bg: '#fee2e2' },
                   { icon: <School size={20} color="#0d9488" />, title: 'Total Sekolah', val: stats.totalSekolah, bg: '#f0fdfa' },
-                  { icon: <Users size={20} color="#0284c7" />, title: 'Laki-Laki', val: stats.totalLaki, bg: '#e0f2fe' },
+                  { icon: <Users size={20} color="#0284c7" />, title: 'Laki-Laki', val: stats.totalLaki, bg: '#fee2e2' },
                   { icon: <Users size={20} color="#d946ef" />, title: 'Perempuan', val: stats.totalPerempuan, bg: '#fdf4ff' },
                   { icon: <MapPin size={20} color="#10b981" />, title: 'Dom. Tomohon', val: stats.domisiliTomohon, bg: '#ecfdf5' },
                   { icon: <MapPin size={20} color="#d97706" />, title: 'Luar Tomohon', val: stats.domisiliLuar, bg: '#fffbeb' }
@@ -741,7 +741,7 @@ export default function DataPendidikanPage() {
                     <div style={{ background: c.bg, padding: '0.75rem', borderRadius: '10px' }}>{c.icon}</div>
                     <div>
                       <p style={{ margin: 0, color: '#64748b', fontSize: '0.8rem', fontWeight: '500' }}>{c.title}</p>
-                      <h3 style={{ margin: 0, fontSize: '1.2rem', color: '#0f172a', fontWeight: '700' }}>{c.val.toLocaleString('id-ID')}</h3>
+                      <h3 style={{ margin: 0, fontSize: '1.2rem', color: '#450a0a', fontWeight: '700' }}>{c.val.toLocaleString('id-ID')}</h3>
                     </div>
                   </div>
                 ))}
@@ -750,12 +750,12 @@ export default function DataPendidikanPage() {
 
             {/* Baris 2: Agama */}
             <div>
-              <h4 style={{ margin: '0 0 0.75rem 0', color: '#334155', fontSize: '0.95rem', fontWeight: '600' }}>Agama</h4>
+              <h4 style={{ margin: '0 0 0.75rem 0', color: '#450a0a', fontSize: '0.95rem', fontWeight: '600' }}>Agama</h4>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '1rem' }}>
                 {['Islam', 'Kristen', 'Katolik', 'Hindu', 'Buddha', 'Konghucu'].map(ag => (
                   <div key={ag} style={{ background: 'white', padding: '1rem', borderRadius: '10px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', border: '1px solid #e2e8f0', textAlign: 'center' }}>
                     <p style={{ margin: '0 0 0.25rem 0', color: '#64748b', fontSize: '0.8rem', fontWeight: '500' }}>{ag}</p>
-                    <h3 style={{ margin: 0, fontSize: '1.2rem', color: '#0f172a', fontWeight: '700' }}>{stats.agamaCount[ag].toLocaleString('id-ID')}</h3>
+                    <h3 style={{ margin: 0, fontSize: '1.2rem', color: '#450a0a', fontWeight: '700' }}>{stats.agamaCount[ag].toLocaleString('id-ID')}</h3>
                   </div>
                 ))}
               </div>
@@ -763,12 +763,12 @@ export default function DataPendidikanPage() {
 
             {/* Baris 3: Umur Dini */}
             <div>
-              <h4 style={{ margin: '0 0 0.75rem 0', color: '#334155', fontSize: '0.95rem', fontWeight: '600' }}>Umur (&lt;4 s.d 6 Tahun) <span style={{ fontSize: "0.8rem", color: "#64748b", fontWeight: "400" }}>(Per 1 Juli 2026)</span></h4>
+              <h4 style={{ margin: '0 0 0.75rem 0', color: '#450a0a', fontSize: '0.95rem', fontWeight: '600' }}>Umur (&lt;4 s.d 6 Tahun) <span style={{ fontSize: "0.8rem", color: "#64748b", fontWeight: "400" }}>(Per 1 Juli 2026)</span></h4>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: '1rem' }}>
                 {['<4', '5', '6'].map(u => (
                   <div key={u} style={{ background: 'white', padding: '1rem', borderRadius: '10px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', border: '1px solid #e2e8f0', textAlign: 'center' }}>
                     <p style={{ margin: '0 0 0.25rem 0', color: '#64748b', fontSize: '0.8rem', fontWeight: '500' }}>{u} Thn</p>
-                    <h3 style={{ margin: 0, fontSize: '1.2rem', color: '#0f172a', fontWeight: '700' }}>{stats.umurCount[u].toLocaleString('id-ID')}</h3>
+                    <h3 style={{ margin: 0, fontSize: '1.2rem', color: '#450a0a', fontWeight: '700' }}>{stats.umurCount[u].toLocaleString('id-ID')}</h3>
                   </div>
                 ))}
               </div>
@@ -776,12 +776,12 @@ export default function DataPendidikanPage() {
 
             {/* Baris 4: Umur Anak */}
             <div>
-              <h4 style={{ margin: '0 0 0.75rem 0', color: '#334155', fontSize: '0.95rem', fontWeight: '600' }}>Umur (7 s.d 12 Tahun) <span style={{ fontSize: "0.8rem", color: "#64748b", fontWeight: "400" }}>(Per 1 Juli 2026)</span></h4>
+              <h4 style={{ margin: '0 0 0.75rem 0', color: '#450a0a', fontSize: '0.95rem', fontWeight: '600' }}>Umur (7 s.d 12 Tahun) <span style={{ fontSize: "0.8rem", color: "#64748b", fontWeight: "400" }}>(Per 1 Juli 2026)</span></h4>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '1rem' }}>
                 {['7', '8', '9', '10', '11', '12'].map(u => (
                   <div key={u} style={{ background: 'white', padding: '1rem', borderRadius: '10px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', border: '1px solid #e2e8f0', textAlign: 'center' }}>
                     <p style={{ margin: '0 0 0.25rem 0', color: '#64748b', fontSize: '0.8rem', fontWeight: '500' }}>{u} Thn</p>
-                    <h3 style={{ margin: 0, fontSize: '1.2rem', color: '#0f172a', fontWeight: '700' }}>{stats.umurCount[u].toLocaleString('id-ID')}</h3>
+                    <h3 style={{ margin: 0, fontSize: '1.2rem', color: '#450a0a', fontWeight: '700' }}>{stats.umurCount[u].toLocaleString('id-ID')}</h3>
                   </div>
                 ))}
               </div>
@@ -789,12 +789,12 @@ export default function DataPendidikanPage() {
 
             {/* Baris 5: Umur Remaja 1 */}
             <div>
-              <h4 style={{ margin: '0 0 0.75rem 0', color: '#334155', fontSize: '0.95rem', fontWeight: '600' }}>Umur (13 s.d 15 Tahun) <span style={{ fontSize: "0.8rem", color: "#64748b", fontWeight: "400" }}>(Per 1 Juli 2026)</span></h4>
+              <h4 style={{ margin: '0 0 0.75rem 0', color: '#450a0a', fontSize: '0.95rem', fontWeight: '600' }}>Umur (13 s.d 15 Tahun) <span style={{ fontSize: "0.8rem", color: "#64748b", fontWeight: "400" }}>(Per 1 Juli 2026)</span></h4>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem' }}>
                 {['13', '14', '15'].map(u => (
                   <div key={u} style={{ background: 'white', padding: '1rem', borderRadius: '10px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', border: '1px solid #e2e8f0', textAlign: 'center' }}>
                     <p style={{ margin: '0 0 0.25rem 0', color: '#64748b', fontSize: '0.8rem', fontWeight: '500' }}>{u} Thn</p>
-                    <h3 style={{ margin: 0, fontSize: '1.2rem', color: '#0f172a', fontWeight: '700' }}>{stats.umurCount[u].toLocaleString('id-ID')}</h3>
+                    <h3 style={{ margin: 0, fontSize: '1.2rem', color: '#450a0a', fontWeight: '700' }}>{stats.umurCount[u].toLocaleString('id-ID')}</h3>
                   </div>
                 ))}
               </div>
@@ -802,12 +802,12 @@ export default function DataPendidikanPage() {
 
             {/* Baris 6: Umur Remaja 2 / Dewasa */}
             <div>
-              <h4 style={{ margin: '0 0 0.75rem 0', color: '#334155', fontSize: '0.95rem', fontWeight: '600' }}>Umur (16 s.d &gt;19 Tahun) <span style={{ fontSize: "0.8rem", color: "#64748b", fontWeight: "400" }}>(Per 1 Juli 2026)</span></h4>
+              <h4 style={{ margin: '0 0 0.75rem 0', color: '#450a0a', fontSize: '0.95rem', fontWeight: '600' }}>Umur (16 s.d &gt;19 Tahun) <span style={{ fontSize: "0.8rem", color: "#64748b", fontWeight: "400" }}>(Per 1 Juli 2026)</span></h4>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem' }}>
                 {['16', '17', '18', '>19'].map(u => (
                   <div key={u} style={{ background: 'white', padding: '1rem', borderRadius: '10px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', border: '1px solid #e2e8f0', textAlign: 'center' }}>
                     <p style={{ margin: '0 0 0.25rem 0', color: '#64748b', fontSize: '0.8rem', fontWeight: '500' }}>{u.includes('>') ? u : u} Thn</p>
-                    <h3 style={{ margin: 0, fontSize: '1.2rem', color: '#0f172a', fontWeight: '700' }}>{stats.umurCount[u].toLocaleString('id-ID')}</h3>
+                    <h3 style={{ margin: 0, fontSize: '1.2rem', color: '#450a0a', fontWeight: '700' }}>{stats.umurCount[u].toLocaleString('id-ID')}</h3>
                   </div>
                 ))}
               </div>

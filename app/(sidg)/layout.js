@@ -17,13 +17,13 @@ export default function SidgLayout({ children }) {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: '#f8fafc' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: '#fdfbf7' }}>
       <nav style={{
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
         padding: '1rem 2rem',
-        backgroundColor: '#0f172a',
+        backgroundColor: '#450a0a',
         boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
         position: 'sticky',
         top: 0,
@@ -47,7 +47,7 @@ export default function SidgLayout({ children }) {
               padding: '0.5rem',
               borderBottom: '2px solid transparent',
               transition: 'all 0.2s'
-            }} onMouseEnter={e => e.currentTarget.style.borderBottomColor = '#38bdf8'} onMouseLeave={e => e.currentTarget.style.borderBottomColor = 'transparent'}>
+            }} onMouseEnter={e => e.currentTarget.style.borderBottomColor = '#fca5a5'} onMouseLeave={e => e.currentTarget.style.borderBottomColor = 'transparent'}>
               Dashboard Guru
             </Link>
             <Link href="/pencarian-guru" style={{
@@ -58,7 +58,7 @@ export default function SidgLayout({ children }) {
               padding: '0.5rem',
               borderBottom: '2px solid transparent',
               transition: 'all 0.2s'
-            }} onMouseEnter={e => e.currentTarget.style.borderBottomColor = '#38bdf8'} onMouseLeave={e => e.currentTarget.style.borderBottomColor = 'transparent'}>
+            }} onMouseEnter={e => e.currentTarget.style.borderBottomColor = '#fca5a5'} onMouseLeave={e => e.currentTarget.style.borderBottomColor = 'transparent'}>
               Pencarian Guru
             </Link>
             <Link href="/analisis-rekap-guru" style={{
@@ -69,7 +69,7 @@ export default function SidgLayout({ children }) {
               padding: '0.5rem',
               borderBottom: '2px solid transparent',
               transition: 'all 0.2s'
-            }} onMouseEnter={e => e.currentTarget.style.borderBottomColor = '#38bdf8'} onMouseLeave={e => e.currentTarget.style.borderBottomColor = 'transparent'}>
+            }} onMouseEnter={e => e.currentTarget.style.borderBottomColor = '#fca5a5'} onMouseLeave={e => e.currentTarget.style.borderBottomColor = 'transparent'}>
               Tabel Rekapitulasi
             </Link>
             <Link href="/admin-guru" style={{
@@ -80,12 +80,12 @@ export default function SidgLayout({ children }) {
               padding: '0.5rem',
               borderBottom: '2px solid transparent',
               transition: 'all 0.2s'
-            }} onMouseEnter={e => e.currentTarget.style.borderBottomColor = '#38bdf8'} onMouseLeave={e => e.currentTarget.style.borderBottomColor = 'transparent'}>
+            }} onMouseEnter={e => e.currentTarget.style.borderBottomColor = '#fca5a5'} onMouseLeave={e => e.currentTarget.style.borderBottomColor = 'transparent'}>
               Admin Upload (SIDG)
             </Link>
           </div>
 
-          <div style={{ width: '1px', height: '24px', background: '#334155' }}></div>
+          <div style={{ width: '1px', height: '24px', background: '#450a0a' }}></div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
             <Link href="/" style={{
@@ -94,9 +94,9 @@ export default function SidgLayout({ children }) {
               fontSize: '0.9rem',
               padding: '0.5rem 1rem',
               borderRadius: '6px',
-              border: '1px solid #334155',
+              border: '1px solid #450a0a',
               transition: 'background 0.2s'
-            }} onMouseEnter={e => e.currentTarget.style.backgroundColor = '#1e293b'} onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}>
+            }} onMouseEnter={e => e.currentTarget.style.backgroundColor = '#7f1d1d'} onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}>
               Kembali ke Portal
             </Link>
             <button onClick={handleLogout} style={{
