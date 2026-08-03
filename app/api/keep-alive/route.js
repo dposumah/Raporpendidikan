@@ -25,7 +25,7 @@ export async function GET(request) {
     // Perform a very lightweight query just to wake up the database
     // We only select 1 row from 'sekolah'
     const { data, error } = await supabase
-      .from('sekolah')
+      .from('rapor_sekolah')
       .select('npsn')
       .limit(1);
 
