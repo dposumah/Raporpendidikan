@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
+import Link from 'next/link';
 import { createClient } from '@/utils/supabase/client';
 import { Search, School, MapPin, ChevronDown, ChevronRight, Activity, TrendingUp, TrendingDown, Minus, X, Info } from 'lucide-react';
 
@@ -160,8 +161,18 @@ export default function RaporSekolahPage() {
                       <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}><MapPin size={14}/> {selectedSekolah.kecamatan}, {selectedSekolah.kabupaten_kota}</span>
                     </div>
                   </div>
-                  <div style={{ background: '#fee2e2', color: '#991b1b', padding: '0.5rem 1rem', borderRadius: '20px', fontSize: '0.85rem', fontWeight: '600' }}>
-                    Tahun {selectedSekolah.tahun}
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.75rem' }}>
+                    <div style={{ background: '#fee2e2', color: '#991b1b', padding: '0.5rem 1rem', borderRadius: '20px', fontSize: '0.85rem', fontWeight: '600' }}>
+                      Tahun {selectedSekolah.tahun}
+                    </div>
+                    <Link 
+                      href={`/sekolah/${selectedSekolah.npsn}`}
+                      style={{ background: '#b91c1c', color: 'white', padding: '0.5rem 1rem', borderRadius: '8px', fontSize: '0.85rem', fontWeight: '600', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.35rem', transition: 'all 0.2s', border: '1px solid #991b1b' }}
+                      onMouseOver={(e) => e.currentTarget.style.background = '#991b1b'}
+                      onMouseOut={(e) => e.currentTarget.style.background = '#b91c1c'}
+                    >
+                      Lihat Detail Sekolah <ChevronRight size={16} />
+                    </Link>
                   </div>
                 </div>
               </div>
