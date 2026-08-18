@@ -77,7 +77,7 @@ export default function DashboardGuruPage() {
 
   const countCert = (data, isCert, statusType) => {
     return data.filter(d => {
-      const cert = d.bidang_studi_sertifikasi && d.bidang_studi_sertifikasi.trim() !== '' && d.bidang_studi_sertifikasi.trim() !== '-';
+      const cert = Boolean(d.bidang_studi_sertifikasi && d.bidang_studi_sertifikasi.trim() !== '' && d.bidang_studi_sertifikasi.trim() !== '-');
       if (isCert !== null && cert !== isCert) return false;
       
       const stat = (d.status_kepegawaian || '').toUpperCase();
