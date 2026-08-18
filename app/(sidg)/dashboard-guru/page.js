@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { 
   Users, UserCheck, GraduationCap, MapPin, Search, 
-  ChevronDown, BookOpen, Briefcase, Filter, Download
+  ChevronDown, BookOpen, Briefcase, Filter, Download, Award
 } from 'lucide-react';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, 
@@ -74,6 +74,9 @@ export default function DashboardGuruPage() {
   const totalGuru = filteredData.length;
   const totalLaki = filteredData.filter(d => d.jenis_kelamin?.toUpperCase() === 'L').length;
   const totalPerempuan = filteredData.filter(d => d.jenis_kelamin?.toUpperCase() === 'P').length;
+
+  const totalSertifikasi = filteredData.filter(d => d.bidang_studi_sertifikasi && d.bidang_studi_sertifikasi.trim() !== '' && d.bidang_studi_sertifikasi.trim() !== '-').length;
+  const totalBelumSertifikasi = totalGuru - totalSertifikasi;
 
   // Dynamic Status Kepegawaian Cards
   const statusKepegawaianCounts = useMemo(() => {
@@ -199,6 +202,20 @@ export default function DashboardGuruPage() {
                   </div>
                 </div>
                 <div style={{ backgroundColor: '#dcfce7', padding: '0.6rem', borderRadius: '8px', color: '#10b981' }}><UserCheck size={24} /></div>
+              </div>
+            </div>
+
+            {/* Kartu Utama: Sertifikasi */}
+            <div style={{ backgroundColor: 'white', padding: '1.5rem', borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', borderLeft: '4px solid #0ea5e9' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <div>
+                  <p style={{ margin: 0, color: '#64748b', fontSize: '0.85rem', fontWeight: '600', textTransform: 'uppercase' }}>Status Sertifikasi</p>
+                  <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
+                    <div><span style={{ color: '#450a0a', fontWeight: 'bold', fontSize: '1.25rem' }}>{totalSertifikasi.toLocaleString()}</span> <span style={{ color: '#64748b', fontSize: '0.85rem' }}>Sudah</span></div>
+                    <div><span style={{ color: '#450a0a', fontWeight: 'bold', fontSize: '1.25rem' }}>{totalBelumSertifikasi.toLocaleString()}</span> <span style={{ color: '#64748b', fontSize: '0.85rem' }}>Belum</span></div>
+                  </div>
+                </div>
+                <div style={{ backgroundColor: '#e0f2fe', padding: '0.6rem', borderRadius: '8px', color: '#0ea5e9' }}><Award size={24} /></div>
               </div>
             </div>
 

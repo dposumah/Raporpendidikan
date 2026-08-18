@@ -84,10 +84,17 @@ export default function AnalisisRekapGuruPage() {
           jenjang: guru.jenjang || '-',
           kecamatan: guru.kecamatan || '-',
           totalGuru: 0,
+          totalSertifikasi: 0,
+          totalBelum: 0,
           guruList: []
         };
       }
       grouped[tempatSekolah].totalGuru++;
+      if (guru.bidang_studi_sertifikasi && guru.bidang_studi_sertifikasi.trim() !== '' && guru.bidang_studi_sertifikasi.trim() !== '-') {
+        grouped[tempatSekolah].totalSertifikasi++;
+      } else {
+        grouped[tempatSekolah].totalBelum++;
+      }
       grouped[tempatSekolah].guruList.push(guru);
     });
 
@@ -247,6 +254,12 @@ export default function AnalisisRekapGuruPage() {
                     <th onClick={() => requestSort('totalGuru')} style={{ padding: '1rem', color: '#475569', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase', cursor: 'pointer', userSelect: 'none', textAlign: 'right' }}>
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '0.5rem' }}>Total Guru {getSortIcon('totalGuru')}</div>
                     </th>
+                    <th onClick={() => requestSort('totalSertifikasi')} style={{ padding: '1rem', color: '#475569', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase', cursor: 'pointer', userSelect: 'none', textAlign: 'right' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '0.5rem' }}>Sertifikasi {getSortIcon('totalSertifikasi')}</div>
+                    </th>
+                    <th onClick={() => requestSort('totalBelum')} style={{ padding: '1rem', color: '#475569', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase', cursor: 'pointer', userSelect: 'none', textAlign: 'right' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '0.5rem' }}>Belum {getSortIcon('totalBelum')}</div>
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -272,12 +285,18 @@ export default function AnalisisRekapGuruPage() {
                           <td style={{ padding: '1rem', textAlign: 'right', fontWeight: 'bold', color: '#10b981', fontSize: '1rem' }}>
                             {s.totalGuru}
                           </td>
+                          <td style={{ padding: '1rem', textAlign: 'right', fontWeight: '600', color: '#0ea5e9', fontSize: '0.95rem' }}>
+                            {s.totalSertifikasi}
+                          </td>
+                          <td style={{ padding: '1rem', textAlign: 'right', fontWeight: '600', color: '#ef4444', fontSize: '0.95rem' }}>
+                            {s.totalBelum}
+                          </td>
                         </tr>
 
                         {/* Child Rows (Expanded) */}
                         {isExpanded && (
                           <tr>
-                            <td colSpan="5" style={{ padding: 0 }}>
+                            <td colSpan="7" style={{ padding: 0 }}>
                               <div style={{ backgroundColor: '#fdfbf7', padding: '1.5rem 3rem', borderBottom: '2px solid #e2e8f0', borderLeft: '4px solid #991b1b' }}>
                                 <h4 style={{ margin: '0 0 1rem 0', color: '#450a0a', fontSize: '0.9rem', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                   <Users size={16} /> Daftar Guru ({s.sekolah})
@@ -315,7 +334,7 @@ export default function AnalisisRekapGuruPage() {
                     );
                   }) : (
                     <tr>
-                      <td colSpan="5" style={{ padding: '3rem', textAlign: 'center', color: '#64748b' }}>
+                      <td colSpan="7" style={{ padding: '3rem', textAlign: 'center', color: '#64748b' }}>
                         Tidak ada sekolah yang cocok dengan pencarian Anda.
                       </td>
                     </tr>
