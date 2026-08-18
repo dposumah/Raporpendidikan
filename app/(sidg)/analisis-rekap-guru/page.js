@@ -86,14 +86,27 @@ export default function AnalisisRekapGuruPage() {
           totalGuru: 0,
           totalSertifikasi: 0,
           totalBelum: 0,
+          certPNS: 0, certPPPK: 0, certNonASN: 0,
+          belumPNS: 0, belumPPPK: 0, belumNonASN: 0,
           guruList: []
         };
       }
       grouped[tempatSekolah].totalGuru++;
+      
+      const stat = (guru.status_kepegawaian || '').toUpperCase();
+      const isPNS = stat.includes('PNS') || stat.includes('CPNS');
+      const isPPPK = stat.includes('PPPK');
+      
       if (guru.bidang_studi_sertifikasi && guru.bidang_studi_sertifikasi.trim() !== '' && guru.bidang_studi_sertifikasi.trim() !== '-') {
         grouped[tempatSekolah].totalSertifikasi++;
+        if (isPNS) grouped[tempatSekolah].certPNS++;
+        else if (isPPPK) grouped[tempatSekolah].certPPPK++;
+        else grouped[tempatSekolah].certNonASN++;
       } else {
         grouped[tempatSekolah].totalBelum++;
+        if (isPNS) grouped[tempatSekolah].belumPNS++;
+        else if (isPPPK) grouped[tempatSekolah].belumPPPK++;
+        else grouped[tempatSekolah].belumNonASN++;
       }
       grouped[tempatSekolah].guruList.push(guru);
     });
@@ -298,6 +311,26 @@ export default function AnalisisRekapGuruPage() {
                           <tr>
                             <td colSpan="7" style={{ padding: 0 }}>
                               <div style={{ backgroundColor: '#fdfbf7', padding: '1.5rem 3rem', borderBottom: '2px solid #e2e8f0', borderLeft: '4px solid #991b1b' }}>
+                                
+                                <div style={{ display: 'flex', gap: '2rem', marginBottom: '1.5rem', backgroundColor: 'white', padding: '1rem', borderRadius: '8px', border: '1px solid #e2e8f0', width: 'fit-content' }}>
+                                  <div>
+                                    <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600' }}>Sudah Sertifikasi</div>
+                                    <div style={{ display: 'flex', gap: '1.5rem', marginTop: '0.25rem', fontSize: '0.85rem' }}>
+                                      <span>PNS: <b>{s.certPNS}</b></span>
+                                      <span>PPPK: <b>{s.certPPPK}</b></span>
+                                      <span>Non ASN: <b>{s.certNonASN}</b></span>
+                                    </div>
+                                  </div>
+                                  <div style={{ borderLeft: '1px solid #e2e8f0', paddingLeft: '2rem' }}>
+                                    <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600' }}>Belum Sertifikasi</div>
+                                    <div style={{ display: 'flex', gap: '1.5rem', marginTop: '0.25rem', fontSize: '0.85rem' }}>
+                                      <span>PNS: <b>{s.belumPNS}</b></span>
+                                      <span>PPPK: <b>{s.belumPPPK}</b></span>
+                                      <span>Non ASN: <b>{s.belumNonASN}</b></span>
+                                    </div>
+                                  </div>
+                                </div>
+
                                 <h4 style={{ margin: '0 0 1rem 0', color: '#450a0a', fontSize: '0.9rem', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                   <Users size={16} /> Daftar Guru ({s.sekolah})
                                 </h4>

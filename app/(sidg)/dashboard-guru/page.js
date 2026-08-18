@@ -75,8 +75,32 @@ export default function DashboardGuruPage() {
   const totalLaki = filteredData.filter(d => d.jenis_kelamin?.toUpperCase() === 'L').length;
   const totalPerempuan = filteredData.filter(d => d.jenis_kelamin?.toUpperCase() === 'P').length;
 
-  const totalSertifikasi = filteredData.filter(d => d.bidang_studi_sertifikasi && d.bidang_studi_sertifikasi.trim() !== '' && d.bidang_studi_sertifikasi.trim() !== '-').length;
-  const totalBelumSertifikasi = totalGuru - totalSertifikasi;
+  const countCert = (data, isCert, statusType) => {
+    return data.filter(d => {
+      const cert = d.bidang_studi_sertifikasi && d.bidang_studi_sertifikasi.trim() !== '' && d.bidang_studi_sertifikasi.trim() !== '-';
+      if (isCert !== null && cert !== isCert) return false;
+      
+      const stat = (d.status_kepegawaian || '').toUpperCase();
+      const isPNS = stat.includes('PNS') || stat.includes('CPNS');
+      const isPPPK = stat.includes('PPPK');
+      
+      if (statusType === 'PNS') return isPNS;
+      if (statusType === 'PPPK') return isPPPK;
+      if (statusType === 'NON ASN') return !isPNS && !isPPPK;
+      return true;
+    }).length;
+  };
+
+  const totalSertifikasi = countCert(filteredData, true, null);
+  const totalBelumSertifikasi = countCert(filteredData, false, null);
+
+  const certPNS = countCert(filteredData, true, 'PNS');
+  const certPPPK = countCert(filteredData, true, 'PPPK');
+  const certNonASN = countCert(filteredData, true, 'NON ASN');
+  
+  const belumPNS = countCert(filteredData, false, 'PNS');
+  const belumPPPK = countCert(filteredData, false, 'PPPK');
+  const belumNonASN = countCert(filteredData, false, 'NON ASN');
 
   // Dynamic Status Kepegawaian Cards
   const statusKepegawaianCounts = useMemo(() => {
@@ -216,6 +240,24 @@ export default function DashboardGuruPage() {
                   </div>
                 </div>
                 <div style={{ backgroundColor: '#e0f2fe', padding: '0.6rem', borderRadius: '8px', color: '#0ea5e9' }}><Award size={24} /></div>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', borderTop: '1px dashed #e2e8f0', paddingTop: '1rem' }}>
+                <div>
+                  <p style={{ margin: '0 0 0.5rem 0', fontSize: '0.75rem', color: '#64748b', fontWeight: '600' }}>Sudah Sertifikasi</p>
+                  <div style={{ fontSize: '0.8rem', color: '#475569', display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>PNS:</span> <b>{certPNS.toLocaleString()}</b></div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>PPPK:</span> <b>{certPPPK.toLocaleString()}</b></div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Non ASN:</span> <b>{certNonASN.toLocaleString()}</b></div>
+                  </div>
+                </div>
+                <div>
+                  <p style={{ margin: '0 0 0.5rem 0', fontSize: '0.75rem', color: '#64748b', fontWeight: '600' }}>Belum Sertifikasi</p>
+                  <div style={{ fontSize: '0.8rem', color: '#475569', display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>PNS:</span> <b>{belumPNS.toLocaleString()}</b></div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>PPPK:</span> <b>{belumPPPK.toLocaleString()}</b></div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Non ASN:</span> <b>{belumNonASN.toLocaleString()}</b></div>
+                  </div>
+                </div>
               </div>
             </div>
 
