@@ -1,7 +1,10 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { School, ChevronDown, ChevronRight, Users, User, Download, Search, X, MapPin, GraduationCap, Briefcase, ArrowUpDown, ArrowUp, ArrowDown, Filter } from 'lucide-react';
+import { School, ChevronDown, ChevronRight, Users, User, Download, Search, X, MapPin, GraduationCap, Briefcase, ArrowUpDown, ArrowUp, ArrowDown, Filter, FileText, FileSpreadsheet } from 'lucide-react';
+import * as XLSX from 'xlsx';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 
 export default function AnalisisRekapGuruPage() {
   const [data, setData] = useState([]);
@@ -159,6 +162,71 @@ export default function AnalisisRekapGuruPage() {
     return sortConfig.direction === 'asc' ? <ArrowUp size={14} color="#991b1b" /> : <ArrowDown size={14} color="#991b1b" />;
   };
 
+  const exportToExcel = () => {
+    const exportData = schoolData.map(s => ({
+      'Nama Sekolah': s.sekolah,
+      'Jenjang': s.jenjang,
+      'Kecamatan': s.kecamatan,
+      'Total Guru': s.totalGuru,
+      'Sudah Sertifikasi': s.totalSertifikasi,
+      'Belum Sertifikasi': s.totalBelum,
+      'Sertifikasi PNS': s.certPNS,
+      'Sertifikasi PPPK': s.certPPPK,
+      'Sertifikasi Non ASN': s.certNonASN,
+      'Belum Sertifikasi PNS': s.belumPNS,
+      'Belum Sertifikasi PPPK': s.belumPPPK,
+      'Belum Sertifikasi Non ASN': s.belumNonASN,
+      'Pendidikan S1': s.pendidikan.S1,
+      'Pendidikan S2/S3': s.pendidikan.S2 + s.pendidikan.S3,
+      'Pendidikan Diploma': s.pendidikan.Diploma,
+      'Pendidikan SMA': s.pendidikan.SMA,
+      'Pendidikan Lainnya': s.pendidikan.Lainnya
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Rekap_Guru');
+    XLSX.writeFile(workbook, 'Rekapitulasi_Guru.xlsx');
+  };
+
+  const exportToPDF = () => {
+    const doc = new jsPDF('landscape');
+    
+    doc.setFontSize(16);
+    doc.text('Rekapitulasi Data Guru per Sekolah', 14, 15);
+    doc.setFontSize(10);
+    doc.text(`Dicetak pada: ${new Date().toLocaleDateString('id-ID')}`, 14, 22);
+
+    const tableColumn = [
+      'No', 'Sekolah', 'Jenjang', 'Kecamatan', 'Total Guru',
+      'Sertifikasi', 'Belum Sert.', 'PNS Sert.', 'PPPK Sert.', 'S1', 'S2/S3'
+    ];
+
+    const tableRows = schoolData.map((s, idx) => [
+      idx + 1,
+      s.sekolah,
+      s.jenjang,
+      s.kecamatan,
+      s.totalGuru,
+      s.totalSertifikasi,
+      s.totalBelum,
+      s.certPNS,
+      s.certPPPK,
+      s.pendidikan.S1,
+      s.pendidikan.S2 + s.pendidikan.S3
+    ]);
+
+    doc.autoTable({
+      head: [tableColumn],
+      body: tableRows,
+      startY: 30,
+      styles: { fontSize: 8 },
+      headStyles: { fillColor: [153, 27, 27] }, // #991b1b
+    });
+
+    doc.save('Rekapitulasi_Guru.pdf');
+  };
+
   const toggleExpand = (sekolahName) => {
     const newSet = new Set(expandedSchools);
     if (newSet.has(sekolahName)) {
@@ -237,6 +305,24 @@ export default function AnalisisRekapGuruPage() {
             <div>
               <h1 style={{ margin: 0, fontSize: '1.75rem', color: '#450a0a', fontWeight: 'bold' }}>Rekapitulasi Guru per Sekolah</h1>
               <p style={{ margin: '0.25rem 0 0 0', color: '#64748b', fontSize: '0.95rem' }}>Klik nama sekolah untuk melihat daftar lengkap tenaga pendidik di sekolah tersebut.</p>
+            </div>
+            <div style={{ display: 'flex', gap: '1rem' }}>
+              <button 
+                onClick={exportToExcel}
+                style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.6rem 1.25rem', backgroundColor: '#10b981', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer', transition: 'background 0.2s', fontSize: '0.9rem' }}
+                onMouseEnter={e => e.currentTarget.style.backgroundColor = '#059669'}
+                onMouseLeave={e => e.currentTarget.style.backgroundColor = '#10b981'}
+              >
+                <FileSpreadsheet size={18} /> Export Excel
+              </button>
+              <button 
+                onClick={exportToPDF}
+                style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.6rem 1.25rem', backgroundColor: '#ef4444', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer', transition: 'background 0.2s', fontSize: '0.9rem' }}
+                onMouseEnter={e => e.currentTarget.style.backgroundColor = '#dc2626'}
+                onMouseLeave={e => e.currentTarget.style.backgroundColor = '#ef4444'}
+              >
+                <FileText size={18} /> Export PDF
+              </button>
             </div>
           </div>
 
