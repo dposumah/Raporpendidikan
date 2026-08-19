@@ -88,6 +88,7 @@ export default function AnalisisRekapGuruPage() {
           totalBelum: 0,
           certPNS: 0, certPPPK: 0, certNonASN: 0,
           belumPNS: 0, belumPPPK: 0, belumNonASN: 0,
+          pendidikan: { S1: 0, S2: 0, S3: 0, Diploma: 0, SMA: 0, Lainnya: 0 },
           guruList: []
         };
       }
@@ -96,6 +97,14 @@ export default function AnalisisRekapGuruPage() {
       const stat = (guru.status_kepegawaian || '').toUpperCase();
       const isPNS = stat.includes('PNS') || stat.includes('CPNS');
       const isPPPK = stat.includes('PPPK');
+      
+      const pend = (guru.pendidikan || '').toUpperCase();
+      if (pend === 'S1') grouped[tempatSekolah].pendidikan.S1++;
+      else if (pend === 'S2') grouped[tempatSekolah].pendidikan.S2++;
+      else if (pend === 'S3') grouped[tempatSekolah].pendidikan.S3++;
+      else if (pend === 'D1' || pend === 'D2' || pend === 'D3' || pend === 'D4') grouped[tempatSekolah].pendidikan.Diploma++;
+      else if (pend.includes('SMA')) grouped[tempatSekolah].pendidikan.SMA++;
+      else grouped[tempatSekolah].pendidikan.Lainnya++;
       
       if (guru.bidang_studi_sertifikasi && guru.bidang_studi_sertifikasi.trim() !== '' && guru.bidang_studi_sertifikasi.trim() !== '-') {
         grouped[tempatSekolah].totalSertifikasi++;
@@ -312,21 +321,34 @@ export default function AnalisisRekapGuruPage() {
                             <td colSpan="7" style={{ padding: 0 }}>
                               <div style={{ backgroundColor: '#fdfbf7', padding: '1.5rem 3rem', borderBottom: '2px solid #e2e8f0', borderLeft: '4px solid #991b1b' }}>
                                 
-                                <div style={{ display: 'flex', gap: '2rem', marginBottom: '1.5rem', backgroundColor: 'white', padding: '1rem', borderRadius: '8px', border: '1px solid #e2e8f0', width: 'fit-content' }}>
-                                  <div>
-                                    <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600' }}>Sudah Sertifikasi</div>
-                                    <div style={{ display: 'flex', gap: '1.5rem', marginTop: '0.25rem', fontSize: '0.85rem' }}>
-                                      <span>PNS: <b>{s.certPNS}</b></span>
-                                      <span>PPPK: <b>{s.certPPPK}</b></span>
-                                      <span>Non ASN: <b>{s.certNonASN}</b></span>
+                                <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
+                                  <div style={{ display: 'flex', gap: '2rem', backgroundColor: 'white', padding: '1rem', borderRadius: '8px', border: '1px solid #e2e8f0', width: 'fit-content' }}>
+                                    <div>
+                                      <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600' }}>Sudah Sertifikasi</div>
+                                      <div style={{ display: 'flex', gap: '1.5rem', marginTop: '0.25rem', fontSize: '0.85rem' }}>
+                                        <span>PNS: <b>{s.certPNS}</b></span>
+                                        <span>PPPK: <b>{s.certPPPK}</b></span>
+                                        <span>Non ASN: <b>{s.certNonASN}</b></span>
+                                      </div>
+                                    </div>
+                                    <div style={{ borderLeft: '1px solid #e2e8f0', paddingLeft: '2rem' }}>
+                                      <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600' }}>Belum Sertifikasi</div>
+                                      <div style={{ display: 'flex', gap: '1.5rem', marginTop: '0.25rem', fontSize: '0.85rem' }}>
+                                        <span>PNS: <b>{s.belumPNS}</b></span>
+                                        <span>PPPK: <b>{s.belumPPPK}</b></span>
+                                        <span>Non ASN: <b>{s.belumNonASN}</b></span>
+                                      </div>
                                     </div>
                                   </div>
-                                  <div style={{ borderLeft: '1px solid #e2e8f0', paddingLeft: '2rem' }}>
-                                    <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600' }}>Belum Sertifikasi</div>
+
+                                  <div style={{ backgroundColor: 'white', padding: '1rem', borderRadius: '8px', border: '1px solid #e2e8f0', width: 'fit-content' }}>
+                                    <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600' }}>Status Pendidikan</div>
                                     <div style={{ display: 'flex', gap: '1.5rem', marginTop: '0.25rem', fontSize: '0.85rem' }}>
-                                      <span>PNS: <b>{s.belumPNS}</b></span>
-                                      <span>PPPK: <b>{s.belumPPPK}</b></span>
-                                      <span>Non ASN: <b>{s.belumNonASN}</b></span>
+                                      <span>S1: <b>{s.pendidikan.S1}</b></span>
+                                      <span>S2/S3: <b>{s.pendidikan.S2 + s.pendidikan.S3}</b></span>
+                                      <span>Diploma: <b>{s.pendidikan.Diploma}</b></span>
+                                      <span>SMA: <b>{s.pendidikan.SMA}</b></span>
+                                      <span>Lainnya: <b>{s.pendidikan.Lainnya}</b></span>
                                     </div>
                                   </div>
                                 </div>
