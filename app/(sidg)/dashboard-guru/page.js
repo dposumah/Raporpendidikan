@@ -107,7 +107,16 @@ export default function DashboardGuruPage() {
     const counts = {};
     filteredData.forEach(d => {
       let val = d.status_kepegawaian;
-      if (!val || val.trim() === '') val = 'Tidak Diketahui';
+      if (!val || val.trim() === '') {
+        val = 'Tidak Diketahui';
+      } else {
+        const upper = val.toUpperCase();
+        if (upper.includes('PNS') || upper.includes('CPNS')) val = 'PNS';
+        else if (upper.includes('PPPK')) val = 'PPPK';
+        else if (upper.includes('GTY') || upper.includes('PTY')) val = 'GTY/PTY';
+        else if (upper.includes('HONOR')) val = 'Honorer';
+        else val = 'Lainnya';
+      }
       counts[val] = (counts[val] || 0) + 1;
     });
     return Object.entries(counts).sort((a, b) => b[1] - a[1]);
